@@ -1,0 +1,144 @@
+@layer reset, global, layout, module, util;
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  body {
+    margin: unset;
+  }
+}
+
+@layer global {
+  body {
+    font-family: Roboto, Helvetica, Arial, Ubuntu, 'Noto Naskh Arabic', sans-serif;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 1rem;
+  }
+}
+
+@layer layout {
+  #svowel {
+    .title {
+      margin-block: 1rem;
+      position: relative;
+      left: 2.5%;
+    }
+    
+    .question-nav {
+      margin-block: 0;
+      padding-inline: 1rem;
+    }
+
+    .svowel-options {
+      margin-inline: auto;
+    }
+
+    button[type="submit"] {
+      margin-inline: auto;
+      display: block;
+      font-size: 1.5rem;
+    }
+
+    .username {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+@layer module {
+
+  .nahwapp-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3EEE00;
+    color: #fff;
+    border-radius: 25%;
+    block-size: 3rem;
+    inline-size: 3rem;
+    filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.25));
+    font-size: 1.5rem;
+    font-family: "Permanent Marker", cursive;
+  }
+
+  .title {
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .question-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    > .question-nav--navigate {
+      border: unset;
+      background-color: unset;
+      cursor: pointer;
+    }
+
+    > .question-nav--prompt {
+      font-size: 1.2rem;
+    }
+  }
+
+  
+  .excerpt {
+    font-size: 2rem;
+    direction: rtl;
+    text-align: justify;
+    padding-inline: 3rem;
+  }
+
+  .instruction {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .svowel-options {
+    max-width: fit-content;
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+
+    button {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    .svowel-options--not-sukoon {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding-inline-start: 1rem;
+    }
+  }
+
+  .button {
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
+    background-color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+}
+
+@layer util {
+  .stack > *+* {
+    margin-block-start: 1.5rem;
+  }
+}

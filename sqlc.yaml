@@ -1,0 +1,13 @@
+version: "2"
+sql:
+- "schema": "model/schema.sql"
+  "engine": "sqlite"
+  "queries": "model/query.sql"
+  "gen": 
+    "go": 
+      "package": "model"
+      "out": "model"
+      "overrides": 
+        - "column": "quiz.excerpt"
+          "go_type": 
+            "import": ""
