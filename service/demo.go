@@ -5,7 +5,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"text/template"
 
 	"github.com/amrojjeh/arareader/arabic"
@@ -22,7 +21,7 @@ func DemoDB(ctx context.Context) *sql.DB {
 	teacher := must.Get(q.CreateTeacher(ctx, model.CreateTeacherParams{
 		Email:        "smith@demo.com",
 		Username:     "Professor Smith",
-		PasswordHash: mustFromPlainPassword("password"),
+		PasswordHash: must.Get(FromPlainPassword("password")),
 	}))
 
 	tmpl := template.Must(template.New("excerpt parser").Funcs(template.FuncMap{"bw": arabic.FromBuckwalter}).
@@ -73,12 +72,4 @@ func DemoDB(ctx context.Context) *sql.DB {
 	}))
 
 	return db
-}
-
-func mustFromPlainPassword(pass string) string {
-	hash, err := FromPlainPassword(pass)
-	if err != nil {
-		panic(errors.Join(errors.New("hash could not be generated"), err))
-	}
-	return hash
 }
