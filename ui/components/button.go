@@ -9,7 +9,7 @@ import (
 	h "github.com/maragudk/gomponents/html"
 )
 
-func Button(text string) g.Node {
+func DefaultButton(text string) g.Node {
 	return button(h.Type("button"),
 		g.Text(text),
 	)
