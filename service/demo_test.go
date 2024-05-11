@@ -44,6 +44,20 @@ func TestDemoDB(t *testing.T) {
 
 	token = must.Get(decoder.Token())
 	assertEndElement(t, token, "excerpt")
+
+	questions := must.Get(q.ListQuestionsByQuiz(ctx, model.ListQuestionsByQuizParams{
+		QuizID: quiz.ID,
+		Limit:  50,
+		Offset: 0,
+	}))
+
+	if questions[0].Type != string(VowelQuestionType) {
+		t.Error("first question should be a vowel question")
+	}
+
+	if questions[1].Type != string(ShortAnswerQuestionType) {
+		t.Error("second question should be a short answer")
+	}
 }
 
 func assertCharData(t *testing.T, token xml.Token, expectedValue string) {

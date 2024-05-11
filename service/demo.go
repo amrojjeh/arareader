@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"text/template"
 
@@ -29,10 +30,46 @@ func DemoDB(ctx context.Context) *sql.DB {
 	buff := &bytes.Buffer{}
 	tmpl.Execute(buff, nil)
 
-	must.Get(q.CreateQuiz(ctx, model.CreateQuizParams{
+	quiz := must.Get(q.CreateQuiz(ctx, model.CreateQuizParams{
 		TeacherID: teacher.ID,
 		Title:     "Quiz 1",
 		Excerpt:   buff.Bytes(),
+	}))
+
+	q.CreateQuestion(ctx, model.CreateQuestionParams{
+		QuizID:   quiz.ID,
+		Position: 0,
+		Type:     string(VowelQuestionType),
+		Data: must.Get(json.Marshal(VowelQuestionData{
+			Reference: 2,
+			Feedback:  "There's a damma because it's a predicate'",
+		})),
+	})
+
+	q.CreateQuestion(ctx, model.CreateQuestionParams{
+		QuizID:   quiz.ID,
+		Position: 1,
+		Type:     string(ShortAnswerQuestionType),
+		Data: must.Get(json.Marshal(ShortAnswerQuestionData{
+			Reference: 1,
+			Feedback:  "Possible translation: this is a house",
+			Prompt:    "Translate the sentence",
+		})),
+	})
+
+	class := must.Get(q.CreateClass(ctx, model.CreateClassParams{
+		TeacherID: teacher.ID,
+		Name:      "Class of 2024",
+	}))
+
+	q.AddQuizToClass(ctx, model.AddQuizToClassParams{
+		QuizID:  quiz.ID,
+		ClassID: class.ID,
+	})
+
+	must.Get(q.CreateStudent(ctx, model.CreateStudentParams{
+		Name:    "Bob",
+		ClassID: class.ID,
 	}))
 
 	return db
