@@ -65,18 +65,17 @@ func (q *Queries) CreateClass(ctx context.Context, arg CreateClassParams) (Class
 const createQuestion = `-- name: CreateQuestion :one
 
 INSERT INTO question (
-    quiz_id, position, segmented, type, json, created, updated
+    quiz_id, position, type, data, created, updated
 ) VALUES (
-    ?, ?, ?, ?, ?, datetime("now"), datetime("now")
-) RETURNING id, quiz_id, position, segmented, type, json, created, updated
+    ?, ?, ?, ?, datetime("now"), datetime("now")
+) RETURNING id, quiz_id, position, type, data, created, updated
 `
 
 type CreateQuestionParams struct {
-	QuizID    int64
-	Position  int64
-	Segmented bool
-	Type      string
-	Json      interface{}
+	QuizID   int64
+	Position int64
+	Type     string
+	Data     []byte
 }
 
 // **********
@@ -86,18 +85,16 @@ func (q *Queries) CreateQuestion(ctx context.Context, arg CreateQuestionParams) 
 	row := q.db.QueryRowContext(ctx, createQuestion,
 		arg.QuizID,
 		arg.Position,
-		arg.Segmented,
 		arg.Type,
-		arg.Json,
+		arg.Data,
 	)
 	var i Question
 	err := row.Scan(
 		&i.ID,
 		&i.QuizID,
 		&i.Position,
-		&i.Segmented,
 		&i.Type,
-		&i.Json,
+		&i.Data,
 		&i.Created,
 		&i.Updated,
 	)
@@ -116,7 +113,7 @@ INSERT INTO quiz (
 type CreateQuizParams struct {
 	TeacherID int64
 	Title     string
-	Excerpt   interface{}
+	Excerpt   []byte
 }
 
 // **********
@@ -234,6 +231,7 @@ func (q *Queries) CreateStudentQuizSession(ctx context.Context, arg CreateStuden
 
 const createTeacher = `-- name: CreateTeacher :one
 
+
 INSERT INTO teacher (
     email, username, password_hash, created, updated
 ) VALUES (
@@ -247,6 +245,7 @@ type CreateTeacherParams struct {
 	PasswordHash string
 }
 
+// Copyright 2024 Amr Ojjeh <amrojjeh@outlook.com>
 // **********
 // TEACHER TABLE
 // **********
@@ -333,7 +332,7 @@ func (q *Queries) GetClass(ctx context.Context, id int64) (Class, error) {
 }
 
 const getQuestion = `-- name: GetQuestion :one
-SELECT id, quiz_id, position, segmented, type, json, created, updated FROM question
+SELECT id, quiz_id, position, type, data, created, updated FROM question
 WHERE id=?
 `
 
@@ -344,9 +343,8 @@ func (q *Queries) GetQuestion(ctx context.Context, id int64) (Question, error) {
 		&i.ID,
 		&i.QuizID,
 		&i.Position,
-		&i.Segmented,
 		&i.Type,
-		&i.Json,
+		&i.Data,
 		&i.Created,
 		&i.Updated,
 	)
@@ -434,7 +432,7 @@ func (q *Queries) ListClassesByTeacher(ctx context.Context, arg ListClassesByTea
 }
 
 const listQuestionsByQuiz = `-- name: ListQuestionsByQuiz :many
-SELECT id, quiz_id, position, segmented, type, json, created, updated FROM question
+SELECT id, quiz_id, position, type, data, created, updated FROM question
 WHERE quiz_id=?
 ORDER BY position
 LIMIT ? OFFSET ?
@@ -459,9 +457,8 @@ func (q *Queries) ListQuestionsByQuiz(ctx context.Context, arg ListQuestionsByQu
 			&i.ID,
 			&i.QuizID,
 			&i.Position,
-			&i.Segmented,
 			&i.Type,
-			&i.Json,
+			&i.Data,
 			&i.Created,
 			&i.Updated,
 		); err != nil {
@@ -496,7 +493,7 @@ type ListQuizzesByClassRow struct {
 	ID        int64
 	TeacherID int64
 	Title     string
-	Excerpt   interface{}
+	Excerpt   []byte
 	Created   time.Time
 	Updated   time.Time
 	ClassID   int64
@@ -540,7 +537,7 @@ func (q *Queries) ListQuizzesByClass(ctx context.Context, arg ListQuizzesByClass
 }
 
 const listSegmentedQuestionsByQuiz = `-- name: ListSegmentedQuestionsByQuiz :many
-SELECT id, quiz_id, position, segmented, type, json, created, updated FROM question
+SELECT id, quiz_id, position, type, data, created, updated FROM question
 WHERE quiz_id=? AND segmented=TRUE
 ORDER BY position
 LIMIT ? OFFSET ?
@@ -565,9 +562,8 @@ func (q *Queries) ListSegmentedQuestionsByQuiz(ctx context.Context, arg ListSegm
 			&i.ID,
 			&i.QuizID,
 			&i.Position,
-			&i.Segmented,
 			&i.Type,
-			&i.Json,
+			&i.Data,
 			&i.Created,
 			&i.Updated,
 		); err != nil {

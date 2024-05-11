@@ -1,4 +1,4 @@
--- Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
+-- Copyright 2024 Amr Ojjeh <amrojjeh@outlook.com>
 
 -- **********
 -- TEACHER TABLE
@@ -57,9 +57,9 @@ WHERE id=?;
 
 -- name: CreateQuestion :one
 INSERT INTO question (
-    quiz_id, position, segmented, type, json, created, updated
+    quiz_id, position, type, data, created, updated
 ) VALUES (
-    ?, ?, ?, ?, ?, datetime("now"), datetime("now")
+    ?, ?, ?, ?, datetime("now"), datetime("now")
 ) RETURNING *;
 
 -- name: GetQuestion :one

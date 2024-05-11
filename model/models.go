@@ -24,21 +24,20 @@ type ClassQuiz struct {
 }
 
 type Question struct {
-	ID        int64
-	QuizID    int64
-	Position  int64
-	Segmented bool
-	Type      string
-	Json      interface{}
-	Created   time.Time
-	Updated   time.Time
+	ID       int64
+	QuizID   int64
+	Position int64
+	Type     string
+	Data     []byte
+	Created  time.Time
+	Updated  time.Time
 }
 
 type Quiz struct {
 	ID        int64
 	TeacherID int64
 	Title     string
-	Excerpt   interface{}
+	Excerpt   []byte
 	Created   time.Time
 	Updated   time.Time
 }

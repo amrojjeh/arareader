@@ -29,9 +29,8 @@ CREATE TABLE IF NOT EXISTS question (
     id INTEGER NOT NULL PRIMARY KEY,
     quiz_id INTEGER NOT NULL,
     position INTEGER NOT NULL,
-    segmented BOOLEAN NOT NULL,
     type TEXT NOT NULL,
-    json JSON NOT NULL,
+    data JSON NOT NULL,
     created DATETIME NOT NULL,
     updated DATETIME NOT NULL,
 

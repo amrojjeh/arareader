@@ -1,13 +1,16 @@
 version: "2"
 sql:
-- "schema": "model/schema.sql"
-  "engine": "sqlite"
-  "queries": "model/query.sql"
-  "gen": 
-    "go": 
-      "package": "model"
-      "out": "model"
-      "overrides": 
-        - "column": "quiz.excerpt"
-          "go_type": 
-            "import": ""
+- schema: "model/schema.sql"
+  engine: "sqlite"
+  queries: "model/query.sql"
+  gen: 
+    go: 
+      package: "model"
+      out: "model"
+      overrides: 
+        - db_type: "XML"
+          go_type: 
+            type: "[]byte"
+        - db_type: "JSON"
+          go_type:
+            type: "[]byte"
