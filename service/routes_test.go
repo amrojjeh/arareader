@@ -33,7 +33,7 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 	for _, tt := range tests {
 		writer := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodGet, tt.path, bytes.NewReader([]byte{}))
-		HTTPRoute{}.ServeHTTP(writer, req)
+		rootHandler{}.ServeHTTP(writer, req)
 		if writer.Code != tt.code {
 			t.Errorf("incorrect status code (path: %s; expected: %d; actual: %d)", tt.path, tt.code, writer.Code)
 		}
