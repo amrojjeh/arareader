@@ -97,6 +97,8 @@ CREATE TABLE IF NOT EXISTS student_quiz_session (
         ON UPDATE CASCADE
 );
 
+
+-- TODO(Amr Ojjeh): Consider storing as a JSON
 CREATE TABLE IF NOT EXISTS student_question_session (
     id INTEGER NOT NULL PRIMARY KEY,
     student_quiz_session_id INTEGER NOT NULL,

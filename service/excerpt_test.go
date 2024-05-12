@@ -135,7 +135,7 @@ func TestExcerptWrite(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expected := &bytes.Buffer{}
 			template.Must(excerptTemplate().Parse(tt.excerpt)).Execute(expected, nil)
-			e := must.Get(FromXML(expected))
+			e := must.Get(ExcerptFromXML(expected))
 			actual := &bytes.Buffer{}
 			e.Write(actual)
 			if actual.String() != expected.String() {
@@ -149,5 +149,5 @@ func parseExcerpt(t *testing.T, excerpt string) *Excerpt {
 	t.Helper()
 	buff := &bytes.Buffer{}
 	template.Must(excerptTemplate().Parse(excerpt)).Execute(buff, nil)
-	return must.Get(FromXML(buff))
+	return must.Get(ExcerptFromXML(buff))
 }

@@ -61,7 +61,6 @@ type StudentQuestionSession struct {
 	StudentQuizSessionID int64
 	QuestionID           int64
 	Status               string
-	Feedback             string
 	Answer               string
 	Created              time.Time
 	Updated              time.Time

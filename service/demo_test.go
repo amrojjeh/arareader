@@ -27,18 +27,14 @@ func TestDemoDB(t *testing.T) {
 	assertEndElement(t, decoder, "ref")
 	// goes on..., no need to test the whole thing
 
-	questions := must.Get(q.ListQuestionsByQuiz(ctx, model.ListQuestionsByQuizParams{
-		QuizID: quiz.ID,
-		Limit:  50,
-		Offset: 0,
-	}))
+	questions := must.Get(q.ListQuestionsByQuiz(ctx, quiz.ID))
 
 	if questions[0].Type != string(VowelQuestionType) {
 		t.Error("first question should be a vowel question")
 	}
 
-	if questions[1].Type != string(ShortAnswerQuestionType) {
-		t.Error("second question should be a short answer")
+	if questions[3].Type != string(ShortAnswerQuestionType) {
+		t.Error("fourth question should be a short answer")
 	}
 }
 

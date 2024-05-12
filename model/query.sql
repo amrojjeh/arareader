@@ -18,8 +18,7 @@ WHERE email=?;
 -- name: ListTeachers :many
 SELECT * FROM teacher
 WHERE username LIKE ? AND email LIKE ?
-ORDER BY email
-LIMIT ? OFFSET ?;
+ORDER BY email;
 
 -- name: DeleteTeacher :exec
 DELETE FROM teacher
@@ -44,8 +43,7 @@ WHERE id=?;
 SELECT *
 FROM quiz AS q
 INNER JOIN class_quiz AS cq ON cq.quiz_id=q.id
-WHERE cq.class_id=?
-LIMIT ? OFFSET ?;
+WHERE cq.class_id=?;
 
 -- name: DeleteQuiz :exec
 DELETE FROM quiz
@@ -66,17 +64,20 @@ INSERT INTO question (
 SELECT * FROM question
 WHERE id=?;
 
+-- name: ListQuestionsByQuizAndType :many
+SELECT * FROM question
+WHERE quiz_id=? AND type=?
+ORDER BY position;
+
 -- name: ListQuestionsByQuiz :many
 SELECT * FROM question
 WHERE quiz_id=?
-ORDER BY position
-LIMIT ? OFFSET ?;
+ORDER BY position;
 
 -- name: ListSegmentedQuestionsByQuiz :many
 SELECT * FROM question
 WHERE quiz_id=? AND segmented=TRUE
-ORDER BY position
-LIMIT ? OFFSET ?;
+ORDER BY position;
 
 
 -- name: DeleteQuestion :exec
@@ -101,8 +102,7 @@ WHERE id=?;
 -- name: ListClassesByTeacher :many
 SELECT * FROM class
 WHERE teacher_id=?
-ORDER BY created
-LIMIT ? OFFSET ?;
+ORDER BY created;
 
 -- name: DeleteClass :exec
 DELETE FROM class
@@ -137,8 +137,7 @@ INSERT INTO student (
 
 -- name: ListStudentsByClass :many
 SELECT * FROM student
-WHERE class_id=?
-LIMIT ? OFFSET ?;
+WHERE class_id=?;
 
 -- name: DeleteStudent :exec
 DELETE FROM student
@@ -161,7 +160,7 @@ INSERT INTO student_quiz_session (
 
 -- name: CreateStudentQuestionSession :one
 INSERT INTO student_question_session (
-    student_quiz_session_id, status, feedback, created, updated
+    student_quiz_session_id, status, created, updated
 ) VALUES (
-    ?, ?, ?, datetime("now"), datetime("now")
+    ?, ?, datetime("now"), datetime("now")
 ) RETURNING *;

@@ -166,30 +166,28 @@ func (q *Queries) CreateStudent(ctx context.Context, arg CreateStudentParams) (S
 const createStudentQuestionSession = `-- name: CreateStudentQuestionSession :one
 
 INSERT INTO student_question_session (
-    student_quiz_session_id, status, feedback, created, updated
+    student_quiz_session_id, status, created, updated
 ) VALUES (
-    ?, ?, ?, datetime("now"), datetime("now")
-) RETURNING id, student_quiz_session_id, question_id, status, feedback, answer, created, updated
+    ?, ?, datetime("now"), datetime("now")
+) RETURNING id, student_quiz_session_id, question_id, status, answer, created, updated
 `
 
 type CreateStudentQuestionSessionParams struct {
 	StudentQuizSessionID int64
 	Status               string
-	Feedback             string
 }
 
 // **********
 // STUDENT_QUESTION_SESSION TABLE
 // **********
 func (q *Queries) CreateStudentQuestionSession(ctx context.Context, arg CreateStudentQuestionSessionParams) (StudentQuestionSession, error) {
-	row := q.db.QueryRowContext(ctx, createStudentQuestionSession, arg.StudentQuizSessionID, arg.Status, arg.Feedback)
+	row := q.db.QueryRowContext(ctx, createStudentQuestionSession, arg.StudentQuizSessionID, arg.Status)
 	var i StudentQuestionSession
 	err := row.Scan(
 		&i.ID,
 		&i.StudentQuizSessionID,
 		&i.QuestionID,
 		&i.Status,
-		&i.Feedback,
 		&i.Answer,
 		&i.Created,
 		&i.Updated,
@@ -393,17 +391,10 @@ const listClassesByTeacher = `-- name: ListClassesByTeacher :many
 SELECT id, teacher_id, name, created, updated FROM class
 WHERE teacher_id=?
 ORDER BY created
-LIMIT ? OFFSET ?
 `
 
-type ListClassesByTeacherParams struct {
-	TeacherID int64
-	Limit     int64
-	Offset    int64
-}
-
-func (q *Queries) ListClassesByTeacher(ctx context.Context, arg ListClassesByTeacherParams) ([]Class, error) {
-	rows, err := q.db.QueryContext(ctx, listClassesByTeacher, arg.TeacherID, arg.Limit, arg.Offset)
+func (q *Queries) ListClassesByTeacher(ctx context.Context, teacherID int64) ([]Class, error) {
+	rows, err := q.db.QueryContext(ctx, listClassesByTeacher, teacherID)
 	if err != nil {
 		return nil, err
 	}
@@ -435,17 +426,52 @@ const listQuestionsByQuiz = `-- name: ListQuestionsByQuiz :many
 SELECT id, quiz_id, position, type, data, created, updated FROM question
 WHERE quiz_id=?
 ORDER BY position
-LIMIT ? OFFSET ?
 `
 
-type ListQuestionsByQuizParams struct {
-	QuizID int64
-	Limit  int64
-	Offset int64
+func (q *Queries) ListQuestionsByQuiz(ctx context.Context, quizID int64) ([]Question, error) {
+	rows, err := q.db.QueryContext(ctx, listQuestionsByQuiz, quizID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Question
+	for rows.Next() {
+		var i Question
+		if err := rows.Scan(
+			&i.ID,
+			&i.QuizID,
+			&i.Position,
+			&i.Type,
+			&i.Data,
+			&i.Created,
+			&i.Updated,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
-func (q *Queries) ListQuestionsByQuiz(ctx context.Context, arg ListQuestionsByQuizParams) ([]Question, error) {
-	rows, err := q.db.QueryContext(ctx, listQuestionsByQuiz, arg.QuizID, arg.Limit, arg.Offset)
+const listQuestionsByQuizAndType = `-- name: ListQuestionsByQuizAndType :many
+SELECT id, quiz_id, position, type, data, created, updated FROM question
+WHERE quiz_id=? AND type=?
+ORDER BY position
+`
+
+type ListQuestionsByQuizAndTypeParams struct {
+	QuizID int64
+	Type   string
+}
+
+func (q *Queries) ListQuestionsByQuizAndType(ctx context.Context, arg ListQuestionsByQuizAndTypeParams) ([]Question, error) {
+	rows, err := q.db.QueryContext(ctx, listQuestionsByQuizAndType, arg.QuizID, arg.Type)
 	if err != nil {
 		return nil, err
 	}
@@ -480,14 +506,7 @@ SELECT id, teacher_id, title, excerpt, q.created, q.updated, class_id, quiz_id, 
 FROM quiz AS q
 INNER JOIN class_quiz AS cq ON cq.quiz_id=q.id
 WHERE cq.class_id=?
-LIMIT ? OFFSET ?
 `
-
-type ListQuizzesByClassParams struct {
-	ClassID int64
-	Limit   int64
-	Offset  int64
-}
 
 type ListQuizzesByClassRow struct {
 	ID        int64
@@ -502,8 +521,8 @@ type ListQuizzesByClassRow struct {
 	Updated_2 time.Time
 }
 
-func (q *Queries) ListQuizzesByClass(ctx context.Context, arg ListQuizzesByClassParams) ([]ListQuizzesByClassRow, error) {
-	rows, err := q.db.QueryContext(ctx, listQuizzesByClass, arg.ClassID, arg.Limit, arg.Offset)
+func (q *Queries) ListQuizzesByClass(ctx context.Context, classID int64) ([]ListQuizzesByClassRow, error) {
+	rows, err := q.db.QueryContext(ctx, listQuizzesByClass, classID)
 	if err != nil {
 		return nil, err
 	}
@@ -540,17 +559,10 @@ const listSegmentedQuestionsByQuiz = `-- name: ListSegmentedQuestionsByQuiz :man
 SELECT id, quiz_id, position, type, data, created, updated FROM question
 WHERE quiz_id=? AND segmented=TRUE
 ORDER BY position
-LIMIT ? OFFSET ?
 `
 
-type ListSegmentedQuestionsByQuizParams struct {
-	QuizID int64
-	Limit  int64
-	Offset int64
-}
-
-func (q *Queries) ListSegmentedQuestionsByQuiz(ctx context.Context, arg ListSegmentedQuestionsByQuizParams) ([]Question, error) {
-	rows, err := q.db.QueryContext(ctx, listSegmentedQuestionsByQuiz, arg.QuizID, arg.Limit, arg.Offset)
+func (q *Queries) ListSegmentedQuestionsByQuiz(ctx context.Context, quizID int64) ([]Question, error) {
+	rows, err := q.db.QueryContext(ctx, listSegmentedQuestionsByQuiz, quizID)
 	if err != nil {
 		return nil, err
 	}
@@ -583,17 +595,10 @@ func (q *Queries) ListSegmentedQuestionsByQuiz(ctx context.Context, arg ListSegm
 const listStudentsByClass = `-- name: ListStudentsByClass :many
 SELECT id, name, class_id, created, updated FROM student
 WHERE class_id=?
-LIMIT ? OFFSET ?
 `
 
-type ListStudentsByClassParams struct {
-	ClassID int64
-	Limit   int64
-	Offset  int64
-}
-
-func (q *Queries) ListStudentsByClass(ctx context.Context, arg ListStudentsByClassParams) ([]Student, error) {
-	rows, err := q.db.QueryContext(ctx, listStudentsByClass, arg.ClassID, arg.Limit, arg.Offset)
+func (q *Queries) ListStudentsByClass(ctx context.Context, classID int64) ([]Student, error) {
+	rows, err := q.db.QueryContext(ctx, listStudentsByClass, classID)
 	if err != nil {
 		return nil, err
 	}
@@ -625,23 +630,15 @@ const listTeachers = `-- name: ListTeachers :many
 SELECT id, email, username, password_hash, created, updated FROM teacher
 WHERE username LIKE ? AND email LIKE ?
 ORDER BY email
-LIMIT ? OFFSET ?
 `
 
 type ListTeachersParams struct {
 	Username string
 	Email    string
-	Limit    int64
-	Offset   int64
 }
 
 func (q *Queries) ListTeachers(ctx context.Context, arg ListTeachersParams) ([]Teacher, error) {
-	rows, err := q.db.QueryContext(ctx, listTeachers,
-		arg.Username,
-		arg.Email,
-		arg.Limit,
-		arg.Offset,
-	)
+	rows, err := q.db.QueryContext(ctx, listTeachers, arg.Username, arg.Email)
 	if err != nil {
 		return nil, err
 	}

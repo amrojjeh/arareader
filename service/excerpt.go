@@ -30,7 +30,7 @@ func (r ReferenceNotFoundError) Error() string {
 	return fmt.Sprintf("ReferenceNotFound: could not find reference (id: %d)", r.ID)
 }
 
-func FromXML(r io.Reader) (*Excerpt, error) {
+func ExcerptFromXML(r io.Reader) (*Excerpt, error) {
 	excerpt := &Excerpt{}
 	decoder := xml.NewDecoder(r)
 	root, err := decoder.Token()

@@ -1,4 +1,4 @@
-package service
+package routes
 
 import (
 	"bytes"
@@ -12,6 +12,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/amrojjeh/arareader/model"
 	"github.com/amrojjeh/arareader/must"
+	"github.com/amrojjeh/arareader/service"
 	"github.com/amrojjeh/arareader/ui/page"
 	"github.com/amrojjeh/arareader/ui/static"
 )
@@ -82,9 +83,15 @@ func (rh rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case ".":
 		// NOTE(Amr Ojjeh): Not an issue since this is assuming demo data
 		quiz := must.Get(rh.queries.GetQuiz(r.Context(), 1))
+		qs := must.Get(rh.queries.ListQuestionsByQuizAndType(r.Context(), model.ListQuestionsByQuizAndTypeParams{
+			QuizID: quiz.ID,
+			Type:   string(service.VowelQuestionType),
+		}))
+		e := must.Get(service.ExcerptFromXML(bytes.NewReader(quiz.Excerpt)))
+		service.ApplyVowelQuestionsToExcerpt(qs, e)
 		page.SVowel(page.SVowelParams{
-			Excerpt:         bytes.NewReader(quiz.Excerpt),
-			HighlightedRef:  "1",
+			Excerpt:         e,
+			HighlightedRef:  1,
 			QuizTitle:       quiz.Title,
 			CurrentQuestion: 1,
 			TotalQuestions:  4,
@@ -93,11 +100,17 @@ func (rh rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// TEMP(Amr Ojjeh): Just for fun
 		if i, err := strconv.Atoi(head); err == nil {
 			quiz := must.Get(rh.queries.GetQuiz(r.Context(), 1))
+			qs := must.Get(rh.queries.ListQuestionsByQuizAndType(r.Context(), model.ListQuestionsByQuizAndTypeParams{
+				QuizID: quiz.ID,
+				Type:   string(service.VowelQuestionType),
+			}))
+			e := must.Get(service.ExcerptFromXML(bytes.NewReader(quiz.Excerpt)))
+			service.ApplyVowelQuestionsToExcerpt(qs, e)
 			page.SVowel(page.SVowelParams{
-				Excerpt:         bytes.NewReader(quiz.Excerpt),
-				HighlightedRef:  strconv.Itoa(i),
+				Excerpt:         e,
+				HighlightedRef:  i,
 				QuizTitle:       quiz.Title,
-				CurrentQuestion: i,
+				CurrentQuestion: 1,
 				TotalQuestions:  4,
 			}).Render(w)
 			return

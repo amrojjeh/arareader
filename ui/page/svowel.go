@@ -5,9 +5,8 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package page
 
 import (
-	"io"
-
 	"github.com/amrojjeh/arareader/arabic"
+	"github.com/amrojjeh/arareader/service"
 	ar "github.com/amrojjeh/arareader/ui/components"
 	g "github.com/maragudk/gomponents"
 	c "github.com/maragudk/gomponents/components"
@@ -15,8 +14,8 @@ import (
 )
 
 type SVowelParams struct {
-	Excerpt         io.Reader
-	HighlightedRef  string
+	Excerpt         *service.Excerpt
+	HighlightedRef  int
 	QuizTitle       string
 	CurrentQuestion int
 	TotalQuestions  int

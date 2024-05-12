@@ -1,64 +1,47 @@
 package components
 
 import (
-	"encoding/xml"
-	"errors"
-	"io"
+	"fmt"
+	"reflect"
 
+	"github.com/amrojjeh/arareader/service"
 	g "github.com/maragudk/gomponents"
 	. "github.com/maragudk/gomponents/html"
 )
 
 // Assumes excerpt is valid
-func Excerpt(r io.Reader, highlightedRef string) g.Node {
-	decoder := xml.NewDecoder(r)
-	node := excerptEl(decoder, highlightedRef)
-	return node
+func Excerpt(e *service.Excerpt, highlightedRef int) g.Node {
+	children := processNodes(e.Nodes, highlightedRef)
+	return P(Class("excerpt"),
+		g.Group(children),
+	)
 }
 
-func excerptEl(decoder *xml.Decoder, highlightedRef string) g.Node {
-	// parsing the starting element <excerpt>
-	token, err := decoder.Token()
-	if err != nil {
-		if errors.Is(err, io.EOF) {
-			return P()
-		}
-	}
-
-	nodes := []g.Node{}
-
-	for {
-		token, _ = decoder.Token()
-		switch token.(type) {
-		case xml.StartElement:
-			start, _ := token.(xml.StartElement)
-			nodes = append(nodes, refEl(decoder, start.Attr[0].Value, highlightedRef))
-		case xml.EndElement:
-			return P(Class("excerpt"), g.Group(nodes))
-		case xml.CharData:
-			data, _ := token.(xml.CharData)
-			nodes = append(nodes, g.Text(string(data)))
-		}
+func refNode(r *service.ReferenceNode, highlightedRef int) g.Node {
+	children := processNodes(r.Nodes, highlightedRef)
+	if r.ID == highlightedRef {
+		return Span(Class("highlight"),
+			g.Group(children),
+		)
+	} else {
+		return Span(
+			g.Group(children),
+		)
 	}
 }
 
-func refEl(decoder *xml.Decoder, id, highlightedRef string) g.Node {
-	// already parsed the starting element
-	nodes := []g.Node{}
-	for {
-		token, _ := decoder.Token()
-		switch token.(type) {
-		case xml.StartElement:
-			start, _ := token.(xml.StartElement)
-			nodes = append(nodes, refEl(decoder, start.Attr[0].Value, highlightedRef))
-		case xml.EndElement:
-			if id == highlightedRef {
-				return Span(Class("highlight"), g.Group(nodes))
-			}
-			return Span(g.Group(nodes))
-		case xml.CharData:
-			data, _ := token.(xml.CharData)
-			nodes = append(nodes, g.Text(string(data)))
+func processNodes(nodes []service.ExcerptNodes, highlightedRef int) []g.Node {
+	acc := []g.Node{}
+	for _, n := range nodes {
+		switch n.(type) {
+		case *service.ReferenceNode:
+			acc = append(acc, refNode(n.(*service.ReferenceNode), highlightedRef))
+		case *service.TextNode:
+			text := n.(*service.TextNode).Text
+			acc = append(acc, g.Text(text))
+		default:
+			panic(fmt.Sprintf("unexpected element of type %v", reflect.TypeOf(n)))
 		}
 	}
+	return acc
 }

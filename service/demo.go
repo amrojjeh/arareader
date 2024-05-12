@@ -37,14 +37,34 @@ func DemoDB(ctx context.Context) *sql.DB {
 		Position: 0,
 		Type:     string(VowelQuestionType),
 		Data: must.Get(json.Marshal(VowelQuestionData{
-			Reference: 2,
-			Feedback:  "There's a damma because it's a predicate'",
+			Reference: 1,
+			Feedback:  "There's a damma because it's a raf'",
 		})),
 	})
 
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
 		QuizID:   quiz.ID,
 		Position: 1,
+		Type:     string(VowelQuestionType),
+		Data: must.Get(json.Marshal(VowelQuestionData{
+			Reference: 2,
+			Feedback:  "There's a kasra because it's a jarr'",
+		})),
+	})
+
+	q.CreateQuestion(ctx, model.CreateQuestionParams{
+		QuizID:   quiz.ID,
+		Position: 2,
+		Type:     string(VowelQuestionType),
+		Data: must.Get(json.Marshal(VowelQuestionData{
+			Reference: 4,
+			Feedback:  "There's a damma because it's a raf'",
+		})),
+	})
+
+	q.CreateQuestion(ctx, model.CreateQuestionParams{
+		QuizID:   quiz.ID,
+		Position: 4,
 		Type:     string(ShortAnswerQuestionType),
 		Data: must.Get(json.Marshal(ShortAnswerQuestionData{
 			Reference: 1,
