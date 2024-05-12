@@ -1,15 +1,15 @@
 package service
 
 import (
+	"bytes"
 	"database/sql"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/amrojjeh/arareader/arabic"
 	"github.com/amrojjeh/arareader/model"
-	"github.com/amrojjeh/arareader/ui/components"
+	"github.com/amrojjeh/arareader/must"
 	"github.com/amrojjeh/arareader/ui/page"
 	"github.com/amrojjeh/arareader/ui/static"
 )
@@ -59,10 +59,11 @@ func (rh rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "static":
 		http.FileServer(http.FS(static.Files)).ServeHTTP(w, r)
 	case ".":
-		// TODO(Amr Ojjeh): load an actual excerpt from DB
+		// FIXME(Amr Ojjeh): handle with a clientError panic recover
+		quiz := must.Get(rh.queries.GetQuiz(r.Context(), 1))
 		page.SVowel(page.SVowelParams{
-			Excerpt: components.Excerpt(arabic.FromBuckwalter("h*A bytN.")),
-			Prompt:  "Hm?",
+			Excerpt:        bytes.NewReader(quiz.Excerpt),
+			HighlightedRef: "1",
 		}).Render(w)
 	default:
 		http.NotFound(w, r)

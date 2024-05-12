@@ -5,6 +5,8 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package page
 
 import (
+	"io"
+
 	"github.com/amrojjeh/arareader/arabic"
 	ar "github.com/amrojjeh/arareader/ui/components"
 	g "github.com/maragudk/gomponents"
@@ -13,8 +15,8 @@ import (
 )
 
 type SVowelParams struct {
-	Excerpt g.Node
-	Prompt  string
+	Excerpt        io.Reader
+	HighlightedRef string
 }
 
 func SVowel(p SVowelParams) g.Node {
@@ -36,7 +38,7 @@ func SVowel(p SVowelParams) g.Node {
 					g.Text("Amr Ojjeh")),
 			),
 			ar.QuestionNav(),
-			p.Excerpt,
+			ar.Excerpt(p.Excerpt, p.HighlightedRef),
 			P(Class("instruction"),
 				g.Text("Enter the correct vowel"),
 			),

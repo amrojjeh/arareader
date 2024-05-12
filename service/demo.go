@@ -7,15 +7,13 @@ import (
 	"encoding/json"
 	"text/template"
 
-	"github.com/amrojjeh/arareader/arabic"
 	"github.com/amrojjeh/arareader/model"
 	"github.com/amrojjeh/arareader/must"
 )
 
-// TODO(Amr Ojjeh): Add a second longer excerpt
-var excerpt = `<excerpt><ref id="1">{{bw "h*A by"}}<ref id="2">{{bw "tN"}}</ref></ref></excerpt>`
-
 func DemoDB(ctx context.Context) *sql.DB {
+	var excerpt = `<excerpt>{{bw "<nmA Al>EmA"}}<ref id="1">{{bw "lu"}}</ref> {{bw "bAlnyA"}}<ref id="2">{{bw "ti"}}</ref>، {{bw "w<nmA lkl AmrY' mA nwY fmn kAnt hjrth <lY"}} <ref id="3">{{bw "Allh wrswlh fhjrth <lY Allh wrswlh، wmn kAnt hjrth ldnyA ySybhA، >w Amr>p ynkHhA fhjrt"}}<ref id="4">{{bw "hu"}}</ref> {{bw "<lY mA hAjr <lyh"}}</ref></excerpt>`
+
 	db := OpenDB(":memory:")
 	Setup(ctx, db)
 	q := model.New(db)
@@ -25,10 +23,8 @@ func DemoDB(ctx context.Context) *sql.DB {
 		PasswordHash: must.Get(FromPlainPassword("password")),
 	}))
 
-	tmpl := template.Must(template.New("excerpt parser").Funcs(template.FuncMap{"bw": arabic.FromBuckwalter}).
-		Parse(excerpt))
 	buff := &bytes.Buffer{}
-	tmpl.Execute(buff, nil)
+	template.Must(excerptTemplate().Parse(excerpt)).Execute(buff, nil)
 
 	quiz := must.Get(q.CreateQuiz(ctx, model.CreateQuizParams{
 		TeacherID: teacher.ID,

@@ -105,6 +105,10 @@
     padding-inline: 3rem;
   }
 
+  .highlight {
+    background-color: rgb(85, 224, 255, 0.5);
+  }
+
   .instruction {
     font-size: 1.5rem;
     text-align: center;

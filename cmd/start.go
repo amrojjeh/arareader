@@ -33,8 +33,8 @@ var startCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(startCmd)
-	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 8080, "specifies the port of the server")
-	rootCmd.PersistentFlags().StringVar(&tlsPath, "tls", "./testtls", "a path to the cert and private key for https")
+	startCmd.PersistentFlags().IntVarP(&port, "port", "p", 8080, "specifies the port of the server")
+	startCmd.PersistentFlags().StringVar(&tlsPath, "tls", "./testtls", "a path to the cert and private key for https")
 }
 
 func certPath() string {

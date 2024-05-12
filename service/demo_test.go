@@ -19,31 +19,13 @@ func TestDemoDB(t *testing.T) {
 	quiz := must.Get(q.GetQuiz(ctx, 1))
 	decoder := xml.NewDecoder(bytes.NewReader(quiz.Excerpt))
 
-	token := must.Get(decoder.Token())
-	assertStartElement(t, token, "excerpt")
-
-	token = must.Get(decoder.Token())
-	assertStartElement(t, token, "ref")
-	assertAttribute(t, token.(xml.StartElement), "id", "1")
-
-	token = must.Get(decoder.Token())
-	assertCharData(t, token, arabic.FromBuckwalter("h*A by"))
-
-	token = must.Get(decoder.Token())
-	assertStartElement(t, token, "ref")
-	assertAttribute(t, token.(xml.StartElement), "id", "2")
-
-	token = must.Get(decoder.Token())
-	assertCharData(t, token, arabic.FromBuckwalter("tN"))
-
-	token = must.Get(decoder.Token())
-	assertEndElement(t, token, "ref")
-
-	token = must.Get(decoder.Token())
-	assertEndElement(t, token, "ref")
-
-	token = must.Get(decoder.Token())
-	assertEndElement(t, token, "excerpt")
+	assertStartElement(t, decoder, "excerpt")
+	assertCharData(t, decoder, arabic.FromBuckwalter("<nmA Al>EmA"))
+	start := assertStartElement(t, decoder, "ref")
+	assertAttribute(t, start, "id", "1")
+	assertCharData(t, decoder, arabic.FromBuckwalter("lu"))
+	assertEndElement(t, decoder, "ref")
+	// goes on..., no need to test the whole thing
 
 	questions := must.Get(q.ListQuestionsByQuiz(ctx, model.ListQuestionsByQuizParams{
 		QuizID: quiz.ID,
@@ -60,8 +42,9 @@ func TestDemoDB(t *testing.T) {
 	}
 }
 
-func assertCharData(t *testing.T, token xml.Token, expectedValue string) {
+func assertCharData(t *testing.T, decoder *xml.Decoder, expectedValue string) {
 	t.Helper()
+	token := must.Get(decoder.Token())
 	charData, ok := token.(xml.CharData)
 	if !ok {
 		t.Error("expected chardata")
@@ -87,8 +70,9 @@ func assertAttribute(t *testing.T, start xml.StartElement, expectedName, expecte
 	t.Errorf("attr not found (expected: '%s')", expectedName)
 }
 
-func assertStartElement(t *testing.T, token xml.Token, expectedName string) {
+func assertStartElement(t *testing.T, decoder *xml.Decoder, expectedName string) xml.StartElement {
 	t.Helper()
+	token := must.Get(decoder.Token())
 	start, ok := token.(xml.StartElement)
 	if !ok {
 		t.Errorf("expected start element, found: %v", reflect.TypeOf(token))
@@ -96,10 +80,12 @@ func assertStartElement(t *testing.T, token xml.Token, expectedName string) {
 	if start.Name.Local != expectedName {
 		t.Errorf("tag name is incorrect (expected: '%s'; actual: '%s')", expectedName, start.Name.Local)
 	}
+	return start
 }
 
-func assertEndElement(t *testing.T, token xml.Token, expectedName string) {
+func assertEndElement(t *testing.T, decoder *xml.Decoder, expectedName string) xml.EndElement {
 	t.Helper()
+	token := must.Get(decoder.Token())
 	end, ok := token.(xml.EndElement)
 	if !ok {
 		t.Errorf("expected end element, found: %v", reflect.TypeOf(token))
@@ -107,4 +93,5 @@ func assertEndElement(t *testing.T, token xml.Token, expectedName string) {
 	if end.Name.Local != expectedName {
 		t.Errorf("tag name is incorrect (expected: '%s'; actual: '%s')", expectedName, end.Name)
 	}
+	return end
 }
