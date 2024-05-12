@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
@@ -55,7 +56,7 @@ type rootHandler struct {
 }
 
 func (rh rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch shiftURL(r) {
+	switch head := shiftURL(r); head {
 	case "static":
 		http.FileServer(http.FS(static.Files)).ServeHTTP(w, r)
 	case ".":
@@ -66,6 +67,15 @@ func (rh rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			HighlightedRef: "1",
 		}).Render(w)
 	default:
+		// TEMP(Amr Ojjeh): Just for fun
+		if i, err := strconv.Atoi(head); err == nil {
+			quiz := must.Get(rh.queries.GetQuiz(r.Context(), 1))
+			page.SVowel(page.SVowelParams{
+				Excerpt:        bytes.NewReader(quiz.Excerpt),
+				HighlightedRef: strconv.Itoa(i),
+			}).Render(w)
+			return
+		}
 		http.NotFound(w, r)
 	}
 }
