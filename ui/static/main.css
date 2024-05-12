@@ -43,6 +43,10 @@
       padding-inline: 1rem;
     }
 
+    .excerpt {
+      block-size: 50svh;
+    }
+
     .svowel-options {
       margin-inline: auto;
     }
@@ -103,6 +107,8 @@
     direction: rtl;
     text-align: justify;
     padding-inline: 3rem;
+    background-color: #eee;
+    overflow: auto;
   }
 
   .highlight {

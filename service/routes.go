@@ -87,15 +87,18 @@ func (rh rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			HighlightedRef:  "1",
 			QuizTitle:       quiz.Title,
 			CurrentQuestion: 1,
-			TotalQuestions:  20,
+			TotalQuestions:  4,
 		}).Render(w)
 	default:
 		// TEMP(Amr Ojjeh): Just for fun
 		if i, err := strconv.Atoi(head); err == nil {
 			quiz := must.Get(rh.queries.GetQuiz(r.Context(), 1))
 			page.SVowel(page.SVowelParams{
-				Excerpt:        bytes.NewReader(quiz.Excerpt),
-				HighlightedRef: strconv.Itoa(i),
+				Excerpt:         bytes.NewReader(quiz.Excerpt),
+				HighlightedRef:  strconv.Itoa(i),
+				QuizTitle:       quiz.Title,
+				CurrentQuestion: i,
+				TotalQuestions:  4,
 			}).Render(w)
 			return
 		}

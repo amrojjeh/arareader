@@ -22,8 +22,6 @@ type SVowelParams struct {
 	TotalQuestions  int
 }
 
-// TODO(Amr Ojjeh): Position the multiple choice at the bottom of the page
-// TODO(Amr Ojjeh): Add a question number
 // TODO(Amr Ojjeh): Make the nav and question into a grid so that centering can be done
 func SVowel(p SVowelParams) g.Node {
 	return c.HTML5(c.HTML5Props{
