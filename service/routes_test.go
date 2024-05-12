@@ -40,7 +40,7 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, tt.path, bytes.NewReader([]byte{}))
 			rootHandler{}.ServeHTTP(writer, req)
 			if writer.Code != tt.code {
-				t.Errorf("incorrect status code (path: %s; expected: %d; actual: %d)", tt.path, tt.code, writer.Code)
+				t.Errorf("incorrect status code (expected: %d; actual: %d)", tt.code, writer.Code)
 			}
 			if !bytes.Contains(writer.Body.Bytes(), tt.body) {
 				t.Errorf("incorrect page (path: %s)", tt.path)
