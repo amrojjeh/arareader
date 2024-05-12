@@ -12,8 +12,8 @@ import (
 )
 
 func Icon() g.Node {
-	return h.Div(h.Class("nahwapp-icon"),
-		g.Text("NA"),
+	return h.Div(h.Class("arareader-icon"),
+		g.Text("AR"),
 	)
 }
 
