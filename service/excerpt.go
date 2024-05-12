@@ -129,7 +129,8 @@ func refEl(r *ReferenceNode, decoder *xml.Decoder) error {
 	}
 }
 
-func (e *Excerpt) Write(enc *xml.Encoder) error {
+func (e *Excerpt) Write(w io.Writer) error {
+	enc := xml.NewEncoder(w)
 	start, end := e.tags()
 	if err := enc.EncodeToken(start); err != nil {
 		return err

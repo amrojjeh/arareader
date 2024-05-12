@@ -104,6 +104,47 @@ func TestExcerptUnpointRef(t *testing.T) {
 	})
 }
 
+func TestExcerptWrite(t *testing.T) {
+	tests := []struct {
+		name    string
+		excerpt string
+	}{
+		{
+			name:    "Basic",
+			excerpt: `<excerpt>{{bw "h*A baytN"}}</excerpt>`,
+		},
+		{
+			name:    "With references",
+			excerpt: `<excerpt>{{bw "h*A"}} {{bw "bay"}}<ref id="1">{{bw "tN"}}</ref> {{bw "wh*A"}} <ref id="2">{{bw "$y'"}}</ref></excerpt>`,
+		},
+		{
+			name:    "With nested references",
+			excerpt: `<excerpt>{{bw "h*A"}} {{bw "bay"}}<ref id="1">{{bw "tN"}}</ref> {{bw "wh*A"}} <ref id="2">{{bw "$y"}}<ref id="3">{{bw "'"}}</ref></ref></excerpt>`,
+		},
+		{
+			name:    "Empty Excerpt",
+			excerpt: "<excerpt></excerpt>",
+		},
+		{
+			name:    "Empty",
+			excerpt: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			expected := &bytes.Buffer{}
+			template.Must(excerptTemplate().Parse(tt.excerpt)).Execute(expected, nil)
+			e := must.Get(FromXML(expected))
+			actual := &bytes.Buffer{}
+			e.Write(actual)
+			if actual.String() != expected.String() {
+				t.Errorf("expected: '%s'; actual: '%s'", expected.String(), actual.String())
+			}
+		})
+	}
+}
+
 func parseExcerpt(t *testing.T, excerpt string) *Excerpt {
 	t.Helper()
 	buff := &bytes.Buffer{}
