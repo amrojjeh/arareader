@@ -20,7 +20,7 @@ var startCmd = &cobra.Command{
 	Short: "Starts the Arareader web server",
 	Long:  `Starts the Arareader web server.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO(Amr Ojjeh): Implement
+		// TODO(Amr Ojjeh): Implement after the demo is complete
 		fmt.Println("Not yet implemented...")
 		// tlsPath = path.Clean(tlsPath)
 		// log.Printf("listening on %s...\n", addr())

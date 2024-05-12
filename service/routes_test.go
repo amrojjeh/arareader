@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -38,7 +39,8 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodGet, tt.path, bytes.NewReader([]byte{}))
-			rootHandler{}.ServeHTTP(writer, req)
+			handler := NewRootHandler(DemoDB(context.Background()))
+			handler.ServeHTTP(writer, req)
 			if writer.Code != tt.code {
 				t.Errorf("incorrect status code (expected: %d; actual: %d)", tt.code, writer.Code)
 			}

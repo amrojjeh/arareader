@@ -102,7 +102,6 @@ CREATE TABLE IF NOT EXISTS student_question_session (
     student_quiz_session_id INTEGER NOT NULL,
     question_id INTEGER NOT NULL,
     status TEXT NOT NULL, -- "correct" | "incorrect" | "pending" | "unsubmitted" | "unattempted"
-    feedback TEXT NOT NULL, --                                     ^ for ultimate mode
     answer TEXT NOT NULL,
     created DATETIME NOT NULL,
     updated DATETIME NOT NULL,

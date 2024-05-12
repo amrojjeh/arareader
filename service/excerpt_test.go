@@ -46,7 +46,8 @@ func TestPlain(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			buff := &bytes.Buffer{}
 			template.Must(excerptTemplate().Parse(tt.excerpt)).Execute(buff, nil)
-			plain := must.Get(Plain(buff))
+			e := must.Get(FromXML(buff))
+			plain := e.Plain()
 			if plain != tt.expected {
 				t.Errorf("expected: '%s'; actual: '%s'", tt.expected, plain)
 			}
