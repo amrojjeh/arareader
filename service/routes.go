@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"runtime/debug"
 	"strconv"
 	"time"
 
@@ -15,7 +16,7 @@ import (
 	"github.com/amrojjeh/arareader/ui/static"
 )
 
-func Server(logger *log.Logger, handler http.Handler, addr string) http.Server {
+func Server(handler http.Handler, addr string) http.Server {
 	return http.Server{
 		Addr:              addr,
 		Handler:           handler,
@@ -23,27 +24,46 @@ func Server(logger *log.Logger, handler http.Handler, addr string) http.Server {
 		ReadHeaderTimeout: 15 * time.Second,
 		WriteTimeout:      15 * time.Second,
 		IdleTimeout:       15 * time.Second,
-		ErrorLog:          logger,
+		ErrorLog:          log.Default(),
 	}
 }
 
-func NewRootHandler(logger *log.Logger, db *sql.DB) http.Handler {
+func NewRootHandler(db *sql.DB) http.Handler {
 	sm := scs.New()
 	var handler http.Handler
 	handler = rootHandler{
 		db:      db,
 		queries: model.New(db),
 		sm:      sm,
-		logger:  logger,
 	}
 	handler = sm.LoadAndSave(handler)
-	handler = logRequest(logger, handler)
+	handler = gracefulRecovery(handler)
+	handler = logRequest(handler)
 	return handler
 }
 
-func logRequest(logger *log.Logger, h http.Handler) http.Handler {
+type clientError int
+
+func gracefulRecovery(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL.Path)
+		defer func() {
+			if rec := recover(); rec != nil {
+				if clientErr, ok := rec.(clientError); ok {
+					http.Error(w, http.StatusText(int(clientErr)), int(clientErr))
+					return
+				}
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				log.Printf("INTERNAL SERVER ERROR: %+v", rec)
+				debug.PrintStack()
+			}
+		}()
+		h.ServeHTTP(w, r)
+	})
+}
+
+func logRequest(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL.Path)
 		h.ServeHTTP(w, r)
 	})
 }
@@ -60,11 +80,14 @@ func (rh rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "static":
 		http.FileServer(http.FS(static.Files)).ServeHTTP(w, r)
 	case ".":
-		// FIXME(Amr Ojjeh): handle with a clientError panic recover
+		// NOTE(Amr Ojjeh): Not an issue since this is assuming demo data
 		quiz := must.Get(rh.queries.GetQuiz(r.Context(), 1))
 		page.SVowel(page.SVowelParams{
-			Excerpt:        bytes.NewReader(quiz.Excerpt),
-			HighlightedRef: "1",
+			Excerpt:         bytes.NewReader(quiz.Excerpt),
+			HighlightedRef:  "1",
+			QuizTitle:       quiz.Title,
+			CurrentQuestion: 1,
+			TotalQuestions:  20,
 		}).Render(w)
 	default:
 		// TEMP(Amr Ojjeh): Just for fun

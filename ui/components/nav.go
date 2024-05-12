@@ -5,12 +5,14 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package components
 
 import (
+	"fmt"
+
 	"github.com/amrojjeh/arareader/ui/svg"
 	g "github.com/maragudk/gomponents"
 	. "github.com/maragudk/gomponents/html"
 )
 
-func QuestionNav(children ...g.Node) g.Node {
+func QuestionNav(currentQuestion, totalQuestions int) g.Node {
 	return Div(Class("question-nav"),
 		Button(Type("button"), Class("question-nav--navigate"),
 			prevIcon(true),
@@ -19,7 +21,7 @@ func QuestionNav(children ...g.Node) g.Node {
 			prevIcon(false),
 		),
 		P(Class("question-nav--prompt"),
-			g.Text("Question 1 out of 20"),
+			g.Text(fmt.Sprintf("Question %d out of %d", currentQuestion, totalQuestions)),
 		),
 		Button(Type("button"), Class("question-nav--navigate"),
 			nextIcon(false),

@@ -15,13 +15,15 @@ import (
 )
 
 type SVowelParams struct {
-	Excerpt        io.Reader
-	HighlightedRef string
+	Excerpt         io.Reader
+	HighlightedRef  string
+	QuizTitle       string
+	CurrentQuestion int
+	TotalQuestions  int
 }
 
-// TODO(Amr Ojjeh): Fix the multiple choice at the bottom of the page
+// TODO(Amr Ojjeh): Position the multiple choice at the bottom of the page
 // TODO(Amr Ojjeh): Add a question number
-// TODO(Amr Ojjeh): Add a question title
 // TODO(Amr Ojjeh): Make the nav and question into a grid so that centering can be done
 func SVowel(p SVowelParams) g.Node {
 	return c.HTML5(c.HTML5Props{
@@ -36,12 +38,12 @@ func SVowel(p SVowelParams) g.Node {
 			Header(
 				ar.Icon(),
 				H1(Class("title"),
-					g.Text(arabic.FromBuckwalter("Hdyv 1")),
+					g.Text(p.QuizTitle),
 				),
 				Button(Type("button"), Class("username button"),
 					g.Text("Amr Ojjeh")),
 			),
-			ar.QuestionNav(),
+			ar.QuestionNav(p.CurrentQuestion, p.TotalQuestions),
 			ar.Excerpt(p.Excerpt, p.HighlightedRef),
 			P(Class("instruction"),
 				g.Text("Enter the correct vowel"),
