@@ -9,26 +9,31 @@ import (
 
 func TestShiftPath(t *testing.T) {
 	tests := []struct {
+		name         string
 		path         string
 		headExpected string
 		tailExpected string
 	}{
 		{
+			name:         "Shift 0",
 			path:         "/static/img/image.png",
 			headExpected: "static",
 			tailExpected: "/img/image.png",
 		},
 		{
+			name:         "Shift 1",
 			path:         "/img/image.png",
 			headExpected: "img",
 			tailExpected: "/image.png",
 		},
 		{
+			name:         "Shift 2",
 			path:         "/image.png",
 			headExpected: "image.png",
 			tailExpected: "/",
 		},
 		{
+			name:         "Shift 3",
 			path:         "/",
 			headExpected: ".",
 			tailExpected: "/",
@@ -36,20 +41,24 @@ func TestShiftPath(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		head, tail := shiftPath(tt.path)
-		if head != tt.headExpected {
-			t.Errorf("head was not matched (actual: '%s'; expected: '%s')", head, tt.headExpected)
-		}
-		if tail != tt.tailExpected {
-			t.Errorf("tail was not matched (actual: '%s'; expected: '%s')", tail, tt.tailExpected)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			head, tail := shiftPath(tt.path)
+			if head != tt.headExpected {
+				t.Errorf("head was not matched (actual: '%s'; expected: '%s')", head, tt.headExpected)
+			}
+			if tail != tt.tailExpected {
+				t.Errorf("tail was not matched (actual: '%s'; expected: '%s')", tail, tt.tailExpected)
+			}
+		})
 	}
 
 	// testing panic
-	defer func() { _ = recover() }()
-	panicPath := "image.png"
-	shiftPath(panicPath)
-	t.Errorf("shiftPath did not panic (path: '%s')", panicPath)
+	t.Run("Relative path", func(t *testing.T) {
+		defer func() { _ = recover() }()
+		panicPath := "image.png"
+		shiftPath(panicPath)
+		t.Errorf("shiftPath did not panic (path: '%s')", panicPath)
+	})
 }
 
 func TestShiftURL(t *testing.T) {

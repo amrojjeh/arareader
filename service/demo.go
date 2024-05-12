@@ -12,6 +12,7 @@ import (
 	"github.com/amrojjeh/arareader/must"
 )
 
+// TODO(Amr Ojjeh): Add a second longer excerpt
 var excerpt = `<excerpt><ref id="1">{{bw "h*A by"}}<ref id="2">{{bw "tN"}}</ref></ref></excerpt>`
 
 func DemoDB(ctx context.Context) *sql.DB {
