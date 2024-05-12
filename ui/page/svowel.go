@@ -19,6 +19,7 @@ type SVowelParams struct {
 	HighlightedRef string
 }
 
+// TODO(Amr Ojjeh): Fix the multiple choice at the bottom of the page
 func SVowel(p SVowelParams) g.Node {
 	return c.HTML5(c.HTML5Props{
 		Title:       "Arareader",
