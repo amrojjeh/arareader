@@ -2,6 +2,8 @@ package service
 
 import (
 	"bytes"
+	"errors"
+	"reflect"
 	"testing"
 	"text/template"
 
@@ -9,7 +11,7 @@ import (
 	"github.com/amrojjeh/arareader/must"
 )
 
-func TestPlain(t *testing.T) {
+func TestExcerptPlain(t *testing.T) {
 	tests := []struct {
 		name     string
 		excerpt  string
@@ -44,13 +46,67 @@ func TestPlain(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			buff := &bytes.Buffer{}
-			template.Must(excerptTemplate().Parse(tt.excerpt)).Execute(buff, nil)
-			e := must.Get(FromXML(buff))
+			e := parseExcerpt(t, tt.excerpt)
 			plain := e.Plain()
 			if plain != tt.expected {
 				t.Errorf("expected: '%s'; actual: '%s'", tt.expected, plain)
 			}
 		})
 	}
+}
+
+func TestExcerptUnpointRef(t *testing.T) {
+	tests := []struct {
+		name     string
+		excerpt  string
+		ref      int
+		expected string
+	}{
+		{
+			name:     "Basic",
+			excerpt:  `<excerpt>{{bw "h*A"}} {{bw "bay"}}<ref id="1">{{bw "tN"}}</ref> {{bw "wh*A"}} <ref id="2">{{bw "$y'"}}</ref></excerpt>`,
+			ref:      1,
+			expected: arabic.FromBuckwalter("h*A bayt wh*A $y'"),
+		},
+		{
+			name:     "Nested references",
+			excerpt:  `<excerpt>{{bw "h*A"}} {{bw "bay"}}<ref id="1">{{bw "tN"}}</ref> {{bw "wh*A"}} <ref id="2">{{bw "$y"}}<ref id="3">{{bw "'N"}}</ref></ref></excerpt>`,
+			ref:      3,
+			expected: arabic.FromBuckwalter("h*A baytN wh*A $y'"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := parseExcerpt(t, tt.excerpt)
+			err := e.UnpointRef(tt.ref)
+			if err != nil {
+				t.Error(err)
+			}
+			plain := e.Plain()
+			if plain != tt.expected {
+				t.Errorf("expected: '%s'; actual: '%s'", tt.expected, plain)
+			}
+		})
+	}
+
+	// testing error
+	t.Run("Reference not found", func(t *testing.T) {
+		e := parseExcerpt(t, `<excerpt>{{bw "h*A"}} {{bw "bay"}}<ref id="1">{{bw "tN"}}</ref> {{bw "wh*A"}} <ref id="2">{{bw "$y'"}}</ref></excerpt>`)
+		err := e.UnpointRef(25)
+		var concreteErr ReferenceNotFoundError
+		if !errors.As(err, &concreteErr) {
+			t.Errorf("expected ReferenceNotFoundError; got %v", reflect.TypeOf(err))
+		}
+		if concreteErr.ID != 25 {
+			t.Errorf("expected err with id 25, found %d", concreteErr.ID)
+		}
+	})
+}
+
+func parseExcerpt(t *testing.T, excerpt string) *Excerpt {
+	t.Helper()
+	buff := &bytes.Buffer{}
+	template.Must(excerptTemplate().Parse(excerpt)).Execute(buff, nil)
+	return must.Get(FromXML(buff))
 }

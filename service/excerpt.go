@@ -12,42 +12,42 @@ import (
 	"github.com/amrojjeh/arareader/arabic"
 )
 
-// TODO(Amr Ojjeh): Write a IsValid function
-// - cannot contain non-Arabic characters
-// - the root must be excerpt
-// - elements must either be excerpt or ref
-// - all refs have exactly one attribute, which is the id
-// - the id is a number
-
-// TODO(Amr Ojjeh): Add a NewExcerpt function which first goes through IsValid
-
 type ExcerptNodes interface {
 	Write(enc *xml.Encoder) error
 	Plain() string
+	Unpoint()
 }
 
 type Excerpt struct {
 	Nodes []ExcerptNodes
 }
 
-func FromXML(r io.Reader) (Excerpt, error) {
-	excerpt := Excerpt{}
+type ReferenceNotFoundError struct {
+	ID int
+}
+
+func (r ReferenceNotFoundError) Error() string {
+	return fmt.Sprintf("ReferenceNotFound: could not find reference (id: %d)", r.ID)
+}
+
+func FromXML(r io.Reader) (*Excerpt, error) {
+	excerpt := &Excerpt{}
 	decoder := xml.NewDecoder(r)
 	root, err := decoder.Token()
 	if err != nil {
 		if errors.Is(err, io.EOF) {
 			return excerpt, nil
 		}
-		return Excerpt{}, nil
+		return &Excerpt{}, nil
 	}
 
 	rootStart, _ := root.(xml.StartElement)
 	if rootStart.Name.Local != "excerpt" {
-		return Excerpt{}, fmt.Errorf("xml document must begin with <excerpt> (found: %s)", rootStart.Name.Local)
+		return &Excerpt{}, fmt.Errorf("xml document must begin with <excerpt> (found: %s)", rootStart.Name.Local)
 	}
 
-	if err = excerptEl(&excerpt, decoder); err != nil {
-		return Excerpt{}, err
+	if err = excerptEl(excerpt, decoder); err != nil {
+		return &Excerpt{}, err
 	}
 	return excerpt, nil
 }
@@ -66,11 +66,11 @@ func excerptEl(e *Excerpt, decoder *xml.Decoder) error {
 			if err != nil {
 				return err
 			}
-			refEl(&r, decoder)
+			refEl(r, decoder)
 			e.Nodes = append(e.Nodes, r)
 		case xml.CharData:
 			data, _ := token.(xml.CharData)
-			textNode := TextNode{string(data)}
+			textNode := &TextNode{string(data)}
 			e.Nodes = append(e.Nodes, textNode)
 		case xml.EndElement:
 			return nil
@@ -78,11 +78,11 @@ func excerptEl(e *Excerpt, decoder *xml.Decoder) error {
 	}
 }
 
-func refStartEl(start xml.StartElement) (r ReferenceNode, err error) {
+func refStartEl(start xml.StartElement) (r *ReferenceNode, err error) {
 	if start.Name.Local != "ref" {
 		return r, fmt.Errorf("element not recognized (el: %s)", start.Name.Local)
 	}
-	r = ReferenceNode{ID: -1}
+	r = &ReferenceNode{ID: -1}
 	for _, attr := range start.Attr {
 		if attr.Name.Local == "id" {
 			r.ID, err = strconv.Atoi(attr.Value)
@@ -117,11 +117,11 @@ func refEl(r *ReferenceNode, decoder *xml.Decoder) error {
 			if err != nil {
 				return err
 			}
-			refEl(&subr, decoder)
+			refEl(subr, decoder)
 			r.Nodes = append(r.Nodes, subr)
 		case xml.CharData:
 			data, _ := token.(xml.CharData)
-			textNode := TextNode{string(data)}
+			textNode := &TextNode{string(data)}
 			r.Nodes = append(r.Nodes, textNode)
 		case xml.EndElement:
 			return nil
@@ -129,7 +129,7 @@ func refEl(r *ReferenceNode, decoder *xml.Decoder) error {
 	}
 }
 
-func (e Excerpt) Write(enc *xml.Encoder) error {
+func (e *Excerpt) Write(enc *xml.Encoder) error {
 	start, end := e.tags()
 	if err := enc.EncodeToken(start); err != nil {
 		return err
@@ -146,7 +146,7 @@ func (e Excerpt) Write(enc *xml.Encoder) error {
 	return nil
 }
 
-func (e Excerpt) tags() (xml.StartElement, xml.EndElement) {
+func (e *Excerpt) tags() (xml.StartElement, xml.EndElement) {
 	return xml.StartElement{
 			Name: xml.Name{
 				Local: "excerpt",
@@ -156,7 +156,7 @@ func (e Excerpt) tags() (xml.StartElement, xml.EndElement) {
 		}
 }
 
-func (e Excerpt) Plain() string {
+func (e *Excerpt) Plain() string {
 	builder := strings.Builder{}
 	for _, n := range e.Nodes {
 		builder.WriteString(n.Plain())
@@ -164,12 +164,34 @@ func (e Excerpt) Plain() string {
 	return builder.String()
 }
 
+func (e *Excerpt) Ref(targetRef int) *ReferenceNode {
+	for _, n := range e.Nodes {
+		ref, ok := n.(*ReferenceNode)
+		if !ok {
+			continue
+		}
+		if target := ref.Ref(targetRef); target != nil {
+			return target
+		}
+	}
+	return nil
+}
+
+func (e *Excerpt) UnpointRef(targetRef int) error {
+	r := e.Ref(targetRef)
+	if r == nil {
+		return ReferenceNotFoundError{targetRef}
+	}
+	r.Unpoint()
+	return nil
+}
+
 type ReferenceNode struct {
 	ID    int
 	Nodes []ExcerptNodes
 }
 
-func (r ReferenceNode) Write(enc *xml.Encoder) error {
+func (r *ReferenceNode) Write(enc *xml.Encoder) error {
 	start, end := r.tags()
 	if err := enc.EncodeToken(start); err != nil {
 		return err
@@ -187,7 +209,7 @@ func (r ReferenceNode) Write(enc *xml.Encoder) error {
 	return nil
 }
 
-func (r ReferenceNode) tags() (xml.StartElement, xml.EndElement) {
+func (r *ReferenceNode) tags() (xml.StartElement, xml.EndElement) {
 	return xml.StartElement{
 			Name: xml.Name{
 				Local: "ref",
@@ -205,7 +227,7 @@ func (r ReferenceNode) tags() (xml.StartElement, xml.EndElement) {
 		}
 }
 
-func (r ReferenceNode) Plain() string {
+func (r *ReferenceNode) Plain() string {
 	builder := strings.Builder{}
 	for _, n := range r.Nodes {
 		builder.WriteString(n.Plain())
@@ -213,16 +235,42 @@ func (r ReferenceNode) Plain() string {
 	return builder.String()
 }
 
+func (r *ReferenceNode) Unpoint() {
+	for _, n := range r.Nodes {
+		n.Unpoint()
+	}
+}
+
+func (r *ReferenceNode) Ref(targetRef int) *ReferenceNode {
+	if r.ID == targetRef {
+		return r
+	}
+	for _, n := range r.Nodes {
+		ref, ok := n.(*ReferenceNode)
+		if !ok {
+			continue
+		}
+		if target := ref.Ref(targetRef); target != nil {
+			return target
+		}
+	}
+	return nil
+}
+
 type TextNode struct {
 	Text string
 }
 
-func (c TextNode) Write(enc *xml.Encoder) error {
+func (c *TextNode) Write(enc *xml.Encoder) error {
 	return enc.EncodeToken(xml.CharData(c.Text))
 }
 
-func (c TextNode) Plain() string {
+func (c *TextNode) Plain() string {
 	return c.Text
+}
+
+func (c *TextNode) Unpoint() {
+	c.Text = arabic.Unpointed(c.Text)
 }
 
 func excerptTemplate() *template.Template {
