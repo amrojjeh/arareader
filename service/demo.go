@@ -83,10 +83,24 @@ func DemoDB(ctx context.Context) *sql.DB {
 		ClassID: class.ID,
 	})
 
-	must.Get(q.CreateStudent(ctx, model.CreateStudentParams{
+	s := must.Get(q.CreateStudent(ctx, model.CreateStudentParams{
 		Name:    "Bob",
 		ClassID: class.ID,
 	}))
+
+	quizSession := must.Get(q.CreateStudentQuizSession(ctx, model.CreateStudentQuizSessionParams{
+		StudentID: s.ID,
+		QuizID:    quiz.ID,
+		Status:    string(UnsubmittedQuizStatus),
+	}))
+
+	questions := must.Get(q.ListQuestionsByQuiz(ctx, quiz.ID))
+	for range questions {
+		q.CreateStudentQuestionSession(ctx, model.CreateStudentQuestionSessionParams{
+			StudentQuizSessionID: quizSession.ID,
+			Status:               string(UnattemptedQuestionStatus),
+		})
+	}
 
 	return db
 }

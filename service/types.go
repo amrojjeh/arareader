@@ -21,3 +21,20 @@ type ShortAnswerQuestionData struct {
 	Feedback  string
 	Prompt    string
 }
+
+type QuizStatus string
+
+const (
+	UnsubmittedQuizStatus = QuizStatus("Unsubmitted")
+	SubmittedQuizStatus   = QuizStatus("Submitted")
+)
+
+type QuestionStatus string
+
+const (
+	CorrectQuestionStatus     = QuestionStatus("Correct")
+	IncorrectQuestionStatus   = QuestionStatus("Incorrect")
+	PendingQuestionStatus     = QuestionStatus("Pending")
+	UnsubmittedQuestionStatus = QuestionStatus("Unsubmitted")
+	UnattemptedQuestionStatus = QuestionStatus("Unattempted")
+)

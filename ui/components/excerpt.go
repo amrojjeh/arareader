@@ -20,7 +20,7 @@ func Excerpt(e *service.Excerpt, highlightedRef int) g.Node {
 func refNode(r *service.ReferenceNode, highlightedRef int) g.Node {
 	children := processNodes(r.Nodes, highlightedRef)
 	if r.ID == highlightedRef {
-		return Span(Class("highlight"),
+		return Span(Class("highlight"), DataAttr("selected-segment", ""),
 			g.Group(children),
 		)
 	} else {

@@ -9,8 +9,8 @@ import (
 	h "github.com/maragudk/gomponents/html"
 )
 
-func DefaultButton(text string) g.Node {
-	return button(h.Type("button"),
+func VowelButton(text string) g.Node {
+	return button(h.Type("button"), h.DataAttr("substitute-button", text),
 		g.Text(text),
 	)
 }

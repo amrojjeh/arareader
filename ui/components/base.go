@@ -21,6 +21,14 @@ func CSS(path string) g.Node {
 	return h.Link(h.Rel("stylesheet"), h.Href(path))
 }
 
+func JS(path string) g.Node {
+	return h.Script(h.Src(path))
+}
+
+func DeferJS(path string) g.Node {
+	return h.Script(h.Src(path), h.Defer())
+}
+
 func roboto() string {
 	return "family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&"
 }

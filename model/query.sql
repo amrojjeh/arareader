@@ -160,7 +160,7 @@ INSERT INTO student_quiz_session (
 
 -- name: CreateStudentQuestionSession :one
 INSERT INTO student_question_session (
-    student_quiz_session_id, status, created, updated
+    student_quiz_session_id, question_id, answer, status, created, updated
 ) VALUES (
-    ?, ?, datetime("now"), datetime("now")
+    ?, ?, ?, datetime("now"), datetime("now")
 ) RETURNING *;

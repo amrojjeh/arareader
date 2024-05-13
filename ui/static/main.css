@@ -18,6 +18,10 @@
 }
 
 @layer global {
+  :root {
+    --primary: #3EEE00;
+  }
+  
   body {
     font-family: Roboto, Helvetica, Arial, Ubuntu, 'Noto Naskh Arabic', sans-serif;
   }
@@ -69,7 +73,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #3EEE00;
+    background-color: var(--primary);
     color: #fff;
     border-radius: 25%;
     block-size: 3rem;
@@ -90,13 +94,13 @@
     align-items: center;
     justify-content: center;
 
-    > .question-nav--navigate {
+    > .question-nav__navigate {
       border: unset;
       background-color: unset;
       cursor: pointer;
     }
 
-    > .question-nav--prompt {
+    > .question-nav__prompt {
       font-size: 1.2rem;
     }
   }
@@ -131,7 +135,7 @@
       height: 3rem;
     }
 
-    .svowel-options--not-sukoon {
+    .svowel-options__not-sukoon {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
@@ -144,6 +148,10 @@
     background-color: #fff;
     border: none;
     cursor: pointer;
+  }
+
+  .button--selected {
+    background-color: var(--primary);
   }
 }
 
