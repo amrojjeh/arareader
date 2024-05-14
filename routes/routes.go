@@ -1,18 +1,16 @@
 package routes
 
 import (
-	"bytes"
 	"database/sql"
 	"log"
 	"net/http"
 	"runtime/debug"
-	"strconv"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/amrojjeh/arareader/model"
-	"github.com/amrojjeh/arareader/must"
 	"github.com/amrojjeh/arareader/service"
+	"github.com/amrojjeh/arareader/ui/components"
 	"github.com/amrojjeh/arareader/ui/page"
 	"github.com/amrojjeh/arareader/ui/static"
 )
@@ -77,44 +75,38 @@ type rootHandler struct {
 }
 
 func (rh rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch head := shiftURL(r); head {
+	switch head := shiftPath(r); head {
 	case "static":
 		http.FileServer(http.FS(static.Files)).ServeHTTP(w, r)
 	case ".":
-		// NOTE(Amr Ojjeh): Not an issue since this is assuming demo data
-		quiz := must.Get(rh.queries.GetQuiz(r.Context(), 1))
-		qs := must.Get(rh.queries.ListQuestionsByQuizAndType(r.Context(), model.ListQuestionsByQuizAndTypeParams{
-			QuizID: quiz.ID,
-			Type:   string(service.VowelQuestionType),
-		}))
-		e := must.Get(service.ExcerptFromXML(bytes.NewReader(quiz.Excerpt)))
-		service.ApplyVowelQuestionsToExcerpt(qs, e)
-		page.SVowel(page.SVowelParams{
-			Excerpt:         e,
-			HighlightedRef:  1,
-			QuizTitle:       quiz.Title,
-			CurrentQuestion: 1,
-			TotalQuestions:  4,
-		}).Render(w)
+		http.Redirect(w, r, "/1", http.StatusSeeOther)
+	case "question":
+		rh.serveQuiz(w, r)
 	default:
-		// TEMP(Amr Ojjeh): Just for fun
-		if i, err := strconv.Atoi(head); err == nil {
-			quiz := must.Get(rh.queries.GetQuiz(r.Context(), 1))
-			qs := must.Get(rh.queries.ListQuestionsByQuizAndType(r.Context(), model.ListQuestionsByQuizAndTypeParams{
-				QuizID: quiz.ID,
-				Type:   string(service.VowelQuestionType),
-			}))
-			e := must.Get(service.ExcerptFromXML(bytes.NewReader(quiz.Excerpt)))
-			service.ApplyVowelQuestionsToExcerpt(qs, e)
-			page.SVowel(page.SVowelParams{
-				Excerpt:         e,
-				HighlightedRef:  i,
-				QuizTitle:       quiz.Title,
-				CurrentQuestion: 1,
-				TotalQuestions:  4,
-			}).Render(w)
-			return
-		}
 		http.NotFound(w, r)
 	}
+}
+
+// TODO(Amr Ojjeh): Turn into its own handler to store quiz and excerpt data and make API clearer
+func (rh rootHandler) serveQuiz(w http.ResponseWriter, r *http.Request) {
+	questionNum := shiftInteger(r)
+	quiz := rh.quiz(r, 1) // TEMP(Amr Ojjeh): Until we add more quizzes
+	e := rh.applyVowelQuestions(r, quiz)
+	qs, _ := rh.queries.ListQuestionsByQuiz(r.Context(), quiz.ID) // TEMP(Amr Ojjeh): Awful code. Change ASAP
+	q := qs[questionNum]
+	qd, _ := service.ExtractQuestionData(q) // TEMP(Amr Ojjeh): More awful code
+	page.SVowel(page.SVowelParams{
+		Excerpt:        e,
+		HighlightedRef: qd.RefID(),
+		QuizTitle:      quiz.Title,
+		QuestionNavProps: components.QuestionNavProps{
+			CurrentQuestion: questionNum + 1,
+			TotalQuestions:  len(qs),
+			SkipForwardURL:  "",
+			SkipBackwardURL: "",
+			NextURL:         "",
+			PrevURL:         "",
+		},
+	}).Render(w)
+	return
 }

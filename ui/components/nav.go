@@ -12,22 +12,39 @@ import (
 	. "github.com/maragudk/gomponents/html"
 )
 
-func QuestionNav(currentQuestion, totalQuestions int) g.Node {
+type QuestionNavProps struct {
+	CurrentQuestion int
+	TotalQuestions  int
+	SkipForwardURL  string
+	SkipBackwardURL string
+	NextURL         string
+	PrevURL         string
+}
+
+func QuestionNav(p QuestionNavProps) g.Node {
 	return Div(Class("question-nav"),
-		Button(Type("button"), Class("question-nav__navigate"),
-			prevIcon(true),
+		g.If(p.SkipBackwardURL != "",
+			A(Type("button"), Class("question-nav__navigate"),
+				prevIcon(true),
+			),
 		),
-		Button(Type("button"), Class("question-nav__navigate"),
-			prevIcon(false),
+		g.If(p.PrevURL != "",
+			A(Type("button"), Class("question-nav__navigate"),
+				prevIcon(false),
+			),
 		),
 		P(Class("question-nav__prompt"),
-			g.Text(fmt.Sprintf("Question %d out of %d", currentQuestion, totalQuestions)),
+			g.Text(fmt.Sprintf("Question %d out of %d", p.CurrentQuestion, p.TotalQuestions)),
 		),
-		Button(Type("button"), Class("question-nav__navigate"),
-			nextIcon(false),
+		g.If(p.NextURL != "",
+			A(Type("button"), Class("question-nav__navigate"), Href(p.NextURL),
+				nextIcon(false),
+			),
 		),
-		Button(Type("button"), Class("question-nav__navigate"),
-			nextIcon(true),
+		g.If(p.SkipForwardURL != "",
+			A(Type("button"), Class("question-nav__navigate"), Href(p.SkipForwardURL),
+				nextIcon(true),
+			),
 		),
 	)
 }

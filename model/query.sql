@@ -162,5 +162,5 @@ INSERT INTO student_quiz_session (
 INSERT INTO student_question_session (
     student_quiz_session_id, question_id, answer, status, created, updated
 ) VALUES (
-    ?, ?, ?, datetime("now"), datetime("now")
+    ?, ?, ?, ?, datetime("now"), datetime("now")
 ) RETURNING *;

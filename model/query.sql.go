@@ -20,8 +20,8 @@ INSERT INTO class_quiz (
 `
 
 type AddQuizToClassParams struct {
-	QuizID  int64
-	ClassID int64
+	QuizID  int
+	ClassID int
 }
 
 // **********
@@ -42,7 +42,7 @@ INSERT INTO class (
 `
 
 type CreateClassParams struct {
-	TeacherID int64
+	TeacherID int
 	Name      string
 }
 
@@ -72,8 +72,8 @@ INSERT INTO question (
 `
 
 type CreateQuestionParams struct {
-	QuizID   int64
-	Position int64
+	QuizID   int
+	Position int
 	Type     string
 	Data     []byte
 }
@@ -111,7 +111,7 @@ INSERT INTO quiz (
 `
 
 type CreateQuizParams struct {
-	TeacherID int64
+	TeacherID int
 	Title     string
 	Excerpt   []byte
 }
@@ -144,7 +144,7 @@ INSERT INTO student (
 
 type CreateStudentParams struct {
 	Name    string
-	ClassID int64
+	ClassID int
 }
 
 // **********
@@ -166,14 +166,16 @@ func (q *Queries) CreateStudent(ctx context.Context, arg CreateStudentParams) (S
 const createStudentQuestionSession = `-- name: CreateStudentQuestionSession :one
 
 INSERT INTO student_question_session (
-    student_quiz_session_id, status, created, updated
+    student_quiz_session_id, question_id, answer, status, created, updated
 ) VALUES (
-    ?, ?, datetime("now"), datetime("now")
+    ?, ?, ?, ?, datetime("now"), datetime("now")
 ) RETURNING id, student_quiz_session_id, question_id, status, answer, created, updated
 `
 
 type CreateStudentQuestionSessionParams struct {
-	StudentQuizSessionID int64
+	StudentQuizSessionID int
+	QuestionID           int
+	Answer               string
 	Status               string
 }
 
@@ -181,7 +183,12 @@ type CreateStudentQuestionSessionParams struct {
 // STUDENT_QUESTION_SESSION TABLE
 // **********
 func (q *Queries) CreateStudentQuestionSession(ctx context.Context, arg CreateStudentQuestionSessionParams) (StudentQuestionSession, error) {
-	row := q.db.QueryRowContext(ctx, createStudentQuestionSession, arg.StudentQuizSessionID, arg.Status)
+	row := q.db.QueryRowContext(ctx, createStudentQuestionSession,
+		arg.StudentQuizSessionID,
+		arg.QuestionID,
+		arg.Answer,
+		arg.Status,
+	)
 	var i StudentQuestionSession
 	err := row.Scan(
 		&i.ID,
@@ -205,8 +212,8 @@ INSERT INTO student_quiz_session (
 `
 
 type CreateStudentQuizSessionParams struct {
-	StudentID int64
-	QuizID    int64
+	StudentID int
+	QuizID    int
 	Status    string
 }
 
@@ -266,7 +273,7 @@ DELETE FROM class
 WHERE id=?
 `
 
-func (q *Queries) DeleteClass(ctx context.Context, id int64) error {
+func (q *Queries) DeleteClass(ctx context.Context, id int) error {
 	_, err := q.db.ExecContext(ctx, deleteClass, id)
 	return err
 }
@@ -276,7 +283,7 @@ DELETE FROM question
 WHERE id=?
 `
 
-func (q *Queries) DeleteQuestion(ctx context.Context, id int64) error {
+func (q *Queries) DeleteQuestion(ctx context.Context, id int) error {
 	_, err := q.db.ExecContext(ctx, deleteQuestion, id)
 	return err
 }
@@ -286,7 +293,7 @@ DELETE FROM quiz
 WHERE id=?
 `
 
-func (q *Queries) DeleteQuiz(ctx context.Context, id int64) error {
+func (q *Queries) DeleteQuiz(ctx context.Context, id int) error {
 	_, err := q.db.ExecContext(ctx, deleteQuiz, id)
 	return err
 }
@@ -296,7 +303,7 @@ DELETE FROM student
 WHERE id=?
 `
 
-func (q *Queries) DeleteStudent(ctx context.Context, id int64) error {
+func (q *Queries) DeleteStudent(ctx context.Context, id int) error {
 	_, err := q.db.ExecContext(ctx, deleteStudent, id)
 	return err
 }
@@ -316,7 +323,7 @@ SELECT id, teacher_id, name, created, updated FROM class
 WHERE id=?
 `
 
-func (q *Queries) GetClass(ctx context.Context, id int64) (Class, error) {
+func (q *Queries) GetClass(ctx context.Context, id int) (Class, error) {
 	row := q.db.QueryRowContext(ctx, getClass, id)
 	var i Class
 	err := row.Scan(
@@ -334,7 +341,7 @@ SELECT id, quiz_id, position, type, data, created, updated FROM question
 WHERE id=?
 `
 
-func (q *Queries) GetQuestion(ctx context.Context, id int64) (Question, error) {
+func (q *Queries) GetQuestion(ctx context.Context, id int) (Question, error) {
 	row := q.db.QueryRowContext(ctx, getQuestion, id)
 	var i Question
 	err := row.Scan(
@@ -354,7 +361,7 @@ SELECT id, teacher_id, title, excerpt, created, updated FROM quiz
 WHERE id=?
 `
 
-func (q *Queries) GetQuiz(ctx context.Context, id int64) (Quiz, error) {
+func (q *Queries) GetQuiz(ctx context.Context, id int) (Quiz, error) {
 	row := q.db.QueryRowContext(ctx, getQuiz, id)
 	var i Quiz
 	err := row.Scan(
@@ -393,7 +400,7 @@ WHERE teacher_id=?
 ORDER BY created
 `
 
-func (q *Queries) ListClassesByTeacher(ctx context.Context, teacherID int64) ([]Class, error) {
+func (q *Queries) ListClassesByTeacher(ctx context.Context, teacherID int) ([]Class, error) {
 	rows, err := q.db.QueryContext(ctx, listClassesByTeacher, teacherID)
 	if err != nil {
 		return nil, err
@@ -428,7 +435,7 @@ WHERE quiz_id=?
 ORDER BY position
 `
 
-func (q *Queries) ListQuestionsByQuiz(ctx context.Context, quizID int64) ([]Question, error) {
+func (q *Queries) ListQuestionsByQuiz(ctx context.Context, quizID int) ([]Question, error) {
 	rows, err := q.db.QueryContext(ctx, listQuestionsByQuiz, quizID)
 	if err != nil {
 		return nil, err
@@ -466,7 +473,7 @@ ORDER BY position
 `
 
 type ListQuestionsByQuizAndTypeParams struct {
-	QuizID int64
+	QuizID int
 	Type   string
 }
 
@@ -509,19 +516,19 @@ WHERE cq.class_id=?
 `
 
 type ListQuizzesByClassRow struct {
-	ID        int64
-	TeacherID int64
+	ID        int
+	TeacherID int
 	Title     string
 	Excerpt   []byte
 	Created   time.Time
 	Updated   time.Time
-	ClassID   int64
-	QuizID    int64
+	ClassID   int
+	QuizID    int
 	Created_2 time.Time
 	Updated_2 time.Time
 }
 
-func (q *Queries) ListQuizzesByClass(ctx context.Context, classID int64) ([]ListQuizzesByClassRow, error) {
+func (q *Queries) ListQuizzesByClass(ctx context.Context, classID int) ([]ListQuizzesByClassRow, error) {
 	rows, err := q.db.QueryContext(ctx, listQuizzesByClass, classID)
 	if err != nil {
 		return nil, err
@@ -561,7 +568,7 @@ WHERE quiz_id=? AND segmented=TRUE
 ORDER BY position
 `
 
-func (q *Queries) ListSegmentedQuestionsByQuiz(ctx context.Context, quizID int64) ([]Question, error) {
+func (q *Queries) ListSegmentedQuestionsByQuiz(ctx context.Context, quizID int) ([]Question, error) {
 	rows, err := q.db.QueryContext(ctx, listSegmentedQuestionsByQuiz, quizID)
 	if err != nil {
 		return nil, err
@@ -597,7 +604,7 @@ SELECT id, name, class_id, created, updated FROM student
 WHERE class_id=?
 `
 
-func (q *Queries) ListStudentsByClass(ctx context.Context, classID int64) ([]Student, error) {
+func (q *Queries) ListStudentsByClass(ctx context.Context, classID int) ([]Student, error) {
 	rows, err := q.db.QueryContext(ctx, listStudentsByClass, classID)
 	if err != nil {
 		return nil, err
@@ -673,8 +680,8 @@ WHERE quiz_id=? AND class_id=?
 `
 
 type RemoveQuizFromClassParams struct {
-	QuizID  int64
-	ClassID int64
+	QuizID  int
+	ClassID int
 }
 
 func (q *Queries) RemoveQuizFromClass(ctx context.Context, arg RemoveQuizFromClassParams) error {

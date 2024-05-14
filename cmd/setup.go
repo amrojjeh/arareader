@@ -15,8 +15,8 @@ var setupCmd = &cobra.Command{
 	Short: "Primes the application ready for use",
 	Long:  `Sets up the database by creating the schema`,
 	Run: func(cmd *cobra.Command, args []string) {
-		db := service.OpenDB(dsn)
-		service.Setup(cmd.Context(), db)
+		db := service.MustOpenDB(dsn)
+		service.MustSetup(cmd.Context(), db)
 	},
 }
 

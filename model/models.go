@@ -9,24 +9,24 @@ import (
 )
 
 type Class struct {
-	ID        int64
-	TeacherID int64
+	ID        int
+	TeacherID int
 	Name      string
 	Created   time.Time
 	Updated   time.Time
 }
 
 type ClassQuiz struct {
-	ClassID int64
-	QuizID  int64
+	ClassID int
+	QuizID  int
 	Created time.Time
 	Updated time.Time
 }
 
 type Question struct {
-	ID       int64
-	QuizID   int64
-	Position int64
+	ID       int
+	QuizID   int
+	Position int
 	Type     string
 	Data     []byte
 	Created  time.Time
@@ -34,8 +34,8 @@ type Question struct {
 }
 
 type Quiz struct {
-	ID        int64
-	TeacherID int64
+	ID        int
+	TeacherID int
 	Title     string
 	Excerpt   []byte
 	Created   time.Time
@@ -49,17 +49,17 @@ type Session struct {
 }
 
 type Student struct {
-	ID      int64
+	ID      int
 	Name    string
-	ClassID int64
+	ClassID int
 	Created time.Time
 	Updated time.Time
 }
 
 type StudentQuestionSession struct {
-	ID                   int64
-	StudentQuizSessionID int64
-	QuestionID           int64
+	ID                   int
+	StudentQuizSessionID int
+	QuestionID           int
 	Status               string
 	Answer               string
 	Created              time.Time
@@ -67,16 +67,16 @@ type StudentQuestionSession struct {
 }
 
 type StudentQuizSession struct {
-	ID        int64
-	StudentID int64
-	QuizID    int64
+	ID        int
+	StudentID int
+	QuizID    int
 	Status    string
 	Created   time.Time
 	Updated   time.Time
 }
 
 type Teacher struct {
-	ID           int64
+	ID           int
 	Email        string
 	Username     string
 	PasswordHash string

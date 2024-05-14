@@ -11,16 +11,16 @@ import (
 
 func TestOpenDB(t *testing.T) {
 	// there should not be any panics
-	db := OpenDB(":memory:")
+	db := MustOpenDB(":memory:")
 	defer db.Close()
 }
 
 func TestSetup(t *testing.T) {
-	db := OpenDB(":memory:")
+	db := MustOpenDB(":memory:")
 	defer db.Close()
 
 	ctx := context.Background()
-	Setup(ctx, db)
+	MustSetup(ctx, db)
 
 	rows, err := db.Query("SELECT name FROM sqlite_master WHERE type='table'")
 	if err != nil {

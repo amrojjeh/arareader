@@ -11,9 +11,17 @@ const (
 	PGNQuestionType            = QuestionType("PGN")
 )
 
+type QuestionData interface {
+	RefID() int
+}
+
 type VowelQuestionData struct {
-	Reference int
+	Reference int // should never be 0. TODO(Amr Ojjeh): Enforce that somehow?
 	Feedback  string
+}
+
+func (vd VowelQuestionData) RefID() int {
+	return vd.Reference
 }
 
 type ShortAnswerQuestionData struct {
@@ -22,6 +30,11 @@ type ShortAnswerQuestionData struct {
 	Prompt    string
 }
 
+func (sd ShortAnswerQuestionData) RefID() int {
+	return sd.Reference
+}
+
+// TODO(Amr Ojjeh): Move these to models and modify sqlc.yaml to convert to these types
 type QuizStatus string
 
 const (

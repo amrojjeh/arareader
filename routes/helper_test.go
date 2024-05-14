@@ -42,7 +42,7 @@ func TestShiftPath(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			head, tail := shiftPath(tt.path)
+			head, tail := shiftPathHelper(tt.path)
 			if head != tt.headExpected {
 				t.Errorf("head was not matched (actual: '%s'; expected: '%s')", head, tt.headExpected)
 			}
@@ -56,14 +56,14 @@ func TestShiftPath(t *testing.T) {
 	t.Run("Relative path", func(t *testing.T) {
 		defer func() { _ = recover() }()
 		panicPath := "image.png"
-		shiftPath(panicPath)
+		shiftPathHelper(panicPath)
 		t.Errorf("shiftPath did not panic (path: '%s')", panicPath)
 	})
 }
 
 func TestShiftURL(t *testing.T) {
 	r := httptest.NewRequest(http.MethodGet, "/static/img/image.png", bytes.NewReader([]byte{}))
-	head := shiftURL(r)
+	head := shiftPath(r)
 	expectedHead, expectedTail := "static", "/img/image.png"
 	if head != expectedHead {
 		t.Errorf("incorrect head (expected: %s; actual: %s)", expectedHead, head)

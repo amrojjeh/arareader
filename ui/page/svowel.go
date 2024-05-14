@@ -14,11 +14,10 @@ import (
 )
 
 type SVowelParams struct {
-	Excerpt         *service.Excerpt
-	HighlightedRef  int
-	QuizTitle       string
-	CurrentQuestion int
-	TotalQuestions  int
+	Excerpt          *service.Excerpt
+	HighlightedRef   int
+	QuizTitle        string
+	QuestionNavProps ar.QuestionNavProps
 }
 
 // TODO(Amr Ojjeh): Make the nav and question into a grid so that centering can be done
@@ -41,7 +40,7 @@ func SVowel(p SVowelParams) g.Node {
 				Button(Type("button"), Class("username button"),
 					g.Text("Amr Ojjeh")),
 			),
-			ar.QuestionNav(p.CurrentQuestion, p.TotalQuestions),
+			ar.QuestionNav(p.QuestionNavProps),
 			ar.Excerpt(p.Excerpt, p.HighlightedRef),
 			P(Class("instruction"),
 				g.Text("Enter the correct vowel"),

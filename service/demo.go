@@ -14,8 +14,8 @@ import (
 func DemoDB(ctx context.Context) *sql.DB {
 	var excerpt = `<excerpt>{{bw "<nmA Al>EmA"}}<ref id="1">{{bw "lu"}}</ref> {{bw "bAlnyA"}}<ref id="2">{{bw "ti"}}</ref>، {{bw "w<nmA lkl AmrY' mA nwY fmn kAnt hjrth <lY"}} <ref id="3">{{bw "Allh wrswlh fhjrth <lY Allh wrswlh، wmn kAnt hjrth ldnyA ySybhA، >w Amr>p ynkHhA fhjrt"}}<ref id="4">{{bw "hu"}}</ref> {{bw "<lY mA hAjr <lyh"}}</ref></excerpt>`
 
-	db := OpenDB(":memory:")
-	Setup(ctx, db)
+	db := MustOpenDB(":memory:")
+	MustSetup(ctx, db)
 	q := model.New(db)
 	teacher := must.Get(q.CreateTeacher(ctx, model.CreateTeacherParams{
 		Email:        "smith@demo.com",
@@ -67,7 +67,7 @@ func DemoDB(ctx context.Context) *sql.DB {
 		Position: 4,
 		Type:     string(ShortAnswerQuestionType),
 		Data: must.Get(json.Marshal(ShortAnswerQuestionData{
-			Reference: 1,
+			Reference: 3,
 			Feedback:  "Possible translation: this is a house",
 			Prompt:    "Translate the sentence",
 		})),
@@ -88,19 +88,10 @@ func DemoDB(ctx context.Context) *sql.DB {
 		ClassID: class.ID,
 	}))
 
-	quizSession := must.Get(q.CreateStudentQuizSession(ctx, model.CreateStudentQuizSessionParams{
+	q.CreateStudentQuizSession(ctx, model.CreateStudentQuizSessionParams{
 		StudentID: s.ID,
 		QuizID:    quiz.ID,
 		Status:    string(UnsubmittedQuizStatus),
-	}))
-
-	questions := must.Get(q.ListQuestionsByQuiz(ctx, quiz.ID))
-	for range questions {
-		q.CreateStudentQuestionSession(ctx, model.CreateStudentQuestionSessionParams{
-			StudentQuizSessionID: quizSession.ID,
-			Status:               string(UnattemptedQuestionStatus),
-		})
-	}
-
+	})
 	return db
 }
