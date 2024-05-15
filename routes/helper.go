@@ -81,6 +81,13 @@ func allowMethods(r *http.Request, methods ...string) {
 	}
 }
 
+func (rh rootHandler) mustParseForm(r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		panic(clientError(http.StatusBadRequest))
+	}
+}
+
 func (rh rootHandler) excerpt(quiz model.Quiz) *model.Excerpt {
 	e, err := model.ExcerptFromXML(bytes.NewReader(quiz.Excerpt))
 	if err != nil {

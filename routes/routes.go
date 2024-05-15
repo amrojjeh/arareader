@@ -144,8 +144,7 @@ func (qh quizHandler) getMethod(w http.ResponseWriter, r *http.Request) {
 
 func (qh quizHandler) postMethod(w http.ResponseWriter, r *http.Request) {
 	question := shiftQuestion(r, qh.questions)
-	// TODO(Amr Ojjeh): Add must parse
-	r.ParseForm()
+	qh.mustParseForm(r)
 	ans := r.Form.Get("ans")
 	// TODO(Amr Ojjeh): Validate answer
 	// TODO(Amr Ojjeh): Check answer
