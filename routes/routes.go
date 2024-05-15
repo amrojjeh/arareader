@@ -82,7 +82,7 @@ func (rh rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.FileServer(http.FS(static.Files)).ServeHTTP(w, r)
 	case ".":
 		allowMethods(r, http.MethodGet)
-		http.Redirect(w, r, "/quiz/1/0", http.StatusPermanentRedirect)
+		http.Redirect(w, r, "/quiz/1/0", http.StatusSeeOther)
 	case "quiz":
 		quiz := shiftQuiz(r, rh.queries)
 		newQuizHandler(r, rh, quiz).ServeHTTP(w, r)

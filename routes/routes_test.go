@@ -20,8 +20,7 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 		{
 			name: "Root",
 			path: "/",
-			code: http.StatusOK,
-			body: []byte("Submit"),
+			code: http.StatusSeeOther,
 		},
 		{
 			name: "Static",
@@ -35,6 +34,12 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 			code: http.StatusNotFound,
 			body: []byte("404"),
 		},
+		{
+			name: "Question",
+			path: "/quiz/1/0",
+			code: http.StatusOK,
+			body: []byte("Submit"),
+		},
 	}
 
 	for _, tt := range tests {
@@ -47,7 +52,7 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 				t.Errorf("incorrect status code (expected: %d; actual: %d)", tt.code, writer.Code)
 			}
 			if !bytes.Contains(writer.Body.Bytes(), tt.body) {
-				t.Errorf("incorrect page (path: %s)", tt.path)
+				t.Errorf("incorrect page")
 			}
 		})
 	}
