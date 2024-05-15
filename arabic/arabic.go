@@ -1,8 +1,8 @@
 package arabic
 
 import (
+	"errors"
 	"strings"
-	"unicode/utf8"
 )
 
 var letters = map[rune]bool{
@@ -86,11 +86,8 @@ func (l LetterPack) String() string {
 	return builder.String()
 }
 
-func LetterPackFromString(str string) LetterPack {
+func ParseLetterPack(str string) (LetterPack, error) {
 	lp := LetterPack{}
-	letter, size := utf8.DecodeRuneInString(str)
-	lp.Letter = letter
-	str = str[size:]
 	for _, l := range str {
 		switch l {
 		case Shadda:
@@ -99,13 +96,21 @@ func LetterPackFromString(str string) LetterPack {
 			lp.SuperscriptAlef = true
 		default:
 			if IsVowel(l) {
+				if lp.Vowel != 0 {
+					return LetterPack{}, errors.New("arabic: cannot have more than one vowel")
+				}
 				lp.Vowel = l
+			} else if IsLetter(l) {
+				if lp.Letter != 0 {
+					return LetterPack{}, errors.New("arabic: cannot have more than one letter")
+				}
+				lp.Letter = l
 			} else {
-				panic("unexpected character")
+				return LetterPack{}, errors.New("arabic: unexpected character")
 			}
 		}
 	}
-	return lp
+	return lp, nil
 }
 
 // UnpointedString returns the word without any vowels
