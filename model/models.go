@@ -27,7 +27,7 @@ type Question struct {
 	ID       int
 	QuizID   int
 	Position int
-	Type     string
+	Type     QuestionType
 	Data     []byte
 	Created  time.Time
 	Updated  time.Time
@@ -60,7 +60,7 @@ type StudentQuestionSession struct {
 	ID                   int
 	StudentQuizSessionID int
 	QuestionID           int
-	Status               string
+	Status               QuestionStatus
 	Answer               string
 	Created              time.Time
 	Updated              time.Time
@@ -70,7 +70,7 @@ type StudentQuizSession struct {
 	ID        int
 	StudentID int
 	QuizID    int
-	Status    string
+	Status    QuizStatus
 	Created   time.Time
 	Updated   time.Time
 }

@@ -1,4 +1,4 @@
-package service
+package model
 
 import (
 	"encoding/xml"
@@ -187,6 +187,15 @@ func (e *Excerpt) UnpointRef(targetRef int) error {
 	return nil
 }
 
+func (e *Excerpt) UnpointRefs(refs []int) error {
+	for _, r := range refs {
+		if err := e.UnpointRef(r); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 type ReferenceNode struct {
 	ID    int
 	Nodes []ExcerptNodes
@@ -274,6 +283,6 @@ func (c *TextNode) Unpoint() {
 	c.Text = arabic.Unpointed(c.Text)
 }
 
-func excerptTemplate() *template.Template {
+func ExcerptTemplate() *template.Template {
 	return template.New("excerpt parser").Funcs(template.FuncMap{"bw": arabic.FromBuckwalter})
 }

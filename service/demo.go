@@ -24,7 +24,7 @@ func DemoDB(ctx context.Context) *sql.DB {
 	}))
 
 	buff := &bytes.Buffer{}
-	template.Must(excerptTemplate().Parse(excerpt)).Execute(buff, nil)
+	template.Must(model.ExcerptTemplate().Parse(excerpt)).Execute(buff, nil)
 
 	quiz := must.Get(q.CreateQuiz(ctx, model.CreateQuizParams{
 		TeacherID: teacher.ID,
@@ -35,42 +35,29 @@ func DemoDB(ctx context.Context) *sql.DB {
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
 		QuizID:   quiz.ID,
 		Position: 0,
-		Type:     string(VowelQuestionType),
-		Data: must.Get(json.Marshal(VowelQuestionData{
-			Reference: 1,
-			Feedback:  "There's a damma because it's a raf'",
-		})),
+		Type:     model.VowelQuestionType,
+		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(1, "There's a damma because it's a raf'"))),
 	})
 
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
 		QuizID:   quiz.ID,
 		Position: 1,
-		Type:     string(VowelQuestionType),
-		Data: must.Get(json.Marshal(VowelQuestionData{
-			Reference: 2,
-			Feedback:  "There's a kasra because it's a jarr'",
-		})),
+		Type:     model.VowelQuestionType,
+		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(2, "There's a kasra because it's a jarr'"))),
 	})
 
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
 		QuizID:   quiz.ID,
 		Position: 2,
-		Type:     string(VowelQuestionType),
-		Data: must.Get(json.Marshal(VowelQuestionData{
-			Reference: 4,
-			Feedback:  "There's a damma because it's a raf'",
-		})),
+		Type:     model.VowelQuestionType,
+		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(4, "There's a damma because it's a raf'"))),
 	})
 
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
 		QuizID:   quiz.ID,
-		Position: 4,
-		Type:     string(ShortAnswerQuestionType),
-		Data: must.Get(json.Marshal(ShortAnswerQuestionData{
-			Reference: 3,
-			Feedback:  "Possible translation: this is a house",
-			Prompt:    "Translate the sentence",
-		})),
+		Position: 3,
+		Type:     model.ShortAnswerQuestionType,
+		Data:     must.Get(json.Marshal(model.NewShortAnswerQuestionData(3, "Possible translation: this is a house", "Translate the sentence"))),
 	})
 
 	class := must.Get(q.CreateClass(ctx, model.CreateClassParams{
@@ -91,7 +78,7 @@ func DemoDB(ctx context.Context) *sql.DB {
 	q.CreateStudentQuizSession(ctx, model.CreateStudentQuizSessionParams{
 		StudentID: s.ID,
 		QuizID:    quiz.ID,
-		Status:    string(UnsubmittedQuizStatus),
+		Status:    model.UnsubmittedQuizStatus,
 	})
 	return db
 }

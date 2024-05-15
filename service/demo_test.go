@@ -29,11 +29,11 @@ func TestDemoDB(t *testing.T) {
 
 	questions := must.Get(q.ListQuestionsByQuiz(ctx, quiz.ID))
 
-	if questions[0].Type != string(VowelQuestionType) {
+	if questions[0].Type != model.VowelQuestionType {
 		t.Error("first question should be a vowel question")
 	}
 
-	if questions[3].Type != string(ShortAnswerQuestionType) {
+	if questions[3].Type != model.ShortAnswerQuestionType {
 		t.Error("fourth question should be a short answer")
 	}
 }

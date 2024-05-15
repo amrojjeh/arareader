@@ -16,3 +16,12 @@ sql:
             type: "[]byte"
         - db_type: "INTEGER"
           go_type: "int"
+        - column: "student_quiz_session.status"
+          go_type:
+            type: "QuizStatus"
+        - column: "student_question_session.status"
+          go_type:
+            type: "QuestionStatus"
+        - column: "question.type"
+          go_type:
+            type: "QuestionType"

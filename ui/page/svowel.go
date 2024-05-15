@@ -6,7 +6,7 @@ package page
 
 import (
 	"github.com/amrojjeh/arareader/arabic"
-	"github.com/amrojjeh/arareader/service"
+	"github.com/amrojjeh/arareader/model"
 	ar "github.com/amrojjeh/arareader/ui/components"
 	g "github.com/maragudk/gomponents"
 	c "github.com/maragudk/gomponents/components"
@@ -14,13 +14,16 @@ import (
 )
 
 type SVowelParams struct {
-	Excerpt          *service.Excerpt
+	Excerpt          *model.Excerpt
 	HighlightedRef   int
 	QuizTitle        string
+	Prompt           string
+	SubmitURL        string
 	QuestionNavProps ar.QuestionNavProps
 }
 
 // TODO(Amr Ojjeh): Make the nav and question into a grid so that centering can be done
+// TODO(Amr Ojjeh): Change into a general questions page
 func SVowel(p SVowelParams) g.Node {
 	return c.HTML5(c.HTML5Props{
 		Title:       "Arareader",
@@ -43,9 +46,10 @@ func SVowel(p SVowelParams) g.Node {
 			ar.QuestionNav(p.QuestionNavProps),
 			ar.Excerpt(p.Excerpt, p.HighlightedRef),
 			P(Class("instruction"),
-				g.Text("Enter the correct vowel"),
+				g.Text(p.Prompt),
 			),
-			FormEl(Class("stack"),
+			FormEl(Class("stack"), Action(p.SubmitURL), Method("post"),
+				Input(Type("hidden"), Name("ans"), DataAttr("vowel-form-answer", "")),
 				Div(Class("svowel-options"),
 					ar.VowelButton(arabic.FromBuckwalter("lo")),
 					Div(Class("svowel-options__not-sukoon"),

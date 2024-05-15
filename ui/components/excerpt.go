@@ -4,20 +4,20 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/amrojjeh/arareader/service"
+	"github.com/amrojjeh/arareader/model"
 	g "github.com/maragudk/gomponents"
 	. "github.com/maragudk/gomponents/html"
 )
 
 // Assumes excerpt is valid
-func Excerpt(e *service.Excerpt, highlightedRef int) g.Node {
+func Excerpt(e *model.Excerpt, highlightedRef int) g.Node {
 	children := processNodes(e.Nodes, highlightedRef)
 	return P(Class("excerpt"),
 		g.Group(children),
 	)
 }
 
-func refNode(r *service.ReferenceNode, highlightedRef int) g.Node {
+func refNode(r *model.ReferenceNode, highlightedRef int) g.Node {
 	children := processNodes(r.Nodes, highlightedRef)
 	if r.ID == highlightedRef {
 		return Span(Class("highlight"), DataAttr("selected-segment", ""),
@@ -30,14 +30,14 @@ func refNode(r *service.ReferenceNode, highlightedRef int) g.Node {
 	}
 }
 
-func processNodes(nodes []service.ExcerptNodes, highlightedRef int) []g.Node {
+func processNodes(nodes []model.ExcerptNodes, highlightedRef int) []g.Node {
 	acc := []g.Node{}
 	for _, n := range nodes {
 		switch n.(type) {
-		case *service.ReferenceNode:
-			acc = append(acc, refNode(n.(*service.ReferenceNode), highlightedRef))
-		case *service.TextNode:
-			text := n.(*service.TextNode).Text
+		case *model.ReferenceNode:
+			acc = append(acc, refNode(n.(*model.ReferenceNode), highlightedRef))
+		case *model.TextNode:
+			text := n.(*model.TextNode).Text
 			acc = append(acc, g.Text(text))
 		default:
 			panic(fmt.Sprintf("unexpected element of type %v", reflect.TypeOf(n)))

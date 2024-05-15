@@ -74,7 +74,7 @@ INSERT INTO question (
 type CreateQuestionParams struct {
 	QuizID   int
 	Position int
-	Type     string
+	Type     QuestionType
 	Data     []byte
 }
 
@@ -164,7 +164,6 @@ func (q *Queries) CreateStudent(ctx context.Context, arg CreateStudentParams) (S
 }
 
 const createStudentQuestionSession = `-- name: CreateStudentQuestionSession :one
-
 INSERT INTO student_question_session (
     student_quiz_session_id, question_id, answer, status, created, updated
 ) VALUES (
@@ -176,12 +175,9 @@ type CreateStudentQuestionSessionParams struct {
 	StudentQuizSessionID int
 	QuestionID           int
 	Answer               string
-	Status               string
+	Status               QuestionStatus
 }
 
-// **********
-// STUDENT_QUESTION_SESSION TABLE
-// **********
 func (q *Queries) CreateStudentQuestionSession(ctx context.Context, arg CreateStudentQuestionSessionParams) (StudentQuestionSession, error) {
 	row := q.db.QueryRowContext(ctx, createStudentQuestionSession,
 		arg.StudentQuizSessionID,
@@ -214,7 +210,7 @@ INSERT INTO student_quiz_session (
 type CreateStudentQuizSessionParams struct {
 	StudentID int
 	QuizID    int
-	Status    string
+	Status    QuizStatus
 }
 
 // **********
@@ -474,7 +470,7 @@ ORDER BY position
 
 type ListQuestionsByQuizAndTypeParams struct {
 	QuizID int
-	Type   string
+	Type   QuestionType
 }
 
 func (q *Queries) ListQuestionsByQuizAndType(ctx context.Context, arg ListQuestionsByQuizAndTypeParams) ([]Question, error) {
@@ -687,4 +683,36 @@ type RemoveQuizFromClassParams struct {
 func (q *Queries) RemoveQuizFromClass(ctx context.Context, arg RemoveQuizFromClassParams) error {
 	_, err := q.db.ExecContext(ctx, removeQuizFromClass, arg.QuizID, arg.ClassID)
 	return err
+}
+
+const submitAnswer = `-- name: SubmitAnswer :one
+
+UPDATE student_question_session
+SET answer=?, status=?, updated=datetime("now")
+WHERE student_quiz_session_id=?
+RETURNING id, student_quiz_session_id, question_id, status, answer, created, updated
+`
+
+type SubmitAnswerParams struct {
+	Answer               string
+	Status               QuestionStatus
+	StudentQuizSessionID int
+}
+
+// **********
+// STUDENT_QUESTION_SESSION TABLE
+// **********
+func (q *Queries) SubmitAnswer(ctx context.Context, arg SubmitAnswerParams) (StudentQuestionSession, error) {
+	row := q.db.QueryRowContext(ctx, submitAnswer, arg.Answer, arg.Status, arg.StudentQuizSessionID)
+	var i StudentQuestionSession
+	err := row.Scan(
+		&i.ID,
+		&i.StudentQuizSessionID,
+		&i.QuestionID,
+		&i.Status,
+		&i.Answer,
+		&i.Created,
+		&i.Updated,
+	)
+	return i, err
 }

@@ -158,6 +158,12 @@ INSERT INTO student_quiz_session (
 -- STUDENT_QUESTION_SESSION TABLE
 -- **********
 
+-- name: SubmitAnswer :one
+UPDATE student_question_session
+SET answer=?, status=?, updated=datetime("now")
+WHERE student_quiz_session_id=?
+RETURNING *;
+
 -- name: CreateStudentQuestionSession :one
 INSERT INTO student_question_session (
     student_quiz_session_id, question_id, answer, status, created, updated

@@ -11,5 +11,7 @@ substituteButtons.forEach(x => {
     selected.innerText = sub
     e.target.classList.add("button--selected")
     e.target.setAttribute("data-selected-button", "")
+    const answer = document.querySelector("[data-vowel-form-answer]")
+    answer.value = sub
   })
 })
