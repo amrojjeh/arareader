@@ -5,7 +5,6 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package page
 
 import (
-	"github.com/amrojjeh/arareader/arabic"
 	"github.com/amrojjeh/arareader/model"
 	ar "github.com/amrojjeh/arareader/ui/components"
 	g "github.com/maragudk/gomponents"
@@ -13,18 +12,17 @@ import (
 	. "github.com/maragudk/gomponents/html"
 )
 
-type SVowelParams struct {
+type QuestionParams struct {
 	Excerpt          *model.Excerpt
 	HighlightedRef   int
 	QuizTitle        string
 	Prompt           string
-	SubmitURL        string
 	QuestionNavProps ar.QuestionNavProps
+	InputMethod      g.Node
 }
 
 // TODO(Amr Ojjeh): Make the nav and question into a grid so that centering can be done
-// TODO(Amr Ojjeh): Change into a general questions page
-func SVowel(p SVowelParams) g.Node {
+func QuestionPage(p QuestionParams) g.Node {
 	return c.HTML5(c.HTML5Props{
 		Title:       "Arareader",
 		Description: "TO DO",
@@ -48,21 +46,7 @@ func SVowel(p SVowelParams) g.Node {
 			P(Class("instruction"),
 				g.Text(p.Prompt),
 			),
-			FormEl(Class("stack"), Action(p.SubmitURL), Method("post"),
-				Input(Type("hidden"), Name("ans"), DataAttr("vowel-form-answer", "")),
-				Div(Class("svowel-options"),
-					ar.VowelButton(arabic.FromBuckwalter("lo")),
-					Div(Class("svowel-options__not-sukoon"),
-						ar.VowelButton(arabic.FromBuckwalter("li")),
-						ar.VowelButton(arabic.FromBuckwalter("la")),
-						ar.VowelButton(arabic.FromBuckwalter("lu")),
-						ar.VowelButton(arabic.FromBuckwalter("lK")),
-						ar.VowelButton(arabic.FromBuckwalter("lF")),
-						ar.VowelButton(arabic.FromBuckwalter("lN")),
-					),
-				),
-				ar.SubmitButton("Submit"),
-			),
+			p.InputMethod,
 		},
 	})
 }

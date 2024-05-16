@@ -9,12 +9,6 @@ import (
 	h "github.com/maragudk/gomponents/html"
 )
 
-func VowelButton(text string) g.Node {
-	return button(h.Type("button"), h.DataAttr("substitute-button", text),
-		g.Text(text),
-	)
-}
-
 func SubmitButton(text string) g.Node {
 	return button(h.Type("submit"),
 		g.Text(text),
