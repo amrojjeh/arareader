@@ -139,33 +139,36 @@ DELETE FROM student
 WHERE id=?;
 
 -- **********
--- STUDENT_QUIZ_SESSION TABLE
+-- QUIZ_SESSION TABLE
 -- **********
 
--- name: CreateStudentQuizSession :one
-INSERT INTO student_quiz_session (
+-- name: CreateQuizSession :one
+INSERT INTO quiz_session (
     student_id, quiz_id, status, created, updated
 ) VALUES (
     ?, ?, ?, datetime("now"), datetime("now")
 ) RETURNING *;
 
--- name: GetStudentQuizSession :one
-SELECT * FROM student_quiz_session
+-- name: GetQuizSession :one
+SELECT * FROM quiz_session
 WHERE student_id=? AND quiz_id=?;
 
 -- **********
--- STUDENT_QUESTION_SESSION TABLE
+-- QUESTION_SESSION TABLE
 -- **********
-
--- name: SubmitAnswer :one
-UPDATE student_question_session
-SET answer=?, status=?, updated=datetime("now")
-WHERE student_quiz_session_id=?
-RETURNING *;
-
--- name: CreateStudentQuestionSession :one
-INSERT INTO student_question_session (
-    student_quiz_session_id, question_id, answer, status, created, updated
+-- name: CreateQuestionSession :one
+INSERT INTO question_session (
+    quiz_session_id, question_id, answer, status, created, updated
 ) VALUES (
     ?, ?, ?, ?, datetime("now"), datetime("now")
 ) RETURNING *;
+
+-- name: SubmitAnswer :one
+UPDATE question_session
+SET answer=?, status=?, updated=datetime("now")
+WHERE quiz_session_id=?
+RETURNING *;
+
+-- name: GetQuestionSession :one
+SELECT  * FROM question_session
+WHERE quiz_session_id=? AND question_id=?;

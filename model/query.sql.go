@@ -101,6 +101,44 @@ func (q *Queries) CreateQuestion(ctx context.Context, arg CreateQuestionParams) 
 	return i, err
 }
 
+const createQuestionSession = `-- name: CreateQuestionSession :one
+INSERT INTO question_session (
+    quiz_session_id, question_id, answer, status, created, updated
+) VALUES (
+    ?, ?, ?, ?, datetime("now"), datetime("now")
+) RETURNING id, quiz_session_id, question_id, status, answer, created, updated
+`
+
+type CreateQuestionSessionParams struct {
+	QuizSessionID int
+	QuestionID    int
+	Answer        string
+	Status        QuestionStatus
+}
+
+// **********
+// QUESTION_SESSION TABLE
+// **********
+func (q *Queries) CreateQuestionSession(ctx context.Context, arg CreateQuestionSessionParams) (QuestionSession, error) {
+	row := q.db.QueryRowContext(ctx, createQuestionSession,
+		arg.QuizSessionID,
+		arg.QuestionID,
+		arg.Answer,
+		arg.Status,
+	)
+	var i QuestionSession
+	err := row.Scan(
+		&i.ID,
+		&i.QuizSessionID,
+		&i.QuestionID,
+		&i.Status,
+		&i.Answer,
+		&i.Created,
+		&i.Updated,
+	)
+	return i, err
+}
+
 const createQuiz = `-- name: CreateQuiz :one
 
 INSERT INTO quiz (
@@ -133,6 +171,38 @@ func (q *Queries) CreateQuiz(ctx context.Context, arg CreateQuizParams) (Quiz, e
 	return i, err
 }
 
+const createQuizSession = `-- name: CreateQuizSession :one
+
+INSERT INTO quiz_session (
+    student_id, quiz_id, status, created, updated
+) VALUES (
+    ?, ?, ?, datetime("now"), datetime("now")
+) RETURNING id, student_id, quiz_id, status, created, updated
+`
+
+type CreateQuizSessionParams struct {
+	StudentID int
+	QuizID    int
+	Status    QuizStatus
+}
+
+// **********
+// QUIZ_SESSION TABLE
+// **********
+func (q *Queries) CreateQuizSession(ctx context.Context, arg CreateQuizSessionParams) (QuizSession, error) {
+	row := q.db.QueryRowContext(ctx, createQuizSession, arg.StudentID, arg.QuizID, arg.Status)
+	var i QuizSession
+	err := row.Scan(
+		&i.ID,
+		&i.StudentID,
+		&i.QuizID,
+		&i.Status,
+		&i.Created,
+		&i.Updated,
+	)
+	return i, err
+}
+
 const createStudent = `-- name: CreateStudent :one
 
 INSERT INTO student (
@@ -157,73 +227,6 @@ func (q *Queries) CreateStudent(ctx context.Context, arg CreateStudentParams) (S
 		&i.ID,
 		&i.Name,
 		&i.ClassID,
-		&i.Created,
-		&i.Updated,
-	)
-	return i, err
-}
-
-const createStudentQuestionSession = `-- name: CreateStudentQuestionSession :one
-INSERT INTO student_question_session (
-    student_quiz_session_id, question_id, answer, status, created, updated
-) VALUES (
-    ?, ?, ?, ?, datetime("now"), datetime("now")
-) RETURNING id, student_quiz_session_id, question_id, status, answer, created, updated
-`
-
-type CreateStudentQuestionSessionParams struct {
-	StudentQuizSessionID int
-	QuestionID           int
-	Answer               string
-	Status               QuestionStatus
-}
-
-func (q *Queries) CreateStudentQuestionSession(ctx context.Context, arg CreateStudentQuestionSessionParams) (StudentQuestionSession, error) {
-	row := q.db.QueryRowContext(ctx, createStudentQuestionSession,
-		arg.StudentQuizSessionID,
-		arg.QuestionID,
-		arg.Answer,
-		arg.Status,
-	)
-	var i StudentQuestionSession
-	err := row.Scan(
-		&i.ID,
-		&i.StudentQuizSessionID,
-		&i.QuestionID,
-		&i.Status,
-		&i.Answer,
-		&i.Created,
-		&i.Updated,
-	)
-	return i, err
-}
-
-const createStudentQuizSession = `-- name: CreateStudentQuizSession :one
-
-INSERT INTO student_quiz_session (
-    student_id, quiz_id, status, created, updated
-) VALUES (
-    ?, ?, ?, datetime("now"), datetime("now")
-) RETURNING id, student_id, quiz_id, status, created, updated
-`
-
-type CreateStudentQuizSessionParams struct {
-	StudentID int
-	QuizID    int
-	Status    QuizStatus
-}
-
-// **********
-// STUDENT_QUIZ_SESSION TABLE
-// **********
-func (q *Queries) CreateStudentQuizSession(ctx context.Context, arg CreateStudentQuizSessionParams) (StudentQuizSession, error) {
-	row := q.db.QueryRowContext(ctx, createStudentQuizSession, arg.StudentID, arg.QuizID, arg.Status)
-	var i StudentQuizSession
-	err := row.Scan(
-		&i.ID,
-		&i.StudentID,
-		&i.QuizID,
-		&i.Status,
 		&i.Created,
 		&i.Updated,
 	)
@@ -352,6 +355,31 @@ func (q *Queries) GetQuestion(ctx context.Context, id int) (Question, error) {
 	return i, err
 }
 
+const getQuestionSession = `-- name: GetQuestionSession :one
+SELECT  id, quiz_session_id, question_id, status, answer, created, updated FROM question_session
+WHERE quiz_session_id=? AND question_id=?
+`
+
+type GetQuestionSessionParams struct {
+	QuizSessionID int
+	QuestionID    int
+}
+
+func (q *Queries) GetQuestionSession(ctx context.Context, arg GetQuestionSessionParams) (QuestionSession, error) {
+	row := q.db.QueryRowContext(ctx, getQuestionSession, arg.QuizSessionID, arg.QuestionID)
+	var i QuestionSession
+	err := row.Scan(
+		&i.ID,
+		&i.QuizSessionID,
+		&i.QuestionID,
+		&i.Status,
+		&i.Answer,
+		&i.Created,
+		&i.Updated,
+	)
+	return i, err
+}
+
 const getQuiz = `-- name: GetQuiz :one
 SELECT id, teacher_id, title, excerpt, created, updated FROM quiz
 WHERE id=?
@@ -371,19 +399,19 @@ func (q *Queries) GetQuiz(ctx context.Context, id int) (Quiz, error) {
 	return i, err
 }
 
-const getStudentQuizSession = `-- name: GetStudentQuizSession :one
-SELECT id, student_id, quiz_id, status, created, updated FROM student_quiz_session
+const getQuizSession = `-- name: GetQuizSession :one
+SELECT id, student_id, quiz_id, status, created, updated FROM quiz_session
 WHERE student_id=? AND quiz_id=?
 `
 
-type GetStudentQuizSessionParams struct {
+type GetQuizSessionParams struct {
 	StudentID int
 	QuizID    int
 }
 
-func (q *Queries) GetStudentQuizSession(ctx context.Context, arg GetStudentQuizSessionParams) (StudentQuizSession, error) {
-	row := q.db.QueryRowContext(ctx, getStudentQuizSession, arg.StudentID, arg.QuizID)
-	var i StudentQuizSession
+func (q *Queries) GetQuizSession(ctx context.Context, arg GetQuizSessionParams) (QuizSession, error) {
+	row := q.db.QueryRowContext(ctx, getQuizSession, arg.StudentID, arg.QuizID)
+	var i QuizSession
 	err := row.Scan(
 		&i.ID,
 		&i.StudentID,
@@ -668,28 +696,24 @@ func (q *Queries) RemoveQuizFromClass(ctx context.Context, arg RemoveQuizFromCla
 }
 
 const submitAnswer = `-- name: SubmitAnswer :one
-
-UPDATE student_question_session
+UPDATE question_session
 SET answer=?, status=?, updated=datetime("now")
-WHERE student_quiz_session_id=?
-RETURNING id, student_quiz_session_id, question_id, status, answer, created, updated
+WHERE quiz_session_id=?
+RETURNING id, quiz_session_id, question_id, status, answer, created, updated
 `
 
 type SubmitAnswerParams struct {
-	Answer               string
-	Status               QuestionStatus
-	StudentQuizSessionID int
+	Answer        string
+	Status        QuestionStatus
+	QuizSessionID int
 }
 
-// **********
-// STUDENT_QUESTION_SESSION TABLE
-// **********
-func (q *Queries) SubmitAnswer(ctx context.Context, arg SubmitAnswerParams) (StudentQuestionSession, error) {
-	row := q.db.QueryRowContext(ctx, submitAnswer, arg.Answer, arg.Status, arg.StudentQuizSessionID)
-	var i StudentQuestionSession
+func (q *Queries) SubmitAnswer(ctx context.Context, arg SubmitAnswerParams) (QuestionSession, error) {
+	row := q.db.QueryRowContext(ctx, submitAnswer, arg.Answer, arg.Status, arg.QuizSessionID)
+	var i QuestionSession
 	err := row.Scan(
 		&i.ID,
-		&i.StudentQuizSessionID,
+		&i.QuizSessionID,
 		&i.QuestionID,
 		&i.Status,
 		&i.Answer,

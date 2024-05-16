@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS teacher (
     created DATETIME NOT NULL,
     updated DATETIME NOT NULL,
 
-    CONSTRAINT teacher_email_uc UNIQUE (email)
+    CONSTRAINT teacher_uc UNIQUE (email)
 );
 
 CREATE TABLE IF NOT EXISTS quiz (
@@ -80,13 +80,14 @@ CREATE TABLE IF NOT EXISTS student (
         ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS student_quiz_session (
+CREATE TABLE IF NOT EXISTS quiz_session (
     id INTEGER NOT NULL PRIMARY KEY,
     student_id INTEGER NOT NULL,
     quiz_id INTEGER NOT NULL,
     status TEXT NOT NULL, -- "submitted" | "unsubmitted"
     created DATETIME NOT NULL,
     updated DATETIME NOT NULL,
+    CONSTRAINT quiz_session UNIQUE (student_id, quiz_id),
     FOREIGN KEY (student_id)
         REFERENCES student(id)
         ON DELETE CASCADE
@@ -98,17 +99,17 @@ CREATE TABLE IF NOT EXISTS student_quiz_session (
 );
 
 
--- TODO(Amr Ojjeh): Consider storing as a JSON
-CREATE TABLE IF NOT EXISTS student_question_session (
+CREATE TABLE IF NOT EXISTS question_session (
     id INTEGER NOT NULL PRIMARY KEY,
-    student_quiz_session_id INTEGER NOT NULL,
+    quiz_session_id INTEGER NOT NULL,
     question_id INTEGER NOT NULL,
     status TEXT NOT NULL, -- "correct" | "incorrect" | "pending" | "unsubmitted" | "unattempted"
     answer TEXT NOT NULL,
     created DATETIME NOT NULL,
     updated DATETIME NOT NULL,
-    FOREIGN KEY (student_quiz_session_id)
-        REFERENCES student_quiz_session(id)
+    CONSTRAINT question_session_uc UNIQUE (quiz_session_id, quiz_id),
+    FOREIGN KEY (quiz_session_id)
+        REFERENCES quiz_session(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     FOREIGN KEY (question_id)

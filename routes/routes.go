@@ -94,22 +94,22 @@ func (rh rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // quizHandler serves a particualr quiz
 type quizHandler struct {
 	rootHandler
-	quiz               model.Quiz
-	studentQuizSession model.StudentQuizSession
-	excerpt            *model.Excerpt
-	questions          []model.Question
+	quiz        model.Quiz
+	quizSession model.QuizSession
+	excerpt     *model.Excerpt
+	questions   []model.Question
 }
 
 func newQuizHandler(r *http.Request, rh rootHandler, quiz model.Quiz) http.Handler {
 	excerpt := rh.excerpt(quiz)
 	qs := rh.questions(r, quiz)
-	sqs, _ := rh.studentQuizSession(r, quiz.ID, 1) // TEMP(Amr Ojjeh): Temporary until there's class management
+	sqs, _ := rh.quizSession(r, quiz.ID, 1) // TEMP(Amr Ojjeh): Temporary until there's class management
 	return quizHandler{
-		rootHandler:        rh,
-		quiz:               quiz,
-		excerpt:            excerpt,
-		questions:          qs,
-		studentQuizSession: sqs,
+		rootHandler: rh,
+		quiz:        quiz,
+		excerpt:     excerpt,
+		questions:   qs,
+		quizSession: sqs,
 	}
 }
 

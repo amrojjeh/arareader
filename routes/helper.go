@@ -100,14 +100,14 @@ func (rh rootHandler) questions(r *http.Request, quiz model.Quiz) []model.Questi
 	return must.Get(rh.queries.ListQuestionsByQuiz(r.Context(), quiz.ID))
 }
 
-func (rh rootHandler) studentQuizSession(r *http.Request, quizID, studentID int) (model.StudentQuizSession, bool) {
-	quizSession, err := rh.queries.GetStudentQuizSession(r.Context(), model.GetStudentQuizSessionParams{
+func (rh rootHandler) quizSession(r *http.Request, quizID, studentID int) (model.QuizSession, bool) {
+	quizSession, err := rh.queries.GetQuizSession(r.Context(), model.GetQuizSessionParams{
 		StudentID: studentID,
 		QuizID:    quizID,
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return model.StudentQuizSession{}, false
+			return model.QuizSession{}, false
 		}
 		panic(fmt.Sprintf("could not retrieve quiz session: %s", err))
 	}
@@ -132,12 +132,17 @@ func isVowelQuestionType(q model.Question) bool {
 
 func (qh quizHandler) submitAnswer(r *http.Request, answer string, status model.QuestionStatus) {
 	_, err := qh.queries.SubmitAnswer(r.Context(), model.SubmitAnswerParams{
-		Answer:               answer,
-		Status:               status,
-		StudentQuizSessionID: qh.studentQuizSession.ID,
+		Answer:        answer,
+		Status:        status,
+		QuizSessionID: qh.quizSession.ID,
 	})
 
 	if err != nil {
 		panic(fmt.Sprintf("could not submit answer: %s", err))
 	}
+}
+
+func (qh quizHandler) QuestionSession(r *http.Request, qs model.QuizSession) (model.QuestionSession, bool) {
+	// TODO(Amr Ojjeh): Retrieve student question session
+	// qh.queries.
 }

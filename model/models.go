@@ -33,11 +33,30 @@ type Question struct {
 	Updated  time.Time
 }
 
+type QuestionSession struct {
+	ID            int
+	QuizSessionID int
+	QuestionID    int
+	Status        QuestionStatus
+	Answer        string
+	Created       time.Time
+	Updated       time.Time
+}
+
 type Quiz struct {
 	ID        int
 	TeacherID int
 	Title     string
 	Excerpt   []byte
+	Created   time.Time
+	Updated   time.Time
+}
+
+type QuizSession struct {
+	ID        int
+	StudentID int
+	QuizID    int
+	Status    QuizStatus
 	Created   time.Time
 	Updated   time.Time
 }
@@ -54,25 +73,6 @@ type Student struct {
 	ClassID int
 	Created time.Time
 	Updated time.Time
-}
-
-type StudentQuestionSession struct {
-	ID                   int
-	StudentQuizSessionID int
-	QuestionID           int
-	Status               QuestionStatus
-	Answer               string
-	Created              time.Time
-	Updated              time.Time
-}
-
-type StudentQuizSession struct {
-	ID        int
-	StudentID int
-	QuizID    int
-	Status    QuizStatus
-	Created   time.Time
-	Updated   time.Time
 }
 
 type Teacher struct {

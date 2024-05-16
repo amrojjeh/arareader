@@ -76,7 +76,7 @@ func DemoDB(ctx context.Context) *sql.DB {
 		ClassID: class.ID,
 	}))
 
-	q.CreateStudentQuizSession(ctx, model.CreateStudentQuizSessionParams{
+	q.CreateQuizSession(ctx, model.CreateQuizSessionParams{
 		StudentID: s.ID,
 		QuizID:    quiz.ID,
 		Status:    model.UnsubmittedQuizStatus,
