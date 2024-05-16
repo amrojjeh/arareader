@@ -12,7 +12,7 @@ import (
 )
 
 func DemoDB(ctx context.Context) *sql.DB {
-	var excerpt = `<excerpt>{{bw "<nmA Al>EmA"}}<ref id="1">{{bw "lu"}}</ref> {{bw "bAlnyA"}}<ref id="2">{{bw "ti"}}</ref>، {{bw "w<nmA lkl AmrY' mA nwY fmn kAnt hjrth <lY"}} <ref id="3">{{bw "Allh wrswlh fhjrth <lY Allh wrswlh، wmn kAnt hjrth ldnyA ySybhA، >w Amr>p ynkHhA fhjrt"}}<ref id="4">{{bw "hu"}}</ref> {{bw "<lY mA hAjr <lyh"}}</ref></excerpt>`
+	var excerptXML = `<excerpt>{{bw "<nmA Al>EmA"}}<ref id="1">{{bw "lu"}}</ref> {{bw "bAlnyA"}}<ref id="2">{{bw "ti"}}</ref>، {{bw "w<nmA lkl AmrY' mA nwY fmn kAnt hjrth <lY"}} <ref id="3">{{bw "Allh wrswlh fhjrth <lY Allh wrswlh، wmn kAnt hjrth ldnyA ySybhA، >w Amr>p ynkHhA fhjrt"}}<ref id="4">{{bw "hu"}}</ref> {{bw "<lY mA hAjr <lyh"}}</ref></excerpt>`
 
 	db := MustOpenDB(":memory:")
 	MustSetup(ctx, db)
@@ -24,7 +24,8 @@ func DemoDB(ctx context.Context) *sql.DB {
 	}))
 
 	buff := &bytes.Buffer{}
-	template.Must(model.ExcerptTemplate().Parse(excerpt)).Execute(buff, nil)
+	template.Must(model.ExcerptTemplate().Parse(excerptXML)).Execute(buff, nil)
+	excerpt, _ := model.ExcerptFromXML(buff)
 
 	quiz := must.Get(q.CreateQuiz(ctx, model.CreateQuizParams{
 		TeacherID: teacher.ID,
@@ -36,28 +37,28 @@ func DemoDB(ctx context.Context) *sql.DB {
 		QuizID:   quiz.ID,
 		Position: 0,
 		Type:     model.VowelQuestionType,
-		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(1, "There's a damma because it's a raf'"))),
+		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(excerpt.Ref(1), "There's a damma because it's a raf'"))),
 	})
 
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
 		QuizID:   quiz.ID,
 		Position: 1,
 		Type:     model.VowelQuestionType,
-		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(2, "There's a kasra because it's a jarr'"))),
+		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(excerpt.Ref(2), "There's a kasra because it's a jarr'"))),
 	})
 
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
 		QuizID:   quiz.ID,
 		Position: 2,
 		Type:     model.VowelQuestionType,
-		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(4, "There's a damma because it's a raf'"))),
+		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(excerpt.Ref(4), "There's a damma because it's a raf'"))),
 	})
 
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
 		QuizID:   quiz.ID,
 		Position: 3,
 		Type:     model.ShortAnswerQuestionType,
-		Data:     must.Get(json.Marshal(model.NewShortAnswerQuestionData(3, "Possible translation: this is a house", "Translate the sentence"))),
+		Data:     must.Get(json.Marshal(model.NewSegmentedShortAnswerQuestionData(excerpt.Ref(4), "Possible translation: this is a house", "Translate the sentence"))),
 	})
 
 	class := must.Get(q.CreateClass(ctx, model.CreateClassParams{

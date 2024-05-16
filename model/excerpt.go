@@ -267,6 +267,11 @@ func (r *ReferenceNode) Ref(targetRef int) *ReferenceNode {
 	return nil
 }
 
+func (r *ReferenceNode) IsLetterSegmented() bool {
+	_, err := arabic.ParseLetterPack(r.Plain())
+	return err == nil
+}
+
 type TextNode struct {
 	Text string
 }

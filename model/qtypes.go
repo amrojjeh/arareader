@@ -1,6 +1,12 @@
+/*
+Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
+*/
+
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type QuestionData struct {
 	Reference int
@@ -37,20 +43,35 @@ const (
 	UnattemptedQuestionStatus = QuestionStatus("Unattempted")
 )
 
-func NewVowelQuestionData(ref int, feedback string) *QuestionData {
-	if ref == 0 {
-		panic("Vowel question data cannot be zero")
+func NewVowelQuestionData(ref *ReferenceNode, feedback string) *QuestionData {
+	if ref.ID == 0 {
+		panic("ref ID cannot be zero")
+	}
+	if !ref.IsLetterSegmented() {
+		panic("reference must be letter segmented")
 	}
 	return &QuestionData{
-		Reference: ref,
+		Reference: ref.ID,
 		Feedback:  feedback,
 		Prompt:    "Choose the correct vowel",
+		Answer:    ref.Plain(),
 	}
 }
 
-func NewShortAnswerQuestionData(ref int, feedback, prompt string) *QuestionData {
+func NewSegmentedShortAnswerQuestionData(ref *ReferenceNode, feedback, prompt string) *QuestionData {
+	if ref.ID == 0 {
+		panic("ref ID cannot be zero")
+	}
 	return &QuestionData{
-		Reference: ref,
+		Reference: ref.ID,
+		Feedback:  feedback,
+		Prompt:    prompt,
+	}
+}
+
+func NewWholeShortAnswerQuestionData(feedback, prompt string) *QuestionData {
+	return &QuestionData{
+		Reference: 0,
 		Feedback:  feedback,
 		Prompt:    prompt,
 	}
@@ -68,4 +89,12 @@ func MustParseQuestionData(q Question) QuestionData {
 		panic(err)
 	}
 	return data
+}
+
+func ValidateQuestion() {
+
+}
+
+func VowelQuestionValidate() {
+
 }
