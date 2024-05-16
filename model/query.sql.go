@@ -371,6 +371,30 @@ func (q *Queries) GetQuiz(ctx context.Context, id int) (Quiz, error) {
 	return i, err
 }
 
+const getStudentQuizSession = `-- name: GetStudentQuizSession :one
+SELECT id, student_id, quiz_id, status, created, updated FROM student_quiz_session
+WHERE student_id=? AND quiz_id=?
+`
+
+type GetStudentQuizSessionParams struct {
+	StudentID int
+	QuizID    int
+}
+
+func (q *Queries) GetStudentQuizSession(ctx context.Context, arg GetStudentQuizSessionParams) (StudentQuizSession, error) {
+	row := q.db.QueryRowContext(ctx, getStudentQuizSession, arg.StudentID, arg.QuizID)
+	var i StudentQuizSession
+	err := row.Scan(
+		&i.ID,
+		&i.StudentID,
+		&i.QuizID,
+		&i.Status,
+		&i.Created,
+		&i.Updated,
+	)
+	return i, err
+}
+
 const getTeacherByEmail = `-- name: GetTeacherByEmail :one
 SELECT id, email, username, password_hash, created, updated FROM teacher
 WHERE email=?
@@ -433,48 +457,6 @@ ORDER BY position
 
 func (q *Queries) ListQuestionsByQuiz(ctx context.Context, quizID int) ([]Question, error) {
 	rows, err := q.db.QueryContext(ctx, listQuestionsByQuiz, quizID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Question
-	for rows.Next() {
-		var i Question
-		if err := rows.Scan(
-			&i.ID,
-			&i.QuizID,
-			&i.Position,
-			&i.Type,
-			&i.Data,
-			&i.Created,
-			&i.Updated,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listQuestionsByQuizAndType = `-- name: ListQuestionsByQuizAndType :many
-SELECT id, quiz_id, position, type, data, created, updated FROM question
-WHERE quiz_id=? AND type=?
-ORDER BY position
-`
-
-type ListQuestionsByQuizAndTypeParams struct {
-	QuizID int
-	Type   QuestionType
-}
-
-func (q *Queries) ListQuestionsByQuizAndType(ctx context.Context, arg ListQuestionsByQuizAndTypeParams) ([]Question, error) {
-	rows, err := q.db.QueryContext(ctx, listQuestionsByQuizAndType, arg.QuizID, arg.Type)
 	if err != nil {
 		return nil, err
 	}

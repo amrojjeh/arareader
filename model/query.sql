@@ -64,11 +64,6 @@ INSERT INTO question (
 SELECT * FROM question
 WHERE id=?;
 
--- name: ListQuestionsByQuizAndType :many
-SELECT * FROM question
-WHERE quiz_id=? AND type=?
-ORDER BY position;
-
 -- name: ListQuestionsByQuiz :many
 SELECT * FROM question
 WHERE quiz_id=?
@@ -153,6 +148,10 @@ INSERT INTO student_quiz_session (
 ) VALUES (
     ?, ?, ?, datetime("now"), datetime("now")
 ) RETURNING *;
+
+-- name: GetStudentQuizSession :one
+SELECT * FROM student_quiz_session
+WHERE student_id=? AND quiz_id=?;
 
 -- **********
 -- STUDENT_QUESTION_SESSION TABLE

@@ -25,7 +25,7 @@ func DemoDB(ctx context.Context) *sql.DB {
 
 	buff := &bytes.Buffer{}
 	template.Must(model.ExcerptTemplate().Parse(excerptXML)).Execute(buff, nil)
-	excerpt, _ := model.ExcerptFromXML(buff)
+	excerpt, _ := model.ExcerptFromXML(bytes.NewReader(buff.Bytes()))
 
 	quiz := must.Get(q.CreateQuiz(ctx, model.CreateQuizParams{
 		TeacherID: teacher.ID,

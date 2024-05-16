@@ -91,10 +91,6 @@ func MustParseQuestionData(q Question) QuestionData {
 	return data
 }
 
-func ValidateQuestion() {
-
-}
-
-func VowelQuestionValidate() {
-
+func ValidateQuestion(question QuestionData, answer string) bool {
+	return question.Answer == answer
 }

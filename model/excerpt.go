@@ -144,7 +144,7 @@ func (e *Excerpt) Write(w io.Writer) error {
 	if err := enc.EncodeToken(end); err != nil {
 		return err
 	}
-	return nil
+	return enc.Flush()
 }
 
 func (e *Excerpt) tags() (xml.StartElement, xml.EndElement) {

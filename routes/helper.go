@@ -100,22 +100,25 @@ func (rh rootHandler) questions(r *http.Request, quiz model.Quiz) []model.Questi
 	return must.Get(rh.queries.ListQuestionsByQuiz(r.Context(), quiz.ID))
 }
 
+func (rh rootHandler) studentQuizSession(r *http.Request, quizID, studentID int) (model.StudentQuizSession, bool) {
+	quizSession, err := rh.queries.GetStudentQuizSession(r.Context(), model.GetStudentQuizSessionParams{
+		StudentID: studentID,
+		QuizID:    quizID,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return model.StudentQuizSession{}, false
+		}
+		panic(fmt.Sprintf("could not retrieve quiz session: %s", err))
+	}
+	return quizSession, true
+}
+
 func (qh quizHandler) applyVowelQuestions() {
 	vowelQuestions := service.Filter(isVowelQuestionType, qh.questions)
 	questionData := service.Map(model.MustParseQuestionData, vowelQuestions)
 	refs := service.Map(excerptRef, questionData)
 	qh.excerpt.UnpointRefs(refs)
-}
-
-func (qh quizHandler) vowelQuestions(r *http.Request) []model.Question {
-	qs, err := qh.queries.ListQuestionsByQuizAndType(r.Context(), model.ListQuestionsByQuizAndTypeParams{
-		QuizID: qh.quiz.ID,
-		Type:   model.VowelQuestionType,
-	})
-	if err != nil {
-		panic(fmt.Sprintf("expected quiz to exist but it does not (id: %d). %s", qh.quiz.ID, err.Error()))
-	}
-	return qs
 }
 
 // Useful for map
@@ -125,4 +128,16 @@ func excerptRef(qd model.QuestionData) int {
 
 func isVowelQuestionType(q model.Question) bool {
 	return q.Type == model.VowelQuestionType
+}
+
+func (qh quizHandler) submitAnswer(r *http.Request, answer string, status model.QuestionStatus) {
+	_, err := qh.queries.SubmitAnswer(r.Context(), model.SubmitAnswerParams{
+		Answer:               answer,
+		Status:               status,
+		StudentQuizSessionID: qh.studentQuizSession.ID,
+	})
+
+	if err != nil {
+		panic(fmt.Sprintf("could not submit answer: %s", err))
+	}
 }

@@ -94,19 +94,22 @@ func (rh rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // quizHandler serves a particualr quiz
 type quizHandler struct {
 	rootHandler
-	quiz      model.Quiz
-	excerpt   *model.Excerpt
-	questions []model.Question
+	quiz               model.Quiz
+	studentQuizSession model.StudentQuizSession
+	excerpt            *model.Excerpt
+	questions          []model.Question
 }
 
 func newQuizHandler(r *http.Request, rh rootHandler, quiz model.Quiz) http.Handler {
 	excerpt := rh.excerpt(quiz)
 	qs := rh.questions(r, quiz)
+	sqs, _ := rh.studentQuizSession(r, quiz.ID, 1) // TEMP(Amr Ojjeh): Temporary until there's class management
 	return quizHandler{
-		rootHandler: rh,
-		quiz:        quiz,
-		excerpt:     excerpt,
-		questions:   qs,
+		rootHandler:        rh,
+		quiz:               quiz,
+		excerpt:            excerpt,
+		questions:          qs,
+		studentQuizSession: sqs,
 	}
 }
 
@@ -121,6 +124,7 @@ func (qh quizHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (qh quizHandler) getMethod(w http.ResponseWriter, r *http.Request) {
+	// TODO(Amr Ojjeh): Send feedback (with animation?)
 	qh.applyVowelQuestions()
 	question := shiftQuestion(r, qh.questions)
 	qd := model.MustParseQuestionData(question)
@@ -146,16 +150,11 @@ func (qh quizHandler) postMethod(w http.ResponseWriter, r *http.Request) {
 	question := shiftQuestion(r, qh.questions)
 	qh.mustParseForm(r)
 	ans := r.Form.Get("ans")
-	// TODO(Amr Ojjeh): Validate answer
-	// TODO(Amr Ojjeh): Check answer
-	// TEMP(Amr Ojjeh): Only vowel for now
 	data := model.MustParseQuestionData(question)
-	log.Println(ans)
-	if qh.excerpt.Ref(data.Reference).Plain() == ans {
-		log.Println("correct")
+	if model.ValidateQuestion(data, ans) {
+		qh.submitAnswer(r, ans, model.CorrectQuestionStatus)
 	} else {
-		log.Println("incorrect")
+		qh.submitAnswer(r, ans, model.IncorrectQuestionStatus)
 	}
 	http.Redirect(w, r, "/quiz/1/0", http.StatusSeeOther)
-	// TODO(Amr Ojjeh): Send feedback (with animation?)
 }

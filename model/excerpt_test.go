@@ -106,36 +106,42 @@ func TestExcerptUnpointRef(t *testing.T) {
 
 func TestExcerptWrite(t *testing.T) {
 	tests := []struct {
-		name    string
-		excerpt string
+		name     string
+		input    string
+		expected string
 	}{
 		{
-			name:    "Basic",
-			excerpt: `<excerpt>{{bw "h*A baytN"}}</excerpt>`,
+			name:     "Basic",
+			expected: `<excerpt>{{bw "h*A baytN"}}</excerpt>`,
 		},
 		{
-			name:    "With references",
-			excerpt: `<excerpt>{{bw "h*A"}} {{bw "bay"}}<ref id="1">{{bw "tN"}}</ref> {{bw "wh*A"}} <ref id="2">{{bw "$y'"}}</ref></excerpt>`,
+			name:     "With references",
+			expected: `<excerpt>{{bw "h*A"}} {{bw "bay"}}<ref id="1">{{bw "tN"}}</ref> {{bw "wh*A"}} <ref id="2">{{bw "$y'"}}</ref></excerpt>`,
 		},
 		{
-			name:    "With nested references",
-			excerpt: `<excerpt>{{bw "h*A"}} {{bw "bay"}}<ref id="1">{{bw "tN"}}</ref> {{bw "wh*A"}} <ref id="2">{{bw "$y"}}<ref id="3">{{bw "'"}}</ref></ref></excerpt>`,
+			name:     "With nested references",
+			expected: `<excerpt>{{bw "h*A"}} {{bw "bay"}}<ref id="1">{{bw "tN"}}</ref> {{bw "wh*A"}} <ref id="2">{{bw "$y"}}<ref id="3">{{bw "'"}}</ref></ref></excerpt>`,
 		},
 		{
-			name:    "Empty Excerpt",
-			excerpt: "<excerpt></excerpt>",
+			name:     "Empty Excerpt",
+			expected: "<excerpt></excerpt>",
 		},
 		{
-			name:    "Empty",
-			excerpt: "",
+			name:     "Empty",
+			input:    "",
+			expected: "<excerpt></excerpt>",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			expected := &bytes.Buffer{}
-			template.Must(ExcerptTemplate().Parse(tt.excerpt)).Execute(expected, nil)
-			e := must.Get(ExcerptFromXML(expected))
+			if tt.input == "" {
+				template.Must(ExcerptTemplate().Parse(tt.expected)).Execute(expected, nil)
+			} else {
+				template.Must(ExcerptTemplate().Parse(tt.input)).Execute(expected, nil)
+			}
+			e := must.Get(ExcerptFromXML(bytes.NewReader(expected.Bytes())))
 			actual := &bytes.Buffer{}
 			e.Write(actual)
 			if actual.String() != expected.String() {
