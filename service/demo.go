@@ -62,7 +62,7 @@ func DemoDB(ctx context.Context) *sql.DB {
 		QuizID:   quiz.ID,
 		Position: 3,
 		Type:     model.ShortAnswerQuestionType,
-		Data:     must.Get(json.Marshal(model.NewSegmentedShortAnswerQuestionData(excerpt.Ref(4), "Possible translation: this is a house", "Translate the sentence"))),
+		Data:     must.Get(json.Marshal(model.NewSegmentedShortAnswerQuestionData(excerpt.Ref(3), "Possible translation: this is a house", "Translate the sentence"))),
 	})
 
 	class := must.Get(q.CreateClass(ctx, model.CreateClassParams{
