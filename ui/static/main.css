@@ -20,6 +20,7 @@
 @layer global {
   :root {
     --primary: #3EEE00;
+    --danger : #F00;
   }
   
   body {
@@ -143,6 +144,16 @@
     }
   }
 
+  .primary {
+    font-weight: bold;
+    color: var(--primary);
+  }
+
+  .danger {
+    font-weight: bold;
+    color: var(--danger);
+  }
+
   .button {
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
     background-color: #fff;
@@ -150,8 +161,13 @@
     cursor: pointer;
   }
 
-  .button--selected {
+  .button--primary {
     background-color: var(--primary);
+  }
+
+  .button--disabled {
+    cursor: unset;
+    box-shadow: none;
   }
 }
 
