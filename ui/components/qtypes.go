@@ -5,10 +5,38 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package components
 
 import (
+	"unicode/utf8"
+
 	"github.com/amrojjeh/arareader/arabic"
+	"github.com/amrojjeh/arareader/model"
 	g "github.com/maragudk/gomponents"
 	. "github.com/maragudk/gomponents/html"
 )
+
+type QuestionToInputMethodParams struct {
+	SubmitURL       string
+	Question        model.Question
+	QuestionData    model.QuestionData
+	QuestionSession model.QuestionSession
+}
+
+func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
+	switch p.Question.Type {
+	case model.VowelQuestionType:
+		return func() g.Node {
+			letter, _ := utf8.DecodeRuneInString(p.QuestionData.Answer)
+			if p.QuestionSession.Status.IsSubmitted() {
+				return VowelInputMethodSubmitted(string(letter), p.QuestionData.Answer, p.QuestionSession.Answer)
+			}
+			return VowelInputMethodUnsubmitted(string(letter), p.SubmitURL)
+		}
+	}
+	return func() g.Node {
+		return P(
+			g.Text("Question not implemented..."),
+		)
+	}
+}
 
 func VowelInputMethodUnsubmitted(letter string, submitURL string) g.Node {
 	options := vowelOptions(letter)
@@ -73,7 +101,7 @@ func vowelButtonDisabled(text, correct, chosen string) g.Node {
 }
 
 func vowelButtonCorrect(text string) g.Node {
-	return Button(Class("primary button button--disabled"), Type("button"), DataAttr("substitute-button", text),
+	return Button(Class("primary button button--disabled"), Type("button"),
 		g.Text(text),
 	)
 }

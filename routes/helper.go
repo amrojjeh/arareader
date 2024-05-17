@@ -152,24 +152,37 @@ func isVowelQuestionType(q model.Question) bool {
 }
 
 func (qh quizHandler) submitAnswer(r *http.Request, q model.Question, answer string, status model.QuestionStatus) {
-	must.Get(qh.queries.CreateQuestionSession(r.Context(), model.CreateQuestionSessionParams{
-		QuizSessionID: qh.quizSession.ID,
-		QuestionID:    q.ID,
+	_, err := qh.queries.SubmitAnswer(r.Context(), model.SubmitAnswerParams{
 		Answer:        answer,
 		Status:        status,
-	}))
+		QuizSessionID: qh.quizSession.ID,
+		QuestionID:    q.ID,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			qh.questionSession(r, q)
+			// TEST(Amr Ojjeh): VERY IMPORTANT TO TEST THIS BRANCH
+			qh.submitAnswer(r, q, answer, status)
+		}
+		panic(err)
+	}
 }
 
-func (qh quizHandler) questionSession(r *http.Request, q model.Question) (model.QuestionSession, bool) {
+func (qh quizHandler) questionSession(r *http.Request, q model.Question) model.QuestionSession {
 	questionSession, err := qh.queries.GetQuestionSession(r.Context(), model.GetQuestionSessionParams{
 		QuizSessionID: qh.quizSession.ID,
 		QuestionID:    q.ID,
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return questionSession, false
+			return must.Get(qh.queries.CreateQuestionSession(r.Context(), model.CreateQuestionSessionParams{
+				QuizSessionID: qh.quizSession.ID,
+				QuestionID:    q.ID,
+				Answer:        "",
+				Status:        model.UnattemptedQuestionStatus,
+			}))
 		}
 		panic(err)
 	}
-	return questionSession, true
+	return questionSession
 }

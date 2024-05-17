@@ -740,7 +740,7 @@ func (q *Queries) RemoveQuizFromClass(ctx context.Context, arg RemoveQuizFromCla
 const submitAnswer = `-- name: SubmitAnswer :one
 UPDATE question_session
 SET answer=?, status=?, updated=datetime("now")
-WHERE quiz_session_id=?
+WHERE quiz_session_id=? AND question_id=?
 RETURNING id, quiz_session_id, question_id, status, answer, created, updated
 `
 
@@ -748,10 +748,16 @@ type SubmitAnswerParams struct {
 	Answer        string
 	Status        QuestionStatus
 	QuizSessionID int
+	QuestionID    int
 }
 
 func (q *Queries) SubmitAnswer(ctx context.Context, arg SubmitAnswerParams) (QuestionSession, error) {
-	row := q.db.QueryRowContext(ctx, submitAnswer, arg.Answer, arg.Status, arg.QuizSessionID)
+	row := q.db.QueryRowContext(ctx, submitAnswer,
+		arg.Answer,
+		arg.Status,
+		arg.QuizSessionID,
+		arg.QuestionID,
+	)
 	var i QuestionSession
 	err := row.Scan(
 		&i.ID,

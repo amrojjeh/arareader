@@ -44,6 +44,10 @@ const (
 	UnattemptedQuestionStatus = QuestionStatus("Unattempted")
 )
 
+func (qs QuestionStatus) IsSubmitted() bool {
+	return qs == CorrectQuestionStatus || qs == IncorrectQuestionStatus
+}
+
 func NewVowelQuestionData(ref *ReferenceNode, feedback string) *QuestionData {
 	if ref.ID == 0 {
 		panic("ref ID cannot be zero")
