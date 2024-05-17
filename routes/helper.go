@@ -121,6 +121,23 @@ func (qh quizHandler) applyVowelQuestions() {
 	qh.excerpt.UnpointRefs(refs)
 }
 
+func (qh quizHandler) applyVowelAnswers(r *http.Request) {
+	vowelSessions := must.Get(qh.queries.ListQuestionSessionByType(r.Context(), model.ListQuestionSessionByTypeParams{
+		QuizSessionID: qh.quizSession.ID,
+		Type:          model.VowelQuestionType,
+	}))
+	ids := map[int]bool{}
+	for _, vs := range vowelSessions {
+		ids[vs.QuestionID] = true
+	}
+	for _, q := range qh.questions {
+		if ids[q.ID] {
+			data := model.MustParseQuestionData(q)
+			qh.excerpt.Ref(data.Reference).ReplaceWithText(data.Answer)
+		}
+	}
+}
+
 // Useful for map
 func excerptRef(qd model.QuestionData) int {
 	return qd.Reference
@@ -130,19 +147,25 @@ func isVowelQuestionType(q model.Question) bool {
 	return q.Type == model.VowelQuestionType
 }
 
-func (qh quizHandler) submitAnswer(r *http.Request, answer string, status model.QuestionStatus) {
-	_, err := qh.queries.SubmitAnswer(r.Context(), model.SubmitAnswerParams{
+func (qh quizHandler) submitAnswer(r *http.Request, q model.Question, answer string, status model.QuestionStatus) {
+	must.Get(qh.queries.CreateQuestionSession(r.Context(), model.CreateQuestionSessionParams{
+		QuizSessionID: qh.quizSession.ID,
+		QuestionID:    q.ID,
 		Answer:        answer,
 		Status:        status,
-		QuizSessionID: qh.quizSession.ID,
-	})
-
-	if err != nil {
-		panic(fmt.Sprintf("could not submit answer: %s", err))
-	}
+	}))
 }
 
-func (qh quizHandler) QuestionSession(r *http.Request, qs model.QuizSession) (model.QuestionSession, bool) {
-	// TODO(Amr Ojjeh): Retrieve student question session
-	// qh.queries.
+func (qh quizHandler) questionSession(r *http.Request, q model.Question) (model.QuestionSession, bool) {
+	questionSession, err := qh.queries.GetQuestionSession(r.Context(), model.GetQuestionSessionParams{
+		QuizSessionID: qh.quizSession.ID,
+		QuestionID:    q.ID,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return questionSession, false
+		}
+		panic(err)
+	}
+	return questionSession, true
 }

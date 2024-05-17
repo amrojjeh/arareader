@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS question_session (
     answer TEXT NOT NULL,
     created DATETIME NOT NULL,
     updated DATETIME NOT NULL,
-    CONSTRAINT question_session_uc UNIQUE (quiz_session_id, quiz_id),
+    CONSTRAINT question_session_uc UNIQUE (quiz_session_id, question_id),
     FOREIGN KEY (quiz_session_id)
         REFERENCES quiz_session(id)
         ON DELETE CASCADE

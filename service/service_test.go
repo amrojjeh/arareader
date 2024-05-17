@@ -28,7 +28,7 @@ func TestSetup(t *testing.T) {
 	}
 
 	expectedNames := map[string]bool{"teacher": false, "quiz": false, "question": false, "class": false,
-		"class_quiz": false, "student": false, "student_quiz_session": false, "student_question_session": false,
+		"class_quiz": false, "student": false, "quiz_session": false, "question_session": false,
 		"sessions": false}
 	for rows.Next() {
 		var name string

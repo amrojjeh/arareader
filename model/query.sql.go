@@ -477,6 +477,48 @@ func (q *Queries) ListClassesByTeacher(ctx context.Context, teacherID int) ([]Cl
 	return items, nil
 }
 
+const listQuestionSessionByType = `-- name: ListQuestionSessionByType :many
+SELECT qs.id, qs.quiz_session_id, qs.question_id, qs.status, qs.answer, qs.created, qs.updated FROM question_session AS qs
+INNER JOIN question AS q ON qs.question_id=q.id
+WHERE qs.quiz_session_id=? AND q.type=?
+`
+
+type ListQuestionSessionByTypeParams struct {
+	QuizSessionID int
+	Type          QuestionType
+}
+
+func (q *Queries) ListQuestionSessionByType(ctx context.Context, arg ListQuestionSessionByTypeParams) ([]QuestionSession, error) {
+	rows, err := q.db.QueryContext(ctx, listQuestionSessionByType, arg.QuizSessionID, arg.Type)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QuestionSession
+	for rows.Next() {
+		var i QuestionSession
+		if err := rows.Scan(
+			&i.ID,
+			&i.QuizSessionID,
+			&i.QuestionID,
+			&i.Status,
+			&i.Answer,
+			&i.Created,
+			&i.Updated,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listQuestionsByQuiz = `-- name: ListQuestionsByQuiz :many
 SELECT id, quiz_id, position, type, data, created, updated FROM question
 WHERE quiz_id=?

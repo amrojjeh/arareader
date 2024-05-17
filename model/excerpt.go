@@ -30,6 +30,7 @@ func (r ReferenceNotFoundError) Error() string {
 	return fmt.Sprintf("ReferenceNotFound: could not find reference (id: %d)", r.ID)
 }
 
+// TODO(Amr Ojjeh): Support colors
 func ExcerptFromXML(r io.Reader) (*Excerpt, error) {
 	excerpt := &Excerpt{}
 	decoder := xml.NewDecoder(r)
@@ -265,6 +266,17 @@ func (r *ReferenceNode) Ref(targetRef int) *ReferenceNode {
 		}
 	}
 	return nil
+}
+
+func (r *ReferenceNode) Replace(other *ReferenceNode) {
+	*r = *other
+}
+
+func (r *ReferenceNode) ReplaceWithText(text string) {
+	node := &TextNode{
+		Text: text,
+	}
+	r.Nodes = []ExcerptNodes{node}
 }
 
 func (r *ReferenceNode) IsLetterSegmented() bool {
