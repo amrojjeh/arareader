@@ -132,7 +132,9 @@ func (qh quizHandler) applyVowelAnswers(r *http.Request) {
 	}))
 	ids := map[int]bool{}
 	for _, vs := range vowelSessions {
-		ids[vs.QuestionID] = true
+		if vs.Status.IsSubmitted() {
+			ids[vs.QuestionID] = true
+		}
 	}
 	for _, q := range qh.questions {
 		if ids[q.ID] {
