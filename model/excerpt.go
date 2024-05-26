@@ -5,6 +5,7 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package model
 
 import (
+	"bytes"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -34,6 +35,10 @@ func (r ReferenceNotFoundError) Error() string {
 	return fmt.Sprintf("ReferenceNotFound: could not find reference (id: %d)", r.ID)
 }
 
+func ExcerptFromQuiz(quiz Quiz) (*Excerpt, error) {
+	return ExcerptFromXML(bytes.NewReader(quiz.Excerpt))
+}
+
 // TODO(Amr Ojjeh): Support colors
 func ExcerptFromXML(r io.Reader) (*Excerpt, error) {
 	excerpt := &Excerpt{}
@@ -48,7 +53,7 @@ func ExcerptFromXML(r io.Reader) (*Excerpt, error) {
 
 	rootStart, _ := root.(xml.StartElement)
 	if rootStart.Name.Local != "excerpt" {
-		return &Excerpt{}, fmt.Errorf("xml document must begin with <excerpt> (found: %s)", rootStart.Name.Local)
+		return &Excerpt{}, fmt.Errorf("excerpt: xml document must begin with <excerpt> (found: %s)", rootStart.Name.Local)
 	}
 
 	if err = excerptEl(excerpt, decoder); err != nil {
@@ -85,23 +90,23 @@ func excerptEl(e *Excerpt, decoder *xml.Decoder) error {
 
 func refStartEl(start xml.StartElement) (r *ReferenceNode, err error) {
 	if start.Name.Local != "ref" {
-		return r, fmt.Errorf("element not recognized (el: %s)", start.Name.Local)
+		return r, fmt.Errorf("excerpt: element not recognized (el: %s)", start.Name.Local)
 	}
 	r = &ReferenceNode{ID: -1}
 	for _, attr := range start.Attr {
 		if attr.Name.Local == "id" {
 			r.ID, err = strconv.Atoi(attr.Value)
 			if err != nil {
-				return r, errors.Join(errors.New("could not convert id to integer"), err)
+				return r, errors.Join(errors.New("model: could not convert id to integer"), err)
 			}
 			break
 		}
 	}
 	if r.ID == -1 {
-		return r, errors.New("ref must have an id")
+		return r, errors.New("model: ref must have an id")
 	}
 	if r.ID == 0 {
-		return r, errors.New("ref id must be greater than 0")
+		return r, errors.New("model: ref id must be greater than 0")
 	}
 
 	return r, nil

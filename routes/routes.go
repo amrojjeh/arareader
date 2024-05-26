@@ -14,6 +14,7 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/amrojjeh/arareader/model"
+	"github.com/amrojjeh/arareader/must"
 	"github.com/amrojjeh/arareader/ui/components"
 	"github.com/amrojjeh/arareader/ui/page"
 	"github.com/amrojjeh/arareader/ui/static"
@@ -75,7 +76,6 @@ type rootHandler struct {
 	db      *sql.DB
 	queries *model.Queries
 	sm      *scs.SessionManager
-	logger  *log.Logger
 }
 
 // TODO(Amr Ojjeh): Redirect if HTTP to HTTPS
@@ -105,8 +105,8 @@ type quizHandler struct {
 }
 
 func newQuizHandler(r *http.Request, rh rootHandler, quiz model.Quiz) http.Handler {
-	excerpt := rh.excerpt(quiz)
-	qs := rh.questions(r, quiz)
+	excerpt := must.Get(model.ExcerptFromQuiz(quiz))
+	qs := must.Get(rh.queries.ListQuestionsByQuiz(r.Context(), quiz.ID))
 	sqs, _ := rh.quizSession(r, quiz.ID, 1) // TEMP(Amr Ojjeh): Temporary until there's class management
 	return quizHandler{
 		rootHandler: rh,

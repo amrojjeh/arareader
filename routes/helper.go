@@ -5,7 +5,6 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package routes
 
 import (
-	"bytes"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -39,6 +38,7 @@ func shiftQuiz(r *http.Request, q *model.Queries) model.Quiz {
 		if errors.Is(err, sql.ErrNoRows) {
 			panic(clientError(http.StatusNotFound))
 		}
+		err = fmt.Errorf("routes: could not shift quiz. %w", err)
 		panic(err)
 	}
 	return quiz
@@ -62,7 +62,7 @@ func shiftPath(r *http.Request) string {
 // p is an absolute path
 func shiftPathHelper(p string) (head string, tail string) {
 	if p[0] != '/' {
-		panic("routes.shiftPath: p must be an absolute path")
+		panic(errors.New("routes: p must be an absolute path"))
 	}
 	p = path.Clean(p[1:])
 	si := strings.Index(p, "/")
@@ -92,19 +92,7 @@ func (rh rootHandler) mustParseForm(r *http.Request) {
 	}
 }
 
-func (rh rootHandler) excerpt(quiz model.Quiz) *model.Excerpt {
-	e, err := model.ExcerptFromXML(bytes.NewReader(quiz.Excerpt))
-	if err != nil {
-		panic(fmt.Sprintf("quiz excerpt cannot be parsed (id: %d). %s", quiz.ID, err.Error()))
-	}
-	return e
-}
-
-func (rh rootHandler) questions(r *http.Request, quiz model.Quiz) []model.Question {
-	return must.Get(rh.queries.ListQuestionsByQuiz(r.Context(), quiz.ID))
-}
-
-func (rh rootHandler) quizSession(r *http.Request, quizID, studentID int) (model.QuizSession, bool) {
+func (rh rootHandler) fetchQuizSession(r *http.Request, quizID, studentID int) (model.QuizSession, bool) {
 	quizSession, err := rh.queries.GetQuizSession(r.Context(), model.GetQuizSessionParams{
 		StudentID: studentID,
 		QuizID:    quizID,
@@ -113,7 +101,8 @@ func (rh rootHandler) quizSession(r *http.Request, quizID, studentID int) (model
 		if errors.Is(err, sql.ErrNoRows) {
 			return model.QuizSession{}, false
 		}
-		panic(fmt.Sprintf("could not retrieve quiz session: %s", err))
+		err = fmt.Errorf("routes: could not retrieve quiz session. %w", err)
+		panic(err)
 	}
 	return quizSession, true
 }
