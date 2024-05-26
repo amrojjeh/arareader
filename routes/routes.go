@@ -107,7 +107,7 @@ type quizHandler struct {
 func newQuizHandler(r *http.Request, rh rootHandler, quiz model.Quiz) http.Handler {
 	excerpt := must.Get(model.ExcerptFromQuiz(quiz))
 	qs := must.Get(rh.queries.ListQuestionsByQuiz(r.Context(), quiz.ID))
-	sqs, _ := rh.quizSession(r, quiz.ID, 1) // TEMP(Amr Ojjeh): Temporary until there's class management
+	sqs, _ := rh.fetchQuizSession(r, quiz.ID, 1) // TEMP(Amr Ojjeh): Temporary until there's class management
 	return quizHandler{
 		rootHandler: rh,
 		quiz:        quiz,
