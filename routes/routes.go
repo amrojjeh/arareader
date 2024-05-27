@@ -134,7 +134,7 @@ func (qh quizHandler) getMethod(w http.ResponseWriter, r *http.Request) {
 	question := shiftQuestion(r, qh.questions)
 	qd := model.MustParseQuestionData(question)
 	inputMethod := components.QuestionToInputMethod(components.QuestionToInputMethodParams{
-		SubmitURL:       fmt.Sprintf("/quiz/1/%d", question.Position), // TEMP(Amr Ojjeh): Turn into a function
+		SubmitURL:       qh.submitURL(question.Position),
 		Question:        question,
 		QuestionData:    qd,
 		QuestionSession: qh.questionSession(r, question),
@@ -150,11 +150,32 @@ func (qh quizHandler) getMethod(w http.ResponseWriter, r *http.Request) {
 			TotalQuestions:  len(qh.questions),
 			SkipForwardURL:  "",
 			SkipBackwardURL: "",
-			NextURL:         "",
-			PrevURL:         "",
+			NextURL:         qh.nextURL(question.Position),
+			PrevURL:         qh.prevURL(question.Position),
 		},
 	}).Render(w)
+}
 
+func (qh quizHandler) submitURL(questionPos int) string {
+	return fmt.Sprintf("/quiz/%d/%d", qh.quiz.ID, questionPos)
+}
+
+func (qh quizHandler) nextURL(questionPos int) string {
+	if questionPos+1 < len(qh.questions) {
+		return qh.questionURL(questionPos + 1)
+	}
+	return ""
+}
+
+func (qh quizHandler) prevURL(questionPos int) string {
+	if questionPos-1 >= 0 {
+		return qh.questionURL(questionPos - 1)
+	}
+	return ""
+}
+
+func (qh quizHandler) questionURL(questionPos int) string {
+	return fmt.Sprintf("/quiz/%d/%d", qh.quiz.ID, questionPos)
 }
 
 func (qh quizHandler) postMethod(w http.ResponseWriter, r *http.Request) {
@@ -167,5 +188,5 @@ func (qh quizHandler) postMethod(w http.ResponseWriter, r *http.Request) {
 	} else {
 		qh.submitAnswer(r, question, ans, model.IncorrectQuestionStatus)
 	}
-	http.Redirect(w, r, "/quiz/1/0", http.StatusSeeOther)
+	http.Redirect(w, r, qh.questionURL(question.Position), http.StatusSeeOther)
 }

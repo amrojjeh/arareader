@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 )
 
-// TODO(Amr Ojjeh): Consider only using it for special questions like multiple choice
 type QuestionData struct {
 	Reference int
 	Feedback  string
