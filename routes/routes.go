@@ -135,6 +135,7 @@ func (qh quizHandler) getMethod(w http.ResponseWriter, r *http.Request) {
 	qd := model.MustParseQuestionData(question)
 	inputMethod := components.QuestionToInputMethod(components.QuestionToInputMethodParams{
 		SubmitURL:       qh.submitURL(question.Position),
+		NextURL:         qh.nextURL(question.Position),
 		Question:        question,
 		QuestionData:    qd,
 		QuestionSession: qh.questionSession(r, question),

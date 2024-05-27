@@ -15,6 +15,7 @@ import (
 
 type QuestionToInputMethodParams struct {
 	SubmitURL       string
+	NextURL         string
 	Question        model.Question
 	QuestionData    model.QuestionData
 	QuestionSession model.QuestionSession
@@ -26,7 +27,7 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
 		return func() g.Node {
 			letter, _ := utf8.DecodeRuneInString(p.QuestionData.Answer)
 			if p.QuestionSession.Status.IsSubmitted() {
-				return VowelInputMethodSubmitted(string(letter), p.QuestionData.Answer, p.QuestionSession.Answer)
+				return VowelInputMethodSubmitted(string(letter), p.QuestionData.Answer, p.QuestionSession.Answer, p.NextURL)
 			}
 			return VowelInputMethodUnsubmitted(string(letter), p.SubmitURL)
 		}
@@ -54,12 +55,19 @@ func VowelInputMethodUnsubmitted(letter string, submitURL string) g.Node {
 	)
 }
 
-func VowelInputMethodSubmitted(letter, correct, chosen string) g.Node {
+func VowelInputMethodSubmitted(letter, correct, chosen, nextURL string) g.Node {
 	options := vowelOptionsDisabled(letter, correct, chosen)
-	return Div(Class("svowel-options"),
-		options[0],
-		Div(Class("svowel-options__not-sukoon"),
-			g.Group(options[1:]),
+	return FormEl(Class("stack"), Action(nextURL), Method("get"),
+		Div(Class("svowel-options"),
+			options[0],
+			Div(Class("svowel-options__not-sukoon"),
+				g.Group(options[1:]),
+			),
+		),
+		g.If(nextURL != "",
+			Button(Type("submit"), Class("button"),
+				g.Text("Next"),
+			),
 		),
 	)
 }
