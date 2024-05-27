@@ -22,7 +22,9 @@ var demoCmd = &cobra.Command{
 		handler := routes.NewRootHandler(db)
 		server := routes.Server(handler, addr())
 		log.Printf("Listening on %s...", addr())
-		server.ListenAndServeTLS(certPath(), keyPath())
+		if err := server.ListenAndServeTLS(certPath(), keyPath()); err != nil {
+			log.Fatal(err)
+		}
 	},
 }
 
