@@ -19,17 +19,21 @@
 
 @layer global {
   :root {
-    --green-50: hsl(98, 76%, 95%);
-    --green-100: hsl(98, 71%, 89%);
-    --green-200: hsl(99, 71%, 80%);
-    --green-300: hsl(100, 69%, 67%);
-    --green-400: hsl(101, 63%, 51%);
-    --green-500: hsl(102, 65%, 44%);
-    --green-600: hsl(102, 69%, 35%);
-    --green-700: hsl(104, 64%, 27%);
-    --green-800: hsl(104, 55%, 23%);
-    --green-900: hsl(105, 50%, 20%);
-    --green-950: hsl(107, 65%, 10%);
+    --green: hsl(145, 81%, 33%);
+    --dark-green: hsl(126, 72%, 29%);
+    --red: hsl(12, 100%, 55%);
+    --yellow: hsl(49, 100%, 65%);
+    --blue: hsl(182, 92%, 61%);
+
+    --gray-100: hsl(0, 0%, 99.20%);
+    --gray-200: hsl(0, 0%, 97.30%);
+    --gray-300: hsl(0, 0%, 93.70%);
+    --gray-400: hsl(0, 0%, 88.20%);
+    --gray-500: hsl(0, 0%, 78.40%);
+    --gray-600: hsl(0, 0%, 66.70%);
+    --gray-700: hsl(0, 0%, 57.30%);
+    --gray-800: hsl(0, 0%, 50.20%);
+    --gray-900: hsl(0, 0%, 45.10%);
 
     --primary: #3EEE00;
     --danger : #F00;
@@ -37,45 +41,29 @@
 
   body {
     font-family: Roboto, Helvetica, Arial, Ubuntu, 'Noto Naskh Arabic', sans-serif;
-    padding: 1rem;
-  }
-
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-inline: 1rem;
+    background-color: var(--gray-100);
   }
 }
 
 @layer layout {
   #question-page {
-    .title {
-      margin-block: 1rem;
-      position: relative;
-      left: 2.5%;
-    }
-    
-    .question-nav {
-      margin-block: 0;
-      padding-inline: 1rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100svh;
+
+    .question-ctrl {
+      height: 100px;
+      width: 100%;
+      margin-top: auto;
+      font-size: 1.5rem;
     }
 
     .excerpt {
       block-size: 50svh;
     }
 
-    .svowel-options {
-      margin-inline: auto;
-    }
-
-    button[type="submit"] {
-      margin-inline: auto;
-      display: block;
-      font-size: 1.5rem;
-    }
-
-    .username {
+    .prompt {
       font-size: 1.5rem;
     }
   }
@@ -83,6 +71,7 @@
 
 @layer module {
   .nav {
+    padding: 1rem;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -103,29 +92,11 @@
     font-family: "Permanent Marker", cursive;
   }
 
-  .title {
-    font-size: 3rem;
-    font-weight: bold;
-    text-align: center;
+
+  .prompt {
+    padding-inline: 1rem;
   }
 
-  .question-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    > .question-nav__navigate {
-      border: unset;
-      background-color: unset;
-      cursor: pointer;
-    }
-
-    > .question-nav__prompt {
-      font-size: 1.2rem;
-    }
-  }
-
-  
   .excerpt {
     font-size: 2rem;
     direction: rtl;
@@ -139,54 +110,38 @@
     background-color: rgb(85, 224, 255, 0.5);
   }
 
-  .instruction {
-    font-size: 1.5rem;
-    text-align: center;
+  .btn {
+    background-color: var(--gray-200);
+    appearance: none;
+    border: 1px solid var(--dark-green);
+    color: var(--green-950);
+    font-weight: bold;
+    font-size: inherit;
+
+    &--primary {
+      background-color: var(--dark-green);
+      color: white;
+    }
   }
 
-  .svowel-options {
-    max-width: fit-content;
+  .question-ctrl {
     display: flex;
-    align-items: center;
-    font-size: 1.5rem;
 
-    button {
-      width: 3rem;
-      height: 3rem;
+    & > * {
+      flex: 1;
     }
 
-    .svowel-options__not-sukoon {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      padding-inline-start: 1rem;
+    &__first {
+      border-start-start-radius: 40%;
+    }
+
+    &__last {
+      border-start-end-radius: 40%;
     }
   }
 
-  .primary {
-    font-weight: bold;
-    color: var(--primary);
-  }
-
-  .danger {
-    font-weight: bold;
-    color: var(--danger);
-  }
-
-  .button {
-    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
-    background-color: #fff;
-    border: none;
-    cursor: pointer;
-  }
-
-  .button--primary {
-    background-color: var(--primary);
-  }
-
-  .button--disabled {
-    cursor: unset;
-    box-shadow: none;
+  .question-ctrl > * {
+    flex: 1;
   }
 }
 

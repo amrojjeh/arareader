@@ -18,7 +18,6 @@ type QuestionParams struct {
 	InputMethod g.Node
 }
 
-// TODO(Amr Ojjeh): Make the nav and question into a grid so that centering can be done
 func QuestionPage(p QuestionParams) g.Node {
 	return c.HTML5(c.HTML5Props{
 		Title:       "Arareader",
@@ -35,6 +34,21 @@ func QuestionPage(p QuestionParams) g.Node {
 				ar.Icon(),
 			),
 			p.Excerpt,
+			P(Class("prompt"),
+				g.Text(p.Prompt),
+			),
+			p.InputMethod,
+			Div(Class("question-ctrl"),
+				Button(Type("button"), Class("question-ctrl__first btn"),
+					g.Text("Previous"),
+				),
+				Button(Type("button"), Class("btn btn--primary"),
+					g.Text("Submit"),
+				),
+				Button(Type("button"), Class("question-ctrl__last btn"),
+					g.Text("Next"),
+				),
+			),
 		},
 	})
 }

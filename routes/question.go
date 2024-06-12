@@ -73,7 +73,7 @@ func (qr questionResource) Get(w http.ResponseWriter, r *http.Request) {
 		Excerpt:     components.Excerpt(excerpt, data.Reference),
 		QuizTitle:   quiz.Title,
 		Prompt:      data.Prompt,
-		InputMethod: nil,
+		InputMethod: components.VowelInputMethodUnsubmitted(data.Answer, "#"),
 	}).Render(w)
 }
 
