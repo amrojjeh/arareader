@@ -11,6 +11,7 @@ import (
 	h "github.com/maragudk/gomponents/html"
 )
 
+// TODO(Amr Ojjeh): Change icon
 func Icon() g.Node {
 	return h.Div(h.Class("arareader-icon"),
 		g.Text("AR"),

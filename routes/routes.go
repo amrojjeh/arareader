@@ -23,7 +23,7 @@ func Routes(db *sql.DB) http.Handler {
 	r.Get("/static*", func(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/static", http.FileServer(http.FS(static.Files))).ServeHTTP(w, r)
 	})
-	r.Mount("/quiz", quizResource{}.Routes())
+	r.Mount("/quiz", quizResource{db}.Routes())
 	return r
 }
 

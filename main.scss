@@ -37,6 +37,7 @@
 
   body {
     font-family: Roboto, Helvetica, Arial, Ubuntu, 'Noto Naskh Arabic', sans-serif;
+    padding: 1rem;
   }
 
   header {
@@ -48,7 +49,7 @@
 }
 
 @layer layout {
-  #svowel {
+  #question-page {
     .title {
       margin-block: 1rem;
       position: relative;
@@ -81,6 +82,13 @@
 }
 
 @layer module {
+  .nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: center;
+  }
+
   .arareader-icon {
     display: flex;
     align-items: center;

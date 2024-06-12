@@ -3,7 +3,6 @@ module github.com/amrojjeh/arareader
 go 1.22
 
 require (
-	github.com/alexedwards/scs/v2 v2.8.0
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/maragudk/gomponents v0.20.3
 	github.com/mattn/go-sqlite3 v1.14.22

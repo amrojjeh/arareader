@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -9,7 +10,9 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type quizResource struct{}
+type quizResource struct {
+	db *sql.DB
+}
 
 const quizIDParam = "quizID"
 
@@ -22,7 +25,7 @@ func (qr quizResource) Routes() chi.Router {
 		r.Get("/", qr.Get)
 		r.Put("/", qr.Put)
 		r.Delete("/", qr.Delete)
-		r.Mount("/question", questionResource{}.Routes())
+		r.Mount("/question", questionResource{qr.db}.Routes())
 	})
 	return r
 }
@@ -59,4 +62,8 @@ func (qr quizResource) QuizID(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), quizIDParam, id)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func quizIDFromRequest(r *http.Request) int {
+	return r.Context().Value(quizIDParam).(int)
 }
