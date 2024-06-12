@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -45,6 +46,10 @@ func (qr questionResource) Get(w http.ResponseWriter, r *http.Request) {
 	q := model.New(qr.db)
 	quiz, err := q.GetQuiz(r.Context(), quizID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			http.NotFound(w, r)
+			return
+		}
 		err = fmt.Errorf("retrieving quiz: %v", err)
 		panic(err)
 	}
@@ -53,6 +58,10 @@ func (qr questionResource) Get(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		err = fmt.Errorf("retrieving questions: %v", err)
 		panic(err)
+	}
+	if questionPos < 0 || questionPos >= len(questions) {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
 	}
 	data := model.MustParseQuestionData(questions[questionPos])
 	excerpt, err := model.ExcerptFromQuiz(quiz)

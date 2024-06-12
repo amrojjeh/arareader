@@ -45,6 +45,21 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 			code: http.StatusOK,
 			body: []byte("html"),
 		},
+		{
+			name: "Negative question",
+			path: "/quiz/1/question/-1",
+			code: http.StatusNotFound,
+		},
+		{
+			name: "Too many questions",
+			path: "/quiz/1/question/4",
+			code: http.StatusBadRequest,
+		},
+		{
+			name: "Quiz does not exist",
+			path: "/quiz/0/question/2",
+			code: http.StatusNotFound,
+		},
 	}
 
 	for _, tt := range tests {
