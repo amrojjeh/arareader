@@ -33,20 +33,10 @@ func QuestionPage(p QuestionParams) g.Node {
 			ar.Fonts(),
 		},
 		Body: []g.Node{ID("svowel"),
-			Header(
+			Nav(
+				ar.Hamburger(),
 				ar.Icon(),
-				H1(Class("title"),
-					g.Text(p.QuizTitle),
-				),
-				Button(Type("button"), Class("username button"),
-					g.Text("Amr Ojjeh")),
 			),
-			ar.QuestionNav(p.QuestionNavProps),
-			ar.Excerpt(p.Excerpt, p.HighlightedRef),
-			P(Class("instruction"),
-				g.Text(p.Prompt),
-			),
-			p.InputMethod,
 		},
 	})
 }

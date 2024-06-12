@@ -4,7 +4,8 @@ go 1.22
 
 require (
 	github.com/alexedwards/scs/v2 v2.8.0
-	github.com/maragudk/gomponents v0.20.2
+	github.com/go-chi/chi/v5 v5.0.12
+	github.com/maragudk/gomponents v0.20.3
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/spf13/cobra v1.8.0
 )

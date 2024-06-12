@@ -1,0 +1,189 @@
+@layer reset, global, layout, module, util;
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  body {
+    margin: unset;
+  }
+}
+
+@layer global {
+  :root {
+    --green-50: hsl(98, 76%, 95%);
+    --green-100: hsl(98, 71%, 89%);
+    --green-200: hsl(99, 71%, 80%);
+    --green-300: hsl(100, 69%, 67%);
+    --green-400: hsl(101, 63%, 51%);
+    --green-500: hsl(102, 65%, 44%);
+    --green-600: hsl(102, 69%, 35%);
+    --green-700: hsl(104, 64%, 27%);
+    --green-800: hsl(104, 55%, 23%);
+    --green-900: hsl(105, 50%, 20%);
+    --green-950: hsl(107, 65%, 10%);
+
+    --primary: #3EEE00;
+    --danger : #F00;
+  }
+
+  body {
+    font-family: Roboto, Helvetica, Arial, Ubuntu, 'Noto Naskh Arabic', sans-serif;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 1rem;
+  }
+}
+
+@layer layout {
+  #svowel {
+    .title {
+      margin-block: 1rem;
+      position: relative;
+      left: 2.5%;
+    }
+    
+    .question-nav {
+      margin-block: 0;
+      padding-inline: 1rem;
+    }
+
+    .excerpt {
+      block-size: 50svh;
+    }
+
+    .svowel-options {
+      margin-inline: auto;
+    }
+
+    button[type="submit"] {
+      margin-inline: auto;
+      display: block;
+      font-size: 1.5rem;
+    }
+
+    .username {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+@layer module {
+  .arareader-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary);
+    color: #fff;
+    border-radius: 25%;
+    block-size: 3rem;
+    inline-size: 3rem;
+    filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.25));
+    font-size: 1.5rem;
+    font-family: "Permanent Marker", cursive;
+  }
+
+  .title {
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .question-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    > .question-nav__navigate {
+      border: unset;
+      background-color: unset;
+      cursor: pointer;
+    }
+
+    > .question-nav__prompt {
+      font-size: 1.2rem;
+    }
+  }
+
+  
+  .excerpt {
+    font-size: 2rem;
+    direction: rtl;
+    text-align: justify;
+    padding-inline: 3rem;
+    background-color: #eee;
+    overflow: auto;
+  }
+
+  .highlight {
+    background-color: rgb(85, 224, 255, 0.5);
+  }
+
+  .instruction {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .svowel-options {
+    max-width: fit-content;
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+
+    button {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    .svowel-options__not-sukoon {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding-inline-start: 1rem;
+    }
+  }
+
+  .primary {
+    font-weight: bold;
+    color: var(--primary);
+  }
+
+  .danger {
+    font-weight: bold;
+    color: var(--danger);
+  }
+
+  .button {
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
+    background-color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+
+  .button--primary {
+    background-color: var(--primary);
+  }
+
+  .button--disabled {
+    cursor: unset;
+    box-shadow: none;
+  }
+}
+
+@layer util {
+  .stack > *+* {
+    margin-block-start: 1.5rem;
+  }
+}

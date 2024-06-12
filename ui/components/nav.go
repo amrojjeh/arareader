@@ -12,6 +12,10 @@ import (
 	. "github.com/maragudk/gomponents/html"
 )
 
+func Hamburger() g.Node {
+	return Img(Width("20px"), Src("/static/icons/bars-solid.svg"))
+}
+
 type QuestionNavProps struct {
 	CurrentQuestion int
 	TotalQuestions  int
