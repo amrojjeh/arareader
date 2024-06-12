@@ -14,7 +14,6 @@ import (
 )
 
 type QuestionToInputMethodParams struct {
-	SubmitURL       string
 	NextURL         string
 	Question        model.Question
 	QuestionData    model.QuestionData
@@ -29,7 +28,7 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
 			if p.QuestionSession.Status.IsSubmitted() {
 				return VowelInputMethodSubmitted(string(letter), p.QuestionData.Answer, p.QuestionSession.Answer, p.NextURL)
 			}
-			return VowelInputMethodUnsubmitted(string(letter), p.SubmitURL)
+			return VowelInputMethodUnsubmitted(string(letter))
 		}
 	}
 	return func() g.Node {
@@ -39,35 +38,22 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
 	}
 }
 
-func VowelInputMethodUnsubmitted(letter string, submitURL string) g.Node {
+func VowelInputMethodUnsubmitted(letter string) g.Node {
 	options := vowelOptions(letter)
-	return FormEl(Class("stack"), Action(submitURL), Method("post"),
+	return g.Group([]g.Node{
 		Input(Type("hidden"), Name("ans"), DataAttr("vowel-form-answer", "")),
 		Div(Class("svowel-options"),
-			options[0],
-			Div(Class("svowel-options__not-sukoon"),
-				g.Group(options[1:]),
-			),
+			g.Group(options),
 		),
-		Button(Class("button"), Type("submit"),
-			g.Text("Submit"),
-		),
-	)
+	})
 }
 
 func VowelInputMethodSubmitted(letter, correct, chosen, nextURL string) g.Node {
 	options := vowelOptionsDisabled(letter, correct, chosen)
-	return FormEl(Class("stack"), Action(nextURL), Method("get"),
-		Div(Class("svowel-options"),
-			options[0],
-			Div(Class("svowel-options__not-sukoon"),
-				g.Group(options[1:]),
-			),
-		),
-		g.If(nextURL != "",
-			Button(Type("submit"), Class("button"),
-				g.Text("Next"),
-			),
+	return Div(Class("svowel-options"),
+		options[0],
+		Div(Class("svowel-options__not-sukoon"),
+			g.Group(options[1:]),
 		),
 	)
 }
@@ -91,7 +77,7 @@ func vowelOptionsDisabled(letter, correct, chosen string) []g.Node {
 }
 
 func vowelButton(text string) g.Node {
-	return Button(Class("button"), Type("button"), DataAttr("substitute-button", text),
+	return Button(Class("btn btn--shadow"), Type("button"), DataAttr("substitute-button", text),
 		g.Text(text),
 	)
 }
@@ -103,19 +89,19 @@ func vowelButtonDisabled(text, correct, chosen string) g.Node {
 	if text == chosen {
 		return vowelButtonIncorrect(text)
 	}
-	return Button(Class("button button--disabled"), Type("button"),
+	return Button(Class("btn btn--disabled"), Type("button"),
 		g.Text(text),
 	)
 }
 
 func vowelButtonCorrect(text string) g.Node {
-	return Button(Class("primary button button--disabled"), Type("button"),
+	return Button(Class("btn btn--disabled btn--primary"), Type("button"),
 		g.Text(text),
 	)
 }
 
 func vowelButtonIncorrect(text string) g.Node {
-	return Button(Class("danger button button--disabled"), Type("button"),
+	return Button(Class("btn btn--disabled"), Type("button"),
 		g.Text(text),
 	)
 }

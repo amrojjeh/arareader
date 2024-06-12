@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/amrojjeh/arareader/arabic"
 	"github.com/amrojjeh/arareader/model"
 	"github.com/amrojjeh/arareader/ui/components"
 	"github.com/amrojjeh/arareader/ui/page"
@@ -73,7 +74,7 @@ func (qr questionResource) Get(w http.ResponseWriter, r *http.Request) {
 		Excerpt:     components.Excerpt(excerpt, data.Reference),
 		QuizTitle:   quiz.Title,
 		Prompt:      data.Prompt,
-		InputMethod: components.VowelInputMethodUnsubmitted(data.Answer, "#"),
+		InputMethod: components.VowelInputMethodUnsubmitted(arabic.Unpointed(data.Answer)),
 	}).Render(w)
 }
 
