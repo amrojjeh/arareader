@@ -1,15 +1,10 @@
-/*
-Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
-*/
-
-package service
+package model
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 
-	"github.com/amrojjeh/arareader/model"
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -30,7 +25,7 @@ func MustOpenDB(dsn string) *sql.DB {
 
 // MustSetup initializes the database schema
 func MustSetup(ctx context.Context, db *sql.DB) {
-	_, err := db.ExecContext(ctx, model.Schema)
+	_, err := db.ExecContext(ctx, Schema)
 	if err != nil {
 		panic("could not execute schema")
 	}
@@ -39,22 +34,4 @@ func MustSetup(ctx context.Context, db *sql.DB) {
 func FromPlainPassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	return string(hash), err
-}
-
-func Map[T any, V any](f func(T) V, arr []T) []V {
-	vs := []V{}
-	for _, el := range arr {
-		vs = append(vs, f(el))
-	}
-	return vs
-}
-
-func Filter[T any](pred func(T) bool, arr []T) []T {
-	vs := []T{}
-	for _, el := range arr {
-		if pred(el) {
-			vs = append(vs, el)
-		}
-	}
-	return vs
 }

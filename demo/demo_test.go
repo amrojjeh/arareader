@@ -2,7 +2,7 @@
 Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 */
 
-package service
+package demo
 
 import (
 	"bytes"
@@ -18,7 +18,9 @@ import (
 
 func TestDemoDB(t *testing.T) {
 	ctx := context.Background()
-	db := DemoDB(ctx)
+	db := model.MustOpenDB(":memory:")
+	model.MustSetup(ctx, db)
+	Demo(ctx, db)
 	q := model.New(db)
 	quiz := must.Get(q.GetQuiz(ctx, 1))
 	decoder := xml.NewDecoder(bytes.NewReader(quiz.Excerpt))

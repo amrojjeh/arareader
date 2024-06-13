@@ -1,8 +1,4 @@
-/*
-Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
-*/
-
-package service
+package model
 
 import (
 	"context"

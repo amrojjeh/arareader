@@ -2,7 +2,7 @@
 Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 */
 
-package service
+package demo
 
 import (
 	"bytes"
@@ -15,16 +15,14 @@ import (
 	"github.com/amrojjeh/arareader/must"
 )
 
-func DemoDB(ctx context.Context) *sql.DB {
+func Demo(ctx context.Context, db *sql.DB) {
 	var excerptXML = `<excerpt>{{bw "<nmA Al>EmA"}}<ref id="1">{{bw "lu"}}</ref> {{bw "bAlnyA"}}<ref id="2">{{bw "ti"}}</ref>، {{bw "w<nmA lkl AmrY' mA nwY fmn kAnt hjrth <lY"}} <ref id="3">{{bw "Allh wrswlh fhjrth <lY Allh wrswlh، wmn kAnt hjrth ldnyA ySybhA، >w Amr>p ynkHhA fhjrt"}}<ref id="4">{{bw "hu"}}</ref> {{bw "<lY mA hAjr <lyh"}}</ref></excerpt>`
 
-	db := MustOpenDB(":memory:")
-	MustSetup(ctx, db)
 	q := model.New(db)
 	teacher := must.Get(q.CreateTeacher(ctx, model.CreateTeacherParams{
 		Email:        "smith@demo.com",
 		Username:     "Professor Smith",
-		PasswordHash: must.Get(FromPlainPassword("password")),
+		PasswordHash: must.Get(model.FromPlainPassword("password")),
 	}))
 
 	buff := &bytes.Buffer{}
@@ -85,5 +83,4 @@ func DemoDB(ctx context.Context) *sql.DB {
 		QuizID:    quiz.ID,
 		Status:    model.UnsubmittedQuizStatus,
 	})
-	return db
 }

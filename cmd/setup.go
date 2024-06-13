@@ -5,7 +5,7 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package cmd
 
 import (
-	"github.com/amrojjeh/arareader/service"
+	"github.com/amrojjeh/arareader/model"
 	"github.com/spf13/cobra"
 )
 
@@ -15,8 +15,8 @@ var setupCmd = &cobra.Command{
 	Short: "Primes the application ready for use",
 	Long:  `Sets up the database by creating the schema`,
 	Run: func(cmd *cobra.Command, args []string) {
-		db := service.MustOpenDB(dsn)
-		service.MustSetup(cmd.Context(), db)
+		db := model.MustOpenDB(dsn)
+		model.MustSetup(cmd.Context(), db)
 	},
 }
 

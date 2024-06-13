@@ -9,8 +9,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/amrojjeh/arareader/demo"
+	"github.com/amrojjeh/arareader/model"
 	"github.com/amrojjeh/arareader/routes"
-	"github.com/amrojjeh/arareader/service"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +21,9 @@ var demoCmd = &cobra.Command{
 	Short: "Start the server with dummy data demonstration",
 	Long:  `Creates an in-memory database and fills it up with dummy data so that it could be toyed and tested without being reset each time. It's also useful for demonstrations.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		db := service.DemoDB(cmd.Context())
+		db := model.MustOpenDB(":memory:")
+		model.MustSetup(cmd.Context(), db)
+		demo.Demo(cmd.Context(), db)
 		handler := routes.Routes(db)
 		server := server(handler)
 		log.Printf("Listening on %s...", addr())

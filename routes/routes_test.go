@@ -11,7 +11,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/amrojjeh/arareader/service"
+	"github.com/amrojjeh/arareader/demo"
+	"github.com/amrojjeh/arareader/model"
 )
 
 func TestHTTPRouteServeHTTP(t *testing.T) {
@@ -64,9 +65,14 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			db := model.MustOpenDB(":memory:")
+			model.MustSetup(ctx, db)
+			demo.Demo(ctx, db)
+
 			writer := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodGet, tt.path, bytes.NewReader([]byte{}))
-			handler := Routes(service.DemoDB(context.Background()))
+			handler := Routes(db)
 			handler.ServeHTTP(writer, req)
 			if writer.Code != tt.code {
 				t.Errorf("incorrect status code (expected: %d; actual: %d)", tt.code, writer.Code)
