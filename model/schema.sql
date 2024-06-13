@@ -14,8 +14,10 @@ CREATE TABLE IF NOT EXISTS teacher (
 CREATE TABLE IF NOT EXISTS quiz (
     id INTEGER NOT NULL PRIMARY KEY,
     teacher_id INTEGER NOT NULL,
+
     title TEXT NOT NULL,
     excerpt XML NOT NULL,
+
     created DATETIME NOT NULL,
     updated DATETIME NOT NULL,
 
@@ -29,8 +31,13 @@ CREATE TABLE IF NOT EXISTS question (
     id INTEGER NOT NULL PRIMARY KEY,
     quiz_id INTEGER NOT NULL,
     position INTEGER NOT NULL,
+
     type TEXT NOT NULL,
-    data JSON NOT NULL,
+    reference INTEGER NOT NULL,
+    feedback TEXT NOT NULL,
+    prompt TEXT NOT NULL,
+    solution TEXT NOT NULL,
+
     created DATETIME NOT NULL,
     updated DATETIME NOT NULL,
 
@@ -84,6 +91,7 @@ CREATE TABLE IF NOT EXISTS quiz_session (
     id INTEGER NOT NULL PRIMARY KEY,
     student_id INTEGER NOT NULL,
     quiz_id INTEGER NOT NULL,
+
     status TEXT NOT NULL, -- "submitted" | "unsubmitted"
     created DATETIME NOT NULL,
     updated DATETIME NOT NULL,
@@ -103,8 +111,10 @@ CREATE TABLE IF NOT EXISTS question_session (
     id INTEGER NOT NULL PRIMARY KEY,
     quiz_session_id INTEGER NOT NULL,
     question_id INTEGER NOT NULL,
+
     status TEXT NOT NULL, -- "correct" | "incorrect" | "pending" | "unsubmitted" | "unattempted"
     answer TEXT NOT NULL,
+
     created DATETIME NOT NULL,
     updated DATETIME NOT NULL,
     CONSTRAINT question_session_uc UNIQUE (quiz_session_id, question_id),

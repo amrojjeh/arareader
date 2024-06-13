@@ -65,17 +65,20 @@ func (q *Queries) CreateClass(ctx context.Context, arg CreateClassParams) (Class
 const createQuestion = `-- name: CreateQuestion :one
 
 INSERT INTO question (
-    quiz_id, position, type, data, created, updated
+    quiz_id, position, type, reference, feedback, prompt, solution, created, updated
 ) VALUES (
-    ?, ?, ?, ?, datetime("now"), datetime("now")
-) RETURNING id, quiz_id, position, type, data, created, updated
+    ?, ?, ?, ?, ?, ?, ?, datetime("now"), datetime("now")
+) RETURNING id, quiz_id, position, type, reference, feedback, prompt, solution, created, updated
 `
 
 type CreateQuestionParams struct {
-	QuizID   int
-	Position int
-	Type     QuestionType
-	Data     []byte
+	QuizID    int
+	Position  int
+	Type      QuestionType
+	Reference int
+	Feedback  string
+	Prompt    string
+	Solution  string
 }
 
 // **********
@@ -86,7 +89,10 @@ func (q *Queries) CreateQuestion(ctx context.Context, arg CreateQuestionParams) 
 		arg.QuizID,
 		arg.Position,
 		arg.Type,
-		arg.Data,
+		arg.Reference,
+		arg.Feedback,
+		arg.Prompt,
+		arg.Solution,
 	)
 	var i Question
 	err := row.Scan(
@@ -94,7 +100,10 @@ func (q *Queries) CreateQuestion(ctx context.Context, arg CreateQuestionParams) 
 		&i.QuizID,
 		&i.Position,
 		&i.Type,
-		&i.Data,
+		&i.Reference,
+		&i.Feedback,
+		&i.Prompt,
+		&i.Solution,
 		&i.Created,
 		&i.Updated,
 	)
@@ -336,7 +345,7 @@ func (q *Queries) GetClass(ctx context.Context, id int) (Class, error) {
 }
 
 const getQuestion = `-- name: GetQuestion :one
-SELECT id, quiz_id, position, type, data, created, updated FROM question
+SELECT id, quiz_id, position, type, reference, feedback, prompt, solution, created, updated FROM question
 WHERE id=?
 `
 
@@ -348,7 +357,10 @@ func (q *Queries) GetQuestion(ctx context.Context, id int) (Question, error) {
 		&i.QuizID,
 		&i.Position,
 		&i.Type,
-		&i.Data,
+		&i.Reference,
+		&i.Feedback,
+		&i.Prompt,
+		&i.Solution,
 		&i.Created,
 		&i.Updated,
 	)
@@ -477,19 +489,14 @@ func (q *Queries) ListClassesByTeacher(ctx context.Context, teacherID int) ([]Cl
 	return items, nil
 }
 
-const listQuestionSessionByType = `-- name: ListQuestionSessionByType :many
+const listQuestionSessions = `-- name: ListQuestionSessions :many
 SELECT qs.id, qs.quiz_session_id, qs.question_id, qs.status, qs.answer, qs.created, qs.updated FROM question_session AS qs
 INNER JOIN question AS q ON qs.question_id=q.id
-WHERE qs.quiz_session_id=? AND q.type=?
+WHERE qs.quiz_session_id=?
 `
 
-type ListQuestionSessionByTypeParams struct {
-	QuizSessionID int
-	Type          QuestionType
-}
-
-func (q *Queries) ListQuestionSessionByType(ctx context.Context, arg ListQuestionSessionByTypeParams) ([]QuestionSession, error) {
-	rows, err := q.db.QueryContext(ctx, listQuestionSessionByType, arg.QuizSessionID, arg.Type)
+func (q *Queries) ListQuestionSessions(ctx context.Context, quizSessionID int) ([]QuestionSession, error) {
+	rows, err := q.db.QueryContext(ctx, listQuestionSessions, quizSessionID)
 	if err != nil {
 		return nil, err
 	}
@@ -520,7 +527,7 @@ func (q *Queries) ListQuestionSessionByType(ctx context.Context, arg ListQuestio
 }
 
 const listQuestionsByQuiz = `-- name: ListQuestionsByQuiz :many
-SELECT id, quiz_id, position, type, data, created, updated FROM question
+SELECT id, quiz_id, position, type, reference, feedback, prompt, solution, created, updated FROM question
 WHERE quiz_id=?
 ORDER BY position
 `
@@ -539,7 +546,10 @@ func (q *Queries) ListQuestionsByQuiz(ctx context.Context, quizID int) ([]Questi
 			&i.QuizID,
 			&i.Position,
 			&i.Type,
-			&i.Data,
+			&i.Reference,
+			&i.Feedback,
+			&i.Prompt,
+			&i.Solution,
 			&i.Created,
 			&i.Updated,
 		); err != nil {
@@ -611,7 +621,7 @@ func (q *Queries) ListQuizzesByClass(ctx context.Context, classID int) ([]ListQu
 }
 
 const listSegmentedQuestionsByQuiz = `-- name: ListSegmentedQuestionsByQuiz :many
-SELECT id, quiz_id, position, type, data, created, updated FROM question
+SELECT id, quiz_id, position, type, reference, feedback, prompt, solution, created, updated FROM question
 WHERE quiz_id=? AND segmented=TRUE
 ORDER BY position
 `
@@ -630,7 +640,10 @@ func (q *Queries) ListSegmentedQuestionsByQuiz(ctx context.Context, quizID int) 
 			&i.QuizID,
 			&i.Position,
 			&i.Type,
-			&i.Data,
+			&i.Reference,
+			&i.Feedback,
+			&i.Prompt,
+			&i.Solution,
 			&i.Created,
 			&i.Updated,
 		); err != nil {

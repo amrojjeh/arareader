@@ -24,13 +24,16 @@ type ClassQuiz struct {
 }
 
 type Question struct {
-	ID       int
-	QuizID   int
-	Position int
-	Type     QuestionType
-	Data     []byte
-	Created  time.Time
-	Updated  time.Time
+	ID        int
+	QuizID    int
+	Position  int
+	Type      QuestionType
+	Reference int
+	Feedback  string
+	Prompt    string
+	Solution  string
+	Created   time.Time
+	Updated   time.Time
 }
 
 type QuestionSession struct {

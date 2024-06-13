@@ -55,9 +55,9 @@ WHERE id=?;
 
 -- name: CreateQuestion :one
 INSERT INTO question (
-    quiz_id, position, type, data, created, updated
+    quiz_id, position, type, reference, feedback, prompt, solution, created, updated
 ) VALUES (
-    ?, ?, ?, ?, datetime("now"), datetime("now")
+    ?, ?, ?, ?, ?, ?, ?, datetime("now"), datetime("now")
 ) RETURNING *;
 
 -- name: GetQuestion :one
@@ -173,7 +173,7 @@ RETURNING *;
 SELECT  * FROM question_session
 WHERE quiz_session_id=? AND question_id=?;
 
--- name: ListQuestionSessionByType :many
+-- name: ListQuestionSessions :many
 SELECT qs.* FROM question_session AS qs
 INNER JOIN question AS q ON qs.question_id=q.id
-WHERE qs.quiz_session_id=? AND q.type=?;
+WHERE qs.quiz_session_id=?

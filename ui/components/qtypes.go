@@ -16,17 +16,18 @@ import (
 type QuestionToInputMethodParams struct {
 	NextURL         string
 	Question        model.Question
-	QuestionData    model.QuestionData
 	QuestionSession model.QuestionSession
 }
+
+var vowels = []string{"u", "N", "a", "F", "i", "K", "o"}
 
 func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
 	switch p.Question.Type {
 	case model.VowelQuestionType:
 		return func() g.Node {
-			letter, _ := utf8.DecodeRuneInString(p.QuestionData.Answer)
+			letter, _ := utf8.DecodeRuneInString(p.Question.Solution)
 			if p.QuestionSession.Status.IsSubmitted() {
-				return VowelInputMethodSubmitted(string(letter), p.QuestionData.Answer, p.QuestionSession.Answer, p.NextURL)
+				return VowelInputMethodSubmitted(string(letter), p.Question.Solution, p.QuestionSession.Answer, p.NextURL)
 			}
 			return VowelInputMethodUnsubmitted(string(letter))
 		}
@@ -59,7 +60,6 @@ func VowelInputMethodSubmitted(letter, correct, chosen, nextURL string) g.Node {
 }
 
 func vowelOptions(letter string) []g.Node {
-	vowels := []string{"o", "i", "a", "u", "K", "F", "N"}
 	buttons := []g.Node{}
 	for _, v := range vowels {
 		buttons = append(buttons, vowelButton(letter+arabic.FromBuckwalter(v)))
@@ -68,7 +68,6 @@ func vowelOptions(letter string) []g.Node {
 }
 
 func vowelOptionsDisabled(letter, correct, chosen string) []g.Node {
-	vowels := []string{"o", "i", "a", "u", "K", "F", "N"}
 	buttons := []g.Node{}
 	for _, v := range vowels {
 		buttons = append(buttons, vowelButtonDisabled(letter+arabic.FromBuckwalter(v), correct, chosen))

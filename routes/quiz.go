@@ -14,13 +14,11 @@ type quizResource struct {
 	db *sql.DB
 }
 
-const quizIDParam = "quizID"
-
 func (qr quizResource) Routes() chi.Router {
 	r := chi.NewRouter()
 	r.Get("/", qr.List)
 	r.Post("/", qr.Post)
-	r.Route(fmt.Sprintf("/{%s:[0-9]+}", quizIDParam), func(r chi.Router) {
+	r.Route(fmt.Sprintf("/{%s:[0-9]+}", quizIDKey), func(r chi.Router) {
 		r.Use(qr.QuizID)
 		r.Get("/", qr.Get)
 		r.Put("/", qr.Put)
@@ -52,18 +50,14 @@ func (qr quizResource) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (qr quizResource) QuizID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		idStr := chi.URLParam(r, quizIDParam)
+		idStr := chi.URLParam(r, string(quizIDKey))
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			err = fmt.Errorf("%s is not an int (%v)", quizIDParam, err)
+			err = fmt.Errorf("%s is not an int (%v)", quizIDKey, err)
 			panic(err)
 		}
 
-		ctx := context.WithValue(r.Context(), quizIDParam, id)
+		ctx := context.WithValue(r.Context(), quizIDKey, id)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
-}
-
-func quizIDFromRequest(r *http.Request) int {
-	return r.Context().Value(quizIDParam).(int)
 }

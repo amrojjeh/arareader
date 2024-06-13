@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
-	"encoding/json"
 	"text/template"
 
 	"github.com/amrojjeh/arareader/model"
@@ -36,31 +35,43 @@ func Demo(ctx context.Context, db *sql.DB) {
 	}))
 
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
-		QuizID:   quiz.ID,
-		Position: 0,
-		Type:     model.VowelQuestionType,
-		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(excerpt.Ref(1), "There's a damma because it's a raf'"))),
+		QuizID:    quiz.ID,
+		Position:  0,
+		Type:      model.VowelQuestionType,
+		Reference: 1,
+		Feedback:  "There's a damma because it's a raf'",
+		Prompt:    "Choose the correct vowel",
+		Solution:  excerpt.Ref(1).Plain(),
 	})
 
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
-		QuizID:   quiz.ID,
-		Position: 1,
-		Type:     model.VowelQuestionType,
-		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(excerpt.Ref(2), "There's a kasra because it's a jarr'"))),
+		QuizID:    quiz.ID,
+		Position:  1,
+		Type:      model.VowelQuestionType,
+		Reference: 2,
+		Feedback:  "There's a kasra because it's a jarr'",
+		Prompt:    "Choose the correct vowel",
+		Solution:  excerpt.Ref(2).Plain(),
 	})
 
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
-		QuizID:   quiz.ID,
-		Position: 2,
-		Type:     model.VowelQuestionType,
-		Data:     must.Get(json.Marshal(model.NewVowelQuestionData(excerpt.Ref(4), "There's a damma because it's a raf'"))),
+		QuizID:    quiz.ID,
+		Position:  2,
+		Type:      model.VowelQuestionType,
+		Reference: 4,
+		Feedback:  "There's a damma because it's a raf'",
+		Prompt:    "Choose the correct vowel",
+		Solution:  excerpt.Ref(4).Plain(),
 	})
 
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
-		QuizID:   quiz.ID,
-		Position: 3,
-		Type:     model.ShortAnswerQuestionType,
-		Data:     must.Get(json.Marshal(model.NewSegmentedShortAnswerQuestionData(excerpt.Ref(3), "Possible translation: this is a house", "Translate the sentence"))),
+		QuizID:    quiz.ID,
+		Position:  3,
+		Type:      model.ShortAnswerQuestionType,
+		Reference: 3,
+		Feedback:  "Possible translation: this is a house",
+		Prompt:    "Translate the sentence",
+		Solution:  "<MANUAL>",
 	})
 
 	class := must.Get(q.CreateClass(ctx, model.CreateClassParams{
