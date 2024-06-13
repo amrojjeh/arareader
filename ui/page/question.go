@@ -18,6 +18,7 @@ type QuestionParams struct {
 	InputMethod g.Node
 	NextURL     string
 	PrevURL     string
+	SubmitURL   string
 }
 
 func QuestionPage(p QuestionParams) g.Node {
@@ -41,11 +42,12 @@ func QuestionPage(p QuestionParams) g.Node {
 				g.Text(p.Prompt),
 			),
 			p.InputMethod,
-			Div(Class("question-ctrl"),
+			Form(Class("question-ctrl"), Method("post"), Action(p.SubmitURL),
+				Input(Type("hidden"), Name("ans"), DataAttr("form-answer", "")),
 				A(Class("question-ctrl__first btn"), Href(p.PrevURL),
 					g.Text("Previous"),
 				),
-				Button(Type("button"), Class("btn btn--primary"),
+				Button(Type("submit"), Class("btn btn--primary"),
 					g.Text("Submit"),
 				),
 				A(Class("question-ctrl__last btn"), Href(p.NextURL),

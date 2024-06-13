@@ -166,7 +166,7 @@ INSERT INTO question_session (
 -- name: SubmitAnswer :one
 UPDATE question_session
 SET answer=?, status=?, updated=datetime("now")
-WHERE quiz_session_id=? AND question_id=?
+WHERE id=?
 RETURNING *;
 
 -- name: GetQuestionSession :one

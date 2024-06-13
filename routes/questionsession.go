@@ -21,7 +21,72 @@ type questionSessionResource struct {
 }
 
 func (qr questionSessionResource) Post(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, http.StatusText(http.StatusNotImplemented), http.StatusNotImplemented)
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var quizID, studentID, questionPos int
+	var found bool
+	if studentID, found = studentIDFromRequest(r); !found {
+		panic("getting student id")
+	}
+	if quizID, found = quizIDFromRequest(r); !found {
+		panic("getting quiz id")
+	}
+	if questionPos, found = questionPositionFromRequest(r); !found {
+		panic("getting question position")
+	}
+
+	q := model.New(qr.db)
+
+	quizSession, err := q.GetQuizSession(r.Context(), model.GetQuizSessionParams{
+		StudentID: studentID,
+		QuizID:    quizID,
+	})
+	if err != nil {
+		err = fmt.Errorf("retrieving quiz session: %v", err)
+		panic(err)
+	}
+
+	questions, err := q.ListQuestionsByQuiz(r.Context(), quizID)
+	if err != nil {
+		err = fmt.Errorf("retrieving questions: %v", err)
+		panic(err)
+	}
+	question := questions[questionPos]
+
+	questionSession, err := q.GetQuestionSession(r.Context(), model.GetQuestionSessionParams{
+		QuizSessionID: quizSession.ID,
+		QuestionID:    question.ID,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			questionSession, err = q.CreateQuestionSession(r.Context(), model.CreateQuestionSessionParams{
+				QuizSessionID: quizSession.ID,
+				QuestionID:    question.ID,
+				Answer:        r.Form.Get("ans"),
+				Status:        model.ValidateQuestion(question, r.Form.Get("ans")),
+			})
+			if err != nil {
+				err = fmt.Errorf("creating question: %v", err)
+				panic(err)
+			}
+		}
+	} else {
+		_, err = q.SubmitAnswer(r.Context(), model.SubmitAnswerParams{
+			Answer: r.Form.Get("ans"),
+			Status: model.ValidateQuestion(question, r.Form.Get("ans")),
+			ID:     questionSession.ID,
+		})
+		if err != nil {
+			err = fmt.Errorf("submitting answer: %v", err)
+			panic(err)
+		}
+	}
+
+	http.Redirect(w, r, questionURL(quizID, questionPos), http.StatusSeeOther)
 }
 
 func (qr questionSessionResource) List(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +145,6 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		StudentID: studentID,
 		QuizID:    quizID,
 	})
-
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			quizSession, err = q.CreateQuizSession(r.Context(), model.CreateQuizSessionParams{
@@ -99,7 +163,7 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	questionSessions, err := q.ListQuestionSessions(r.Context(), quizSession.ID)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	if err != nil {
 		err = fmt.Errorf("getting vowel question sessions: %v", err)
 		panic(err)
 	}

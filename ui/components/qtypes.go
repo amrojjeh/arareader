@@ -42,7 +42,6 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
 func VowelInputMethodUnsubmitted(letter string) g.Node {
 	options := vowelOptions(letter)
 	return g.Group([]g.Node{
-		Input(Type("hidden"), Name("ans"), DataAttr("vowel-form-answer", "")),
 		Div(Class("svowel-options"),
 			g.Group(options),
 		),

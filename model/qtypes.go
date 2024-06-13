@@ -4,6 +4,8 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 
 package model
 
+import "fmt"
+
 type QuestionType string
 
 const (
@@ -34,4 +36,17 @@ const (
 
 func (qs QuestionStatus) IsSubmitted() bool {
 	return qs == CorrectQuestionStatus || qs == IncorrectQuestionStatus
+}
+
+func ValidateQuestion(q Question, ans string) QuestionStatus {
+	switch q.Type {
+	case VowelQuestionType:
+		if ans == q.Solution {
+			return CorrectQuestionStatus
+		}
+		return IncorrectQuestionStatus
+	default:
+		err := fmt.Errorf("unsupported question type: %v", q.Type)
+		panic(err)
+	}
 }

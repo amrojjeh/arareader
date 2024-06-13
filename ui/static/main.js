@@ -12,7 +12,7 @@ htmx.onLoad(function() {
       selected.innerText = sub
       e.target.classList.add("btn--primary")
       e.target.setAttribute("data-selected-button", "")
-      const answer = document.querySelector("[data-vowel-form-answer]")
+      const answer = document.querySelector("[data-form-answer]")
       answer.value = sub
     })
   })
