@@ -113,9 +113,10 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 
 	page.QuestionPage(page.QuestionParams{
 		Excerpt:     components.Excerpt(excerpt, question.Reference),
-		QuizTitle:   quiz.Title,
 		Prompt:      question.Prompt,
 		InputMethod: components.VowelInputMethodUnsubmitted(arabic.Unpointed(question.Solution)),
+		NextURL:     questionURL(quiz.ID, questionPos+1),
+		PrevURL:     questionURL(quiz.ID, questionPos-1),
 	}).Render(w)
 }
 
@@ -135,4 +136,8 @@ func questionWithID(qs []model.Question, id int) model.Question {
 	}
 	err := fmt.Errorf("getting question with id %d", id)
 	panic(err)
+}
+
+func questionURL(quizID, questionPos int) string {
+	return fmt.Sprintf("/quiz/%d/question/%d", quizID, questionPos)
 }

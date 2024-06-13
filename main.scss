@@ -123,12 +123,17 @@
   }
 
   .btn {
+    display: flex;
     background-color: var(--gray-200);
     appearance: none;
     color: var(--green-950);
     border: none;
     font-weight: bold;
     font-size: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    align-items: center;
+    justify-content: center;
 
     &--primary {
       background-color: var(--dark-green);
