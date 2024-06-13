@@ -1,3 +1,7 @@
+/*
+Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
+*/
+
 package routes
 
 import (
