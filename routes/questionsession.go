@@ -86,7 +86,7 @@ func (qr questionSessionResource) Post(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	http.Redirect(w, r, questionURL(quizID, questionPos), http.StatusSeeOther)
+	http.Redirect(w, r, questionURL(quizID, questionPos, len(questions)), http.StatusSeeOther)
 }
 
 func (qr questionSessionResource) List(w http.ResponseWriter, r *http.Request) {
@@ -179,8 +179,8 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		Excerpt:     components.Excerpt(excerpt, question.Reference),
 		Prompt:      question.Prompt,
 		InputMethod: components.VowelInputMethodUnsubmitted(arabic.Unpointed(question.Solution)),
-		NextURL:     questionURL(quiz.ID, questionPos+1),
-		PrevURL:     questionURL(quiz.ID, questionPos-1),
+		NextURL:     questionURL(quiz.ID, questionPos+1, len(questions)),
+		PrevURL:     questionURL(quiz.ID, questionPos-1, len(questions)),
 	}).Render(w)
 }
 
@@ -202,6 +202,9 @@ func questionWithID(qs []model.Question, id int) model.Question {
 	panic(err)
 }
 
-func questionURL(quizID, questionPos int) string {
+func questionURL(quizID, questionPos, totalQuestions int) string {
+	if questionPos < 0 || questionPos >= totalQuestions {
+		return ""
+	}
 	return fmt.Sprintf("/quiz/%d/question/%d", quizID, questionPos)
 }
