@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/amrojjeh/arareader/arabic"
 	"github.com/amrojjeh/arareader/model"
 	"github.com/amrojjeh/arareader/ui/components"
 	"github.com/amrojjeh/arareader/ui/page"
@@ -168,19 +167,29 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	questionSession := model.QuestionSession{
+		Status: model.UnattemptedQuestionStatus,
+	}
+
 	for _, qs := range questionSessions {
 		if qs.Status.IsSubmitted() {
 			question := questionWithID(questions, qs.QuestionID)
 			excerpt.Ref(question.Reference).ReplaceWithText(question.Solution)
 		}
+		if qs.QuestionID == question.ID {
+			questionSession = qs
+		}
 	}
 
 	page.QuestionPage(page.QuestionParams{
-		Excerpt:     components.Excerpt(excerpt, question.Reference),
-		Prompt:      question.Prompt,
-		InputMethod: components.VowelInputMethodUnsubmitted(arabic.Unpointed(question.Solution)),
-		NextURL:     questionURL(quiz.ID, questionPos+1, len(questions)),
-		PrevURL:     questionURL(quiz.ID, questionPos-1, len(questions)),
+		Excerpt: components.Excerpt(excerpt, question.Reference),
+		Prompt:  question.Prompt,
+		InputMethod: components.QuestionToInputMethod(components.QuestionToInputMethodParams{
+			Question:        question,
+			QuestionSession: questionSession,
+		})(),
+		NextURL: questionURL(quiz.ID, questionPos+1, len(questions)),
+		PrevURL: questionURL(quiz.ID, questionPos-1, len(questions)),
 	}).Render(w)
 }
 

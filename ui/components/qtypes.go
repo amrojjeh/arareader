@@ -14,7 +14,6 @@ import (
 )
 
 type QuestionToInputMethodParams struct {
-	NextURL         string
 	Question        model.Question
 	QuestionSession model.QuestionSession
 }
@@ -27,7 +26,7 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
 		return func() g.Node {
 			letter, _ := utf8.DecodeRuneInString(p.Question.Solution)
 			if p.QuestionSession.Status.IsSubmitted() {
-				return VowelInputMethodSubmitted(string(letter), p.Question.Solution, p.QuestionSession.Answer, p.NextURL)
+				return VowelInputMethodSubmitted(string(letter), p.Question.Solution, p.QuestionSession.Answer)
 			}
 			return VowelInputMethodUnsubmitted(string(letter))
 		}
@@ -48,13 +47,11 @@ func VowelInputMethodUnsubmitted(letter string) g.Node {
 	})
 }
 
-func VowelInputMethodSubmitted(letter, correct, chosen, nextURL string) g.Node {
+func VowelInputMethodSubmitted(letter, correct, chosen string) g.Node {
 	options := vowelOptionsDisabled(letter, correct, chosen)
 	return Div(Class("svowel-options"),
 		options[0],
-		Div(Class("svowel-options__not-sukoon"),
-			g.Group(options[1:]),
-		),
+		g.Group(options[1:]),
 	)
 }
 
@@ -87,19 +84,19 @@ func vowelButtonDisabled(text, correct, chosen string) g.Node {
 	if text == chosen {
 		return vowelButtonIncorrect(text)
 	}
-	return Button(Class("btn btn--disabled"), Type("button"),
+	return Button(Class("btn"), Type("button"), Disabled(),
 		g.Text(text),
 	)
 }
 
 func vowelButtonCorrect(text string) g.Node {
-	return Button(Class("btn btn--disabled btn--primary"), Type("button"),
+	return Button(Class("btn btn--primary"), Type("button"), Disabled(),
 		g.Text(text),
 	)
 }
 
 func vowelButtonIncorrect(text string) g.Node {
-	return Button(Class("btn btn--disabled"), Type("button"),
+	return Button(Class("btn btn--danger"), Type("button"), Disabled(),
 		g.Text(text),
 	)
 }

@@ -150,10 +150,17 @@ $blue: #40f1f7;
       color: black;
     }
 
+    &--disabled {
+      background-color: var(--gray-200);
+      color: var(--gray-900);
+    }
+
+    &--danger {
+      background-color: var(--red);
+    }
+
     &[disabled] {
       cursor: not-allowed;
-      background-color: var(--200);
-      color: var(--gray-900);
     }
   }
 
