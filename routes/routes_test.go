@@ -87,6 +87,7 @@ func TestShortVowel(t *testing.T) {
 	r := Routes(db)
 	assert.HTTPStatusCode(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, http.StatusOK)
 	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, arabic.FromBuckwalter("a"))
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, "</form>")
 	assert.HTTPRedirect(t, r.ServeHTTP, http.MethodPost, "/quiz/1/question/0", url.Values{
 		"ans": []string{arabic.FromBuckwalter("lo")},
 	})
