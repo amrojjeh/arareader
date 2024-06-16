@@ -5,14 +5,15 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package routes
 
 import (
-	"bytes"
 	"context"
 	"net/http"
-	"net/http/httptest"
+	"net/url"
 	"testing"
 
+	"github.com/amrojjeh/arareader/arabic"
 	"github.com/amrojjeh/arareader/demo"
 	"github.com/amrojjeh/arareader/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHTTPRouteServeHTTP(t *testing.T) {
@@ -20,31 +21,31 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 		name string
 		path string
 		code int
-		body []byte
+		body string
 	}{
 		{
 			name: "Root",
 			path: "/",
 			code: http.StatusNotFound,
-			body: []byte("404"),
+			body: "404",
 		},
 		{
 			name: "Static",
 			path: "/static/main.css",
 			code: http.StatusOK,
-			body: []byte("body"),
+			body: "body",
 		},
 		{
 			name: "Does not exist",
 			path: "/doesnotexist",
 			code: http.StatusNotFound,
-			body: []byte("404"),
+			body: "404",
 		},
 		{
 			name: "Question",
 			path: "/quiz/1/question/0",
 			code: http.StatusOK,
-			body: []byte("html"),
+			body: "html",
 		},
 		{
 			name: "Negative question",
@@ -70,16 +71,24 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 			model.MustSetup(ctx, db)
 			demo.Demo(ctx, db)
 
-			writer := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodGet, tt.path, bytes.NewReader([]byte{}))
 			handler := Routes(db)
-			handler.ServeHTTP(writer, req)
-			if writer.Code != tt.code {
-				t.Errorf("incorrect status code (expected: %d; actual: %d)", tt.code, writer.Code)
-			}
-			if !bytes.Contains(writer.Body.Bytes(), tt.body) {
-				t.Errorf("incorrect page")
-			}
+			assert.HTTPStatusCode(t, handler.ServeHTTP, http.MethodGet, tt.path, nil, tt.code)
+			assert.HTTPBodyContains(t, handler.ServeHTTP, http.MethodGet, tt.path, nil, tt.body)
 		})
 	}
+}
+
+func TestShortVowel(t *testing.T) {
+	ctx := context.Background()
+	db := model.MustOpenDB(":memory:")
+	model.MustSetup(ctx, db)
+	demo.Demo(ctx, db)
+
+	r := Routes(db)
+	assert.HTTPStatusCode(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, http.StatusOK)
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, arabic.FromBuckwalter("a"))
+	assert.HTTPRedirect(t, r.ServeHTTP, http.MethodPost, "/quiz/1/question/0", url.Values{
+		"ans": []string{arabic.FromBuckwalter("lo")},
+	})
+	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, "</form>")
 }
