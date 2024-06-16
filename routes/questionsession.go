@@ -181,9 +181,11 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	submitURL := ""
+	submitURL, feedback := "", ""
 	if !questionSession.Status.IsSubmitted() {
 		submitURL = questionURL(quizID, questionPos, len(questions))
+	} else {
+		feedback = question.Feedback
 	}
 
 	page.QuestionPage(page.QuestionParams{
@@ -196,6 +198,7 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		NextURL:   questionURL(quiz.ID, questionPos+1, len(questions)),
 		PrevURL:   questionURL(quiz.ID, questionPos-1, len(questions)),
 		SubmitURL: submitURL,
+		Feedback:  feedback,
 	}).Render(w)
 }
 

@@ -21,7 +21,7 @@ $blue: #40f1f7;
 
 @layer global {
   :root {
-    --green: #109849;
+    --green: #29ea7a;
     --dark-green: #157f1f;
     --red: #ff471a;
     --yellow: #ffde4d;
@@ -51,7 +51,7 @@ $blue: #40f1f7;
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100svh;
+    height: calc(100svh + 10rem);
 
     .question-ctrl {
       height: 4rem;
@@ -165,7 +165,13 @@ $blue: #40f1f7;
   }
 
   .question-ctrl {
+    position: fixed;
+    width: 100vw;
+    bottom: 0;
+    left: 0;
+    height: 10rem;
     display: flex;
+    flex-direction: row;
 
     & > * {
       flex: 1;
@@ -182,6 +188,21 @@ $blue: #40f1f7;
 
   .question-ctrl > * {
     flex: 1;
+  }
+
+  .callout {
+    background-color: var(--green);
+    min-height: 10rem;
+    padding-left: 2em;
+    padding-top: 2em;
+
+    .callout__icon {
+      width: 2em;
+    }
+
+    .callout__text {
+      
+    }
   }
 }
 

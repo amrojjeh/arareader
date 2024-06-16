@@ -19,6 +19,7 @@ type QuestionParams struct {
 	NextURL     string
 	PrevURL     string
 	SubmitURL   string
+	Feedback    string
 }
 
 func QuestionPage(p QuestionParams) g.Node {
@@ -42,27 +43,38 @@ func QuestionPage(p QuestionParams) g.Node {
 				g.Text(p.Prompt),
 			),
 			p.InputMethod,
-			g.If(p.SubmitURL != "",
-				Form(Class("question-ctrl"), Method("post"), Action(p.SubmitURL),
-					Input(Type("hidden"), Name("ans"), DataAttr("form-answer", "")),
-					prev(p.PrevURL),
-					Button(Type("submit"), Class("btn btn--primary"),
-						g.Text("Submit"),
+			g.If(p.Feedback != "",
+				Div(Class("callout"),
+					Img(Class("callout__icon"), Src("/static/icons/message-solid.svg")),
+					P(Class("callout__text"),
+						g.Text(p.Feedback),
 					),
-					next(p.NextURL),
 				),
 			),
-			g.If(p.SubmitURL == "",
-				Div(Class("question-ctrl"),
-					prev(p.PrevURL),
-					Button(Type("button"), Class("btn btn--disabled"),
-						g.Text("Submit"),
-					),
-					next(p.NextURL),
-				),
-			),
+			questionCtrl(p.PrevURL, p.NextURL, p.SubmitURL),
 		},
 	})
+}
+
+func questionCtrl(prevURL, nextURL, submitURL string) g.Node {
+	inner := g.Group([]g.Node{
+		prev(prevURL),
+		Button(g.If(submitURL == "", Type("button")), g.If(submitURL != "", Type("submit")), c.Classes{
+			"btn":           true,
+			"btn--disabled": submitURL == "",
+			"btn--primary":  submitURL != "",
+		},
+			g.Text("Submit"),
+		),
+		next(nextURL),
+	})
+
+	if submitURL == "" {
+		return Div(Class("question-ctrl"), inner)
+	}
+	return Form(Class("question-ctrl"), Method("post"), Action(submitURL),
+		Input(Type("hidden"), DataAttr("form-answer", "")),
+		inner)
 }
 
 func prev(prevURL string) g.Node {
