@@ -42,32 +42,45 @@ func QuestionPage(p QuestionParams) g.Node {
 				g.Text(p.Prompt),
 			),
 			p.InputMethod,
-			Form(Class("question-ctrl"), Method("post"), Action(p.SubmitURL),
-				Input(Type("hidden"), Name("ans"), DataAttr("form-answer", "")),
-				g.If(p.PrevURL == "",
-					A(Class("question-ctrl__first btn btn--disabled"), Disabled(),
-						g.Text("Previous"),
+			g.If(p.SubmitURL != "",
+				Form(Class("question-ctrl"), Method("post"), Action(p.SubmitURL),
+					Input(Type("hidden"), Name("ans"), DataAttr("form-answer", "")),
+					prev(p.PrevURL),
+					Button(Type("submit"), Class("btn btn--primary"),
+						g.Text("Submit"),
 					),
+					next(p.NextURL),
 				),
-				g.If(p.PrevURL != "",
-					A(Class("question-ctrl__first btn btn--secondary"), Href(p.PrevURL),
-						g.Text("Previous"),
+			),
+			g.If(p.SubmitURL == "",
+				Div(Class("question-ctrl"),
+					prev(p.PrevURL),
+					Button(Type("button"), Class("btn btn--disabled"),
+						g.Text("Submit"),
 					),
-				),
-				Button(Type("submit"), Class("btn btn--primary"),
-					g.Text("Submit"),
-				),
-				g.If(p.NextURL == "",
-					A(Class("question-ctrl__last btn btn--disabled"), Disabled(),
-						g.Text("Next"),
-					),
-				),
-				g.If(p.NextURL != "",
-					A(Class("question-ctrl__last btn btn--secondary"), Href(p.NextURL),
-						g.Text("Next"),
-					),
+					next(p.NextURL),
 				),
 			),
 		},
 	})
+}
+
+func prev(prevURL string) g.Node {
+	if prevURL == "" {
+		return A(Class("question-ctrl__first btn btn--disabled"), Disabled(),
+			g.Text("Previous"),
+		)
+	}
+	return A(Class("question-ctrl__first btn btn--secondary"), Href(prevURL), g.Text("Previous"))
+}
+
+func next(nextURL string) g.Node {
+	if nextURL == "" {
+		return A(Class("question-ctrl__last btn btn--disabled"), Disabled(),
+			g.Text("Next"),
+		)
+	}
+	return A(Class("question-ctrl__last btn btn--secondary"), Href(nextURL),
+		g.Text("Next"),
+	)
 }

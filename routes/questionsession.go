@@ -181,6 +181,11 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	submitURL := ""
+	if !questionSession.Status.IsSubmitted() {
+		submitURL = questionURL(quizID, questionPos, len(questions))
+	}
+
 	page.QuestionPage(page.QuestionParams{
 		Excerpt: components.Excerpt(excerpt, question.Reference),
 		Prompt:  question.Prompt,
@@ -188,8 +193,9 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 			Question:        question,
 			QuestionSession: questionSession,
 		})(),
-		NextURL: questionURL(quiz.ID, questionPos+1, len(questions)),
-		PrevURL: questionURL(quiz.ID, questionPos-1, len(questions)),
+		NextURL:   questionURL(quiz.ID, questionPos+1, len(questions)),
+		PrevURL:   questionURL(quiz.ID, questionPos-1, len(questions)),
+		SubmitURL: submitURL,
 	}).Render(w)
 }
 
