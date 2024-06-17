@@ -59,6 +59,16 @@ var vowels = map[rune]bool{
 	Kasratan: true,
 }
 
+var Vowels = []rune{
+	Sukoon,
+	Damma,
+	Fatha,
+	Kasra,
+	Dammatan,
+	Fathatan,
+	Kasratan,
+}
+
 // TODO(Amr Ojjeh): Consider making Vowel []rune so that more than one correct answer can be supported
 type LetterPack struct {
 	Letter          rune

@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/amrojjeh/arareader/model"
 	"github.com/amrojjeh/arareader/ui/components"
@@ -38,6 +39,12 @@ func (qr questionSessionResource) Post(w http.ResponseWriter, r *http.Request) {
 		panic("getting question position")
 	}
 
+	ans := r.Form.Get("ans")
+	if strings.TrimSpace(ans) == "" {
+		http.Redirect(w, r, questionURLUnsafe(quizID, questionPos), http.StatusSeeOther)
+		return
+	}
+
 	q := model.New(qr.db)
 
 	quizSession, err := q.GetQuizSession(r.Context(), model.GetQuizSessionParams{
@@ -56,6 +63,24 @@ func (qr questionSessionResource) Post(w http.ResponseWriter, r *http.Request) {
 	}
 	question := questions[questionPos]
 
+	options, err := model.VowelQuestionOptions(question.Solution)
+	if err != nil {
+		panic("generating options")
+	}
+
+	validOption := false
+	for _, o := range options {
+		if ans == o {
+			validOption = true
+			break
+		}
+	}
+
+	if !validOption {
+		http.Redirect(w, r, questionURL(quizID, questionPos, len(questions)), http.StatusSeeOther)
+		return
+	}
+
 	questionSession, err := q.GetQuestionSession(r.Context(), model.GetQuestionSessionParams{
 		QuizSessionID: quizSession.ID,
 		QuestionID:    question.ID,
@@ -65,8 +90,8 @@ func (qr questionSessionResource) Post(w http.ResponseWriter, r *http.Request) {
 			questionSession, err = q.CreateQuestionSession(r.Context(), model.CreateQuestionSessionParams{
 				QuizSessionID: quizSession.ID,
 				QuestionID:    question.ID,
-				Answer:        r.Form.Get("ans"),
-				Status:        model.ValidateQuestion(question, r.Form.Get("ans")),
+				Answer:        ans,
+				Status:        model.ValidateQuestion(question, ans),
 			})
 			if err != nil {
 				err = fmt.Errorf("creating question: %v", err)
@@ -75,8 +100,8 @@ func (qr questionSessionResource) Post(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		_, err = q.SubmitAnswer(r.Context(), model.SubmitAnswerParams{
-			Answer: r.Form.Get("ans"),
-			Status: model.ValidateQuestion(question, r.Form.Get("ans")),
+			Answer: ans,
+			Status: model.ValidateQuestion(question, ans),
 			ID:     questionSession.ID,
 		})
 		if err != nil {
@@ -188,12 +213,18 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		feedback = question.Feedback
 	}
 
+	options, err := model.VowelQuestionOptions(question.Solution)
+	if err != nil {
+		panic("generating options")
+	}
+
 	page.QuestionPage(page.QuestionParams{
 		Excerpt: components.Excerpt(excerpt, question.Reference),
 		Prompt:  question.Prompt,
 		InputMethod: components.QuestionToInputMethod(components.QuestionToInputMethodParams{
 			Question:        question,
 			QuestionSession: questionSession,
+			Options:         options,
 		})(),
 		NextURL:   questionURL(quiz.ID, questionPos+1, len(questions)),
 		PrevURL:   questionURL(quiz.ID, questionPos-1, len(questions)),
@@ -224,5 +255,9 @@ func questionURL(quizID, questionPos, totalQuestions int) string {
 	if questionPos < 0 || questionPos >= totalQuestions {
 		return ""
 	}
+	return fmt.Sprintf("/quiz/%d/question/%d", quizID, questionPos)
+}
+
+func questionURLUnsafe(quizID, questionPos int) string {
 	return fmt.Sprintf("/quiz/%d/question/%d", quizID, questionPos)
 }

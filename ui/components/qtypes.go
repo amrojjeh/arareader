@@ -5,9 +5,6 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package components
 
 import (
-	"unicode/utf8"
-
-	"github.com/amrojjeh/arareader/arabic"
 	"github.com/amrojjeh/arareader/model"
 	g "github.com/maragudk/gomponents"
 	. "github.com/maragudk/gomponents/html"
@@ -16,19 +13,17 @@ import (
 type QuestionToInputMethodParams struct {
 	Question        model.Question
 	QuestionSession model.QuestionSession
+	Options         []string
 }
-
-var vowels = []string{"u", "N", "a", "F", "i", "K", "o"}
 
 func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
 	switch p.Question.Type {
 	case model.VowelQuestionType:
 		return func() g.Node {
-			letter, _ := utf8.DecodeRuneInString(p.Question.Solution)
 			if p.QuestionSession.Status.IsSubmitted() {
-				return VowelInputMethodSubmitted(string(letter), p.Question.Solution, p.QuestionSession.Answer)
+				return VowelInputMethodSubmitted(p.Options, p.Question.Solution, p.QuestionSession.Answer)
 			}
-			return VowelInputMethodUnsubmitted(string(letter))
+			return VowelInputMethodUnsubmitted(p.Options)
 		}
 	}
 	return func() g.Node {
@@ -38,35 +33,35 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
 	}
 }
 
-func VowelInputMethodUnsubmitted(letter string) g.Node {
-	options := vowelOptions(letter)
+func VowelInputMethodUnsubmitted(options []string) g.Node {
+	btns := vowelOptions(options)
 	return g.Group([]g.Node{
 		Div(Class("svowel-options"),
-			g.Group(options),
+			g.Group(btns),
 		),
 	})
 }
 
-func VowelInputMethodSubmitted(letter, correct, chosen string) g.Node {
-	options := vowelOptionsDisabled(letter, correct, chosen)
+func VowelInputMethodSubmitted(options []string, correct, chosen string) g.Node {
+	btns := vowelOptionsDisabled(options, correct, chosen)
 	return Div(Class("svowel-options"),
-		options[0],
-		g.Group(options[1:]),
+		btns[0],
+		g.Group(btns[1:]),
 	)
 }
 
-func vowelOptions(letter string) []g.Node {
+func vowelOptions(options []string) []g.Node {
 	buttons := []g.Node{}
-	for _, v := range vowels {
-		buttons = append(buttons, vowelButton(letter+arabic.FromBuckwalter(v)))
+	for _, o := range options {
+		buttons = append(buttons, vowelButton(o))
 	}
 	return buttons
 }
 
-func vowelOptionsDisabled(letter, correct, chosen string) []g.Node {
+func vowelOptionsDisabled(options []string, correct, chosen string) []g.Node {
 	buttons := []g.Node{}
-	for _, v := range vowels {
-		buttons = append(buttons, vowelButtonDisabled(letter+arabic.FromBuckwalter(v), correct, chosen))
+	for _, o := range options {
+		buttons = append(buttons, vowelButtonDisabled(o, correct, chosen))
 	}
 	return buttons
 }

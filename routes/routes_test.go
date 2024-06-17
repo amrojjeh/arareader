@@ -93,3 +93,35 @@ func TestShortVowel(t *testing.T) {
 	})
 	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, "</form>")
 }
+
+func TestShortVowelEmpty(t *testing.T) {
+	ctx := context.Background()
+	db := model.MustOpenDB(":memory:")
+	model.MustSetup(ctx, db)
+	demo.Demo(ctx, db)
+
+	r := Routes(db)
+	assert.HTTPStatusCode(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, http.StatusOK)
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, arabic.FromBuckwalter("a"))
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, "</form>")
+	assert.HTTPRedirect(t, r.ServeHTTP, http.MethodPost, "/quiz/1/question/0", url.Values{
+		"ans": []string{" "},
+	})
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, "</form>")
+}
+
+func TestShortVowelInvalid(t *testing.T) {
+	ctx := context.Background()
+	db := model.MustOpenDB(":memory:")
+	model.MustSetup(ctx, db)
+	demo.Demo(ctx, db)
+
+	r := Routes(db)
+	assert.HTTPStatusCode(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, http.StatusOK)
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, arabic.FromBuckwalter("a"))
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, "</form>")
+	assert.HTTPRedirect(t, r.ServeHTTP, http.MethodPost, "/quiz/1/question/0", url.Values{
+		"ans": []string{arabic.FromBuckwalter("to")},
+	})
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, "</form>")
+}

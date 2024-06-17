@@ -4,7 +4,11 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 
 package model
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/amrojjeh/arareader/arabic"
+)
 
 type QuestionType string
 
@@ -49,4 +53,25 @@ func ValidateQuestion(q Question, ans string) QuestionStatus {
 		err := fmt.Errorf("unsupported question type: %v", q.Type)
 		panic(err)
 	}
+}
+
+type NotALetterError struct {
+	letter string
+}
+
+func (e NotALetterError) Error() string {
+	return fmt.Sprintf("model: %s is not an Arabic letter", e.letter)
+}
+
+func VowelQuestionOptions(letter string) ([]string, error) {
+	letterPack, err := arabic.ParseLetterPack(letter)
+	if err != nil {
+		return nil, NotALetterError{letter}
+	}
+	options := make([]string, len(arabic.Vowels))
+	for i := range len(arabic.Vowels) {
+		letterPack.Vowel = arabic.Vowels[i]
+		options[i] = letterPack.String()
+	}
+	return options, nil
 }
