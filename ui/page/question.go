@@ -62,11 +62,7 @@ func QuestionPage(p QuestionParams) g.Node {
 func questionCtrl(prevURL, nextURL, submitURL string) g.Node {
 	inner := g.Group([]g.Node{
 		prev(prevURL),
-		Button(g.If(submitURL == "", Type("button")), g.If(submitURL != "", Type("submit")), c.Classes{
-			"btn":           true,
-			"btn--disabled": submitURL == "",
-			"btn--primary":  submitURL != "",
-		},
+		Button(g.If(submitURL == "", Type("button")), g.If(submitURL != "", Type("submit")), Class("btn btn--disabled"), ID("submit"), Disabled(),
 			g.Text("Submit"),
 		),
 		next(nextURL),

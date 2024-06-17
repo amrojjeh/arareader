@@ -4,6 +4,10 @@ htmx.onLoad(function() {
 
   substituteButtons.forEach(x => {
     x.addEventListener("click", function(e) {
+      const submitBtn = document.querySelector("#submit")
+      submitBtn.classList.add("btn--primary")
+      submitBtn.classList.remove("btn--disabled")
+      submitBtn.removeAttribute("disabled")
       substituteButtons.forEach(b => {
         b.classList.remove("btn--primary")
         b.removeAttribute("data-selected-button")
