@@ -13,7 +13,6 @@ import (
 type QuestionToInputMethodParams struct {
 	Question        model.Question
 	QuestionSession model.QuestionSession
-	Options         []string
 }
 
 func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
@@ -21,9 +20,9 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
 	case model.VowelQuestionType:
 		return func() g.Node {
 			if p.QuestionSession.Status.IsSubmitted() {
-				return VowelInputMethodSubmitted(p.Options, p.Question.Solution, p.QuestionSession.Answer)
+				return VowelInputMethodSubmitted(p.Question.Solution, p.QuestionSession.Answer)
 			}
-			return VowelInputMethodUnsubmitted(p.Options)
+			return VowelInputMethodUnsubmitted(p.Question.Solution)
 		}
 	}
 	return func() g.Node {
@@ -33,8 +32,8 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
 	}
 }
 
-func VowelInputMethodUnsubmitted(options []string) g.Node {
-	btns := vowelOptions(options)
+func VowelInputMethodUnsubmitted(correct string) g.Node {
+	btns := vowelOptions(correct)
 	return g.Group([]g.Node{
 		Div(Class("svowel-options"),
 			g.Group(btns),
@@ -42,24 +41,32 @@ func VowelInputMethodUnsubmitted(options []string) g.Node {
 	})
 }
 
-func VowelInputMethodSubmitted(options []string, correct, chosen string) g.Node {
-	btns := vowelOptionsDisabled(options, correct, chosen)
+func VowelInputMethodSubmitted(correct, chosen string) g.Node {
+	btns := vowelOptionsDisabled(correct, chosen)
 	return Div(Class("svowel-options"),
 		btns[0],
 		g.Group(btns[1:]),
 	)
 }
 
-func vowelOptions(options []string) []g.Node {
+func vowelOptions(correct string) []g.Node {
 	buttons := []g.Node{}
+	options, err := model.VowelQuestionOptions(correct)
+	if err != nil {
+		panic("generating options")
+	}
 	for _, o := range options {
 		buttons = append(buttons, vowelButton(o))
 	}
 	return buttons
 }
 
-func vowelOptionsDisabled(options []string, correct, chosen string) []g.Node {
+func vowelOptionsDisabled(correct, chosen string) []g.Node {
 	buttons := []g.Node{}
+	options, err := model.VowelQuestionOptions(correct)
+	if err != nil {
+		panic("generating options")
+	}
 	for _, o := range options {
 		buttons = append(buttons, vowelButtonDisabled(o, correct, chosen))
 	}

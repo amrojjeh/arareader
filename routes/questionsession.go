@@ -213,18 +213,12 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		feedback = question.Feedback
 	}
 
-	options, err := model.VowelQuestionOptions(question.Solution)
-	if err != nil {
-		panic("generating options")
-	}
-
 	page.QuestionPage(page.QuestionParams{
 		Excerpt: components.Excerpt(excerpt, question.Reference),
 		Prompt:  question.Prompt,
 		InputMethod: components.QuestionToInputMethod(components.QuestionToInputMethodParams{
 			Question:        question,
 			QuestionSession: questionSession,
-			Options:         options,
 		})(),
 		NextURL:   questionURL(quiz.ID, questionPos+1, len(questions)),
 		PrevURL:   questionURL(quiz.ID, questionPos-1, len(questions)),
