@@ -31,27 +31,30 @@ func QuestionPage(p QuestionParams) g.Node {
 			ar.CSS("/static/main.css"),
 			ar.DeferJS("/static/main.js"),
 			g.Raw("<script src='https://unpkg.com/htmx.org@1.9.12' integrity='sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2' crossorigin='anonymous'></script>"),
+			g.Raw("<script src='https://unpkg.com/idiomorph@0.3.0'></script>"),
 			ar.Fonts(),
 		},
-		Body: []g.Node{ID("question-page"), htmx.Boost("true"),
+		Body: []g.Node{ID("question-page"), htmx.Ext("morph"), htmx.Boost("true"),
 			Nav(Class("nav"),
 				ar.Hamburger(), // TODO(Amr Ojjeh): Pull up drawer
 				ar.Icon(),
 			),
 			p.Excerpt,
-			P(Class("prompt"),
-				g.Text(p.Prompt),
-			),
-			p.InputMethod,
-			g.If(p.Feedback != "",
-				Div(Class("callout"),
-					Img(Class("callout__icon"), Src("/static/icons/message-solid.svg")),
-					P(Class("callout__text"),
-						g.Text(p.Feedback),
+			Div(ID("target"), htmx.Select("#target"), htmx.Target("#target"), htmx.Swap("show:none"),
+				P(Class("prompt"),
+					g.Text(p.Prompt),
+				),
+				p.InputMethod,
+				g.If(p.Feedback != "",
+					Div(Class("callout"),
+						Img(Class("callout__icon"), Src("/static/icons/message-solid.svg")),
+						P(Class("callout__text"),
+							g.Text(p.Feedback),
+						),
 					),
 				),
+				questionCtrl(p.PrevURL, p.NextURL, p.SubmitURL),
 			),
-			questionCtrl(p.PrevURL, p.NextURL, p.SubmitURL),
 		},
 	})
 }
@@ -73,7 +76,7 @@ func questionCtrl(prevURL, nextURL, submitURL string) g.Node {
 		return Div(Class("question-ctrl"), inner)
 	}
 	return Form(Class("question-ctrl"), Method("post"), Action(submitURL),
-		Input(Type("hidden"), DataAttr("form-answer", "")),
+		Input(Type("hidden"), Name("ans"), DataAttr("form-answer", "")),
 		inner)
 }
 

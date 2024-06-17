@@ -16,4 +16,35 @@ htmx.onLoad(function() {
       answer.value = sub
     })
   })
+
+  const highlighted = document.querySelector(".highlight")
+  highlighted.scrollIntoView({
+    "behavior": "smooth",
+    "block": "center",
+    "inline": "center",
+  })
+})
+
+document.querySelector("#target").addEventListener("htmx:beforeSwap", function(evt) {
+  const response = new DOMParser().parseFromString(evt.detail.xhr.response, "text/html")
+  const responseExcerpt = response.querySelector("#excerpt")
+  if (responseExcerpt) {
+    const responseRefs = responseExcerpt.querySelectorAll("span")
+    const myExcerpt = document.body.querySelector("#excerpt")
+    const refs = myExcerpt.querySelectorAll("span")
+    for (let x = 0; x < refs.length; x++) {
+      const ref = refs[x]
+      ref.className = responseRefs[x].className
+      ref.removeAttribute("data-selected-segment")
+      if (responseRefs[x].hasAttribute("data-selected-segment")) {
+        ref.setAttribute("data-selected-segment", "")
+      }
+    }
+    const highlighted = document.querySelector(".highlight")
+    highlighted.scrollIntoView({
+      "behavior": "smooth",
+      "block": "center",
+      "inline": "center",
+    })
+  }
 })

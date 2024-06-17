@@ -39,6 +39,7 @@ func Routes(db *sql.DB) http.Handler {
 	r.Use(middleware.CleanPath)
 	r.Use(middleware.StripSlashes)
 	r.Use(sm.LoadAndSave)
+	r.Use(rs.htmxVary)
 	r.Use(rs.Auth)
 	r.Get("/static*", func(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/static", http.FileServer(http.FS(static.Files))).ServeHTTP(w, r)
@@ -52,5 +53,13 @@ func (rs rootResource) Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), studentIDKey, 1)
 		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func (rs rootResource) htmxVary(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Vary", "HX-Request")
+		w.Header().Add("Vary", "HX-Target")
+		next.ServeHTTP(w, r)
 	})
 }

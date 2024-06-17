@@ -16,7 +16,7 @@ import (
 // Assumes excerpt is valid
 func Excerpt(e *model.Excerpt, highlightedRef int) g.Node {
 	children := processNodes(e.Nodes, highlightedRef)
-	return P(Class("excerpt"),
+	return P(Class("excerpt"), ID("excerpt"),
 		g.Group(children),
 	)
 }
