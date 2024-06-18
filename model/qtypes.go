@@ -39,7 +39,7 @@ const (
 )
 
 func (qs QuestionStatus) IsSubmitted() bool {
-	return qs == CorrectQuestionStatus || qs == IncorrectQuestionStatus
+	return qs == CorrectQuestionStatus || qs == IncorrectQuestionStatus || qs == PendingQuestionStatus
 }
 
 // TODO(Amr Ojjeh): Add a character limit to short answer

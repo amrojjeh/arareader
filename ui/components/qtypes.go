@@ -25,9 +25,10 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) g.Node {
 		return VowelInputMethodUnsubmitted(p.Question.Solution)
 	case model.ShortAnswerQuestionType:
 		if p.QuestionSession.Status.IsSubmitted() {
+			if p.QuestionSession.Status == model.PendingQuestionStatus {
+				return ShortAnswerInputMethodPending(p.QuestionSession.Answer)
+			}
 			return ShortAnswerInputMethodSubmitted(p.Question.Solution, p.QuestionSession.Answer)
-		} else if p.QuestionSession.Status == model.PendingQuestionStatus {
-			return ShortAnswerInputMethodPending(p.QuestionSession.Answer)
 		}
 		return ShortAnswerInputMethodUnsubmitted()
 	}
@@ -69,8 +70,8 @@ func shortAnswerInput(value string, disabled bool) g.Node {
 			AutoFocus(),
 		})),
 		c.Classes{
-			"shadow-md py-1": true,
-			"bg-gray-200":    disabled,
+			"shadow-md px-1 py-1": true,
+			"bg-gray-200":         disabled,
 		},
 	)
 }
@@ -135,8 +136,8 @@ func vowelButton(text string, status inputStatus) g.Node {
 		g.If(status == correctStatus, Data("type", "primary")),
 		g.If(status != acceptingInput, Disabled()),
 		c.Classes{
-			"btn shadow py-1 text-xl": true,
-			"bg-red-300":              status == incorrectStatus,
+			"btn shadow py-2 text-2xl": true,
+			"bg-red-300":               status == incorrectStatus,
 		},
 		g.Text(text),
 	)
