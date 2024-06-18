@@ -1,0 +1,3 @@
+[submodule "forks/gomponents"]
+	path = forks/gomponents
+	url = https://github.com/amrojjeh/gomponents.git
