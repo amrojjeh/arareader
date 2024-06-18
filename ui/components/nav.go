@@ -10,5 +10,5 @@ import (
 )
 
 func Hamburger() g.Node {
-	return Img(Width("20px"), Src("/static/icons/bars-solid.svg"))
+	return Img(Class("cursor-pointer"), Width("20px"), Src("/static/icons/bars-solid.svg"))
 }

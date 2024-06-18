@@ -9,12 +9,10 @@ htmx.onLoad(function() {
     answer.set = function(value) {
       this.value = value.trim().toLowerCase()
       if (this.value == "") {
-        submitBtn.classList.remove("btn--primary")
-        submitBtn.classList.add("btn--disabled")
+        submitBtn.dataset.type = "disabled"
         submitBtn.setAttribute("disabled", "")
       } else {
-        submitBtn.classList.add("btn--primary")
-        submitBtn.classList.remove("btn--disabled")
+        submitBtn.dataset.type = "primary"
         submitBtn.removeAttribute("disabled")
       }
     }.bind(answer)
@@ -32,19 +30,17 @@ htmx.onLoad(function() {
   substituteButtons.forEach(x => {
     x.addEventListener("click", function(e) {
       substituteButtons.forEach(b => {
-        b.classList.remove("btn--primary")
-        b.removeAttribute("data-selected-button")
+        delete b.dataset.type
+        delete b.dataset.selectedButton
       })
-      const sub = e.target.getAttribute("data-substitute-button")
+      const sub = e.target.dataset.substituteButton
       selected.innerText = sub
-      e.target.classList.add("btn--primary")
-      e.target.setAttribute("data-selected-button", "")
+      e.target.dataset.type = "primary"
       answer.set(sub)
     })
   })
 
-  const highlighted = document.querySelector(".highlight")
-  highlighted.scrollIntoView({
+  selected.scrollIntoView({
     "behavior": "smooth",
     "block": "center",
     "inline": "center",
@@ -61,16 +57,16 @@ document.querySelector("#target").addEventListener("htmx:beforeSwap", function(e
     for (let x = 0; x < refs.length; x++) {
       const ref = refs[x]
       ref.className = responseRefs[x].className
-      ref.removeAttribute("data-selected-segment")
-      if (responseRefs[x].hasAttribute("data-selected-segment")) {
-        ref.setAttribute("data-selected-segment", "")
+      delete ref.dataset.selectedSegment
+      if (Object.hasOwn(responseRefs[x].dataset, "selectedSegment")) {
+        ref.dataset.selectedSegment = ""
       }
       if (ref.children.length == 0) {
         ref.innerText = responseRefs[x].innerText
       }
     }
-    const highlighted = document.querySelector(".highlight")
-    highlighted.scrollIntoView({
+    const selected = document.querySelector("[data-selected-segment]")
+    selected.scrollIntoView({
       "behavior": "smooth",
       "block": "center",
       "inline": "center",

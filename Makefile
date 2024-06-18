@@ -3,10 +3,10 @@ coverage:
 	go test ./... -covermode=count -coverprofile=c.out
 	go tool cover -html=c.out
 
-.PHONY: sass
-sass:
-	sass main.scss ui/static/main.css --style=compressed
+.PHONY: demo
+demo: tailwind
+	go run . start demo
 
-.PHONY: sass-watch
-sass-watch:
-	sass main.scss ui/static/main.css --style=compressed -w
+.PHONY: tailwind
+tailwind:
+	./bin/tailwindcss -i input.css -o ./ui/static/main.css

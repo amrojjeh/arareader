@@ -16,7 +16,7 @@ import (
 // Assumes excerpt is valid
 func Excerpt(e *model.Excerpt, highlightedRef int) g.Node {
 	children := processNodes(e.Nodes, highlightedRef)
-	return P(Class("excerpt"), ID("excerpt"),
+	return P(Class("max-h-96 mb-3 text-xl text-justify px-5 bg-gray-200 overflow-auto"), ID("excerpt"), Dir("rtl"),
 		g.Group(children),
 	)
 }
@@ -24,7 +24,7 @@ func Excerpt(e *model.Excerpt, highlightedRef int) g.Node {
 func refNode(r *model.ReferenceNode, highlightedRef int) g.Node {
 	children := processNodes(r.Nodes, highlightedRef)
 	if r.ID == highlightedRef {
-		return Span(Class("highlight"), DataAttr("selected-segment", ""),
+		return Span(Class("bg-opacity-50 bg-blue-400"), Data("selected-segment", ""),
 			g.Group(children),
 		)
 	} else {

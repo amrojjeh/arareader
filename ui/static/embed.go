@@ -6,5 +6,5 @@ package static
 
 import "embed"
 
-//go:embed *.css *.js icons/* *.map
+//go:embed *.css *.js icons/*
 var Files embed.FS

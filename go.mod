@@ -24,3 +24,5 @@ require (
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/crypto v0.23.0
 )
+
+replace github.com/maragudk/gomponents => ./forks/gomponents

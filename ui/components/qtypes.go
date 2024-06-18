@@ -7,6 +7,7 @@ package components
 import (
 	"github.com/amrojjeh/arareader/model"
 	g "github.com/maragudk/gomponents"
+	c "github.com/maragudk/gomponents/components"
 	. "github.com/maragudk/gomponents/html"
 )
 
@@ -36,35 +37,47 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) g.Node {
 }
 
 func ShortAnswerInputMethodUnsubmitted() g.Node {
-	return Input(Class("short-answer"), DataAttr("input", ""), AutoFocus())
+	return shortAnswerInput("", false)
 }
 
 func ShortAnswerInputMethodSubmitted(solution, answer string) g.Node {
 	if solution == answer {
-		return Div(Class("short-answer-feedback"),
-			Input(Class("short-answer"), Value(answer), Disabled()),
-			Img(Class("short-answer-feedback__icon"), Src("/static/icons/circle-check-solid.svg")),
-		)
+		return shortAnswerFeedback(answer, "/static/icons/circle-check-solid.svg")
 	}
-	return Div(Class("stack"),
-		Div(Class("short-answer-feedback"),
-			Input(Class("short-answer"), Value(answer), Disabled()),
-			Img(Class("short-answer-feedback__icon"), Src("/static/icons/circle-xmark-solid.svg")),
-		),
-		Div(Class("short-answer-feedback"),
-			Input(Class("short-answer"), Value(solution), Disabled()),
-			Img(Class("short-answer-feedback__icon"), Src("/static/icons/circle-check-solid.svg")),
-		),
+	return Div(Class("flex flex-col gap-3"),
+		shortAnswerFeedback(answer, "/static/icons/circle-xmark-solid.svg"),
+		shortAnswerFeedback(solution, "/static/icons/circle-check-solid.svg"),
 	)
 }
 
-// TODO(Amr Ojjeh):
+func shortAnswerFeedback(value, icon string) g.Node {
+	return Div(Class("flex flex-row gap-2"),
+		shortAnswerInput(value, true),
+		shortAnswerIcon(icon),
+	)
+}
+
+func shortAnswerIcon(src string) g.Node {
+	return Img(Class("w-5"), Src(src))
+}
+
+func shortAnswerInput(value string, disabled bool) g.Node {
+	return Input(Value(value),
+		g.If(disabled, Disabled()),
+		g.If(!disabled, g.Group([]g.Node{
+			Data("input", ""),
+			AutoFocus(),
+		})),
+		c.Classes{
+			"shadow-md":   true,
+			"bg-gray-200": disabled,
+		},
+	)
+}
+
 func ShortAnswerInputMethodPending(answer string) g.Node {
 	return Div(
-		Div(Class("short-answer-feedback"),
-			Input(Class("short-answer"), Value(answer), Disabled()),
-			Img(Class("short-answer-feedback__icon"), Src("/static/icons/circle-question-solid.svg")),
-		),
+		shortAnswerFeedback(answer, "/static/icons/circle-question-solid.svg"),
 		P(
 			g.Text("Waiting for teacher's feedback..."),
 		),
@@ -72,23 +85,6 @@ func ShortAnswerInputMethodPending(answer string) g.Node {
 }
 
 func VowelInputMethodUnsubmitted(correct string) g.Node {
-	btns := vowelOptions(correct)
-	return g.Group([]g.Node{
-		Div(Class("svowel-options"),
-			g.Group(btns),
-		),
-	})
-}
-
-func VowelInputMethodSubmitted(correct, chosen string) g.Node {
-	btns := vowelOptionsDisabled(correct, chosen)
-	return Div(Class("svowel-options"),
-		btns[0],
-		g.Group(btns[1:]),
-	)
-}
-
-func vowelOptions(correct string) []g.Node {
 	buttons := []g.Node{}
 	options, err := model.VowelQuestionOptions(correct)
 	if err != nil {
@@ -97,10 +93,10 @@ func vowelOptions(correct string) []g.Node {
 	for _, o := range options {
 		buttons = append(buttons, vowelButton(o))
 	}
-	return buttons
+	return vowelOptionsContainer(buttons)
 }
 
-func vowelOptionsDisabled(correct, chosen string) []g.Node {
+func VowelInputMethodSubmitted(correct, chosen string) g.Node {
 	buttons := []g.Node{}
 	options, err := model.VowelQuestionOptions(correct)
 	if err != nil {
@@ -109,11 +105,17 @@ func vowelOptionsDisabled(correct, chosen string) []g.Node {
 	for _, o := range options {
 		buttons = append(buttons, vowelButtonDisabled(o, correct, chosen))
 	}
-	return buttons
+	return vowelOptionsContainer(buttons)
+}
+
+func vowelOptionsContainer(buttons []g.Node) g.Node {
+	return Div(Class("grid grid-cols-2 gap-2"),
+		g.Group(buttons),
+	)
 }
 
 func vowelButton(text string) g.Node {
-	return Button(Class("btn btn--shadow"), Type("button"), DataAttr("substitute-button", text),
+	return Button(Class("btn shadow"), Type("button"), Data("substitute-button", text),
 		g.Text(text),
 	)
 }
@@ -125,19 +127,19 @@ func vowelButtonDisabled(text, correct, chosen string) g.Node {
 	if text == chosen {
 		return vowelButtonIncorrect(text)
 	}
-	return Button(Class("btn"), Type("button"), Disabled(),
+	return Button(Class("btn shadow"), Type("button"), Disabled(),
 		g.Text(text),
 	)
 }
 
 func vowelButtonCorrect(text string) g.Node {
-	return Button(Class("btn btn--primary"), Type("button"), Disabled(),
+	return Button(Class("btn shadow"), Data("type", "primary"), Type("button"), Disabled(),
 		g.Text(text),
 	)
 }
 
 func vowelButtonIncorrect(text string) g.Node {
-	return Button(Class("btn btn--danger"), Type("button"), Disabled(),
+	return Button(Class("btn shadow bg-red-300"), Type("button"), Disabled(),
 		g.Text(text),
 	)
 }

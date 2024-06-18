@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply flex bg-white text-green-900 border-0 cursor-pointer items-center justify-center;
+
+    &[disabled] {
+      @apply cursor-not-allowed;
+    }
+  }
+
+  .btn[data-type="primary"] {
+    @apply bg-green-600 text-white;
+  }
+
+  .btn[data-type="disabled"] {
+    @apply bg-gray-200 text-gray-900;
+  }
+}
