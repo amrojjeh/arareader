@@ -184,7 +184,7 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, qs := range questionSessions {
-		if qs.Status.IsSubmitted() {
+		if qs.Status.IsSubmitted() && questionWithID(questions, qs.QuestionID).Type == model.VowelQuestionType {
 			question := questionWithID(questions, qs.QuestionID)
 			excerpt.Ref(question.Reference).ReplaceWithText(question.Solution)
 		}
