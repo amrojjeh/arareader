@@ -1,13 +1,36 @@
 htmx.onLoad(function() {
   const selected = document.querySelector("[data-selected-segment]")
   const substituteButtons = document.querySelectorAll("[data-substitute-button]")
+  const inputField = document.querySelector("[data-input]")
   const submitBtn = document.querySelector("#submit")
+  const answer = document.querySelector("[data-form-answer]")
+
+  if (answer) {
+    answer.set = function(value) {
+      this.value = value.trim().toLowerCase()
+      if (this.value == "") {
+        submitBtn.classList.remove("btn--primary")
+        submitBtn.classList.add("btn--disabled")
+        submitBtn.setAttribute("disabled", "")
+      } else {
+        submitBtn.classList.add("btn--primary")
+        submitBtn.classList.remove("btn--disabled")
+        submitBtn.removeAttribute("disabled")
+      }
+    }.bind(answer)
+    answer.addEventListener("input", function(e) {
+      console.log("ans changed")
+    })
+  }
+
+  if (inputField) {
+    inputField.addEventListener("input", function(e) {
+      answer.set(e.target.value)
+    })
+  }
 
   substituteButtons.forEach(x => {
     x.addEventListener("click", function(e) {
-      submitBtn.classList.add("btn--primary")
-      submitBtn.classList.remove("btn--disabled")
-      submitBtn.removeAttribute("disabled")
       substituteButtons.forEach(b => {
         b.classList.remove("btn--primary")
         b.removeAttribute("data-selected-button")
@@ -16,8 +39,7 @@ htmx.onLoad(function() {
       selected.innerText = sub
       e.target.classList.add("btn--primary")
       e.target.setAttribute("data-selected-button", "")
-      const answer = document.querySelector("[data-form-answer]")
-      answer.value = sub
+      answer.set(sub)
     })
   })
 

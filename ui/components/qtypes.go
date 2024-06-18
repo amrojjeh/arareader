@@ -34,7 +34,7 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) g.Node {
 }
 
 func ShortAnswerInputMethodUnsubmitted() g.Node {
-	return Input(Class("short-answer"), AutoFocus())
+	return Input(Class("short-answer"), DataAttr("input", ""), AutoFocus())
 }
 
 func ShortAnswerInputMethodSubmitted() g.Node {
