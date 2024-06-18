@@ -123,9 +123,6 @@ Second phase is development after feedback/marketing
 - [x] Excerpt API
 - [x] **Redesign figma to improve feedback location + phone support**
 - [ ] Add logo
-- [ ] Improve design (a broken window -- which we cannot leave behind)
-  - [ ] Write a components page
-  - [ ] Improve layout
 - [ ] Write test cases for short answer
   - [ ] Add a character limit
 - [x] Add support for quiz sessions
