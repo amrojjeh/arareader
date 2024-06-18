@@ -1,10 +1,10 @@
 htmx.onLoad(function() {
   const selected = document.querySelector("[data-selected-segment]")
   const substituteButtons = document.querySelectorAll("[data-substitute-button]")
+  const submitBtn = document.querySelector("#submit")
 
   substituteButtons.forEach(x => {
     x.addEventListener("click", function(e) {
-      const submitBtn = document.querySelector("#submit")
       submitBtn.classList.add("btn--primary")
       submitBtn.classList.remove("btn--disabled")
       submitBtn.removeAttribute("disabled")
@@ -31,10 +31,10 @@ htmx.onLoad(function() {
 
 document.querySelector("#target").addEventListener("htmx:beforeSwap", function(evt) {
   const response = new DOMParser().parseFromString(evt.detail.xhr.response, "text/html")
+  const myExcerpt = document.body.querySelector("#excerpt")
   const responseExcerpt = response.querySelector("#excerpt")
   if (responseExcerpt) {
     const responseRefs = responseExcerpt.querySelectorAll("span")
-    const myExcerpt = document.body.querySelector("#excerpt")
     const refs = myExcerpt.querySelectorAll("span")
     for (let x = 0; x < refs.length; x++) {
       const ref = refs[x]
@@ -42,6 +42,9 @@ document.querySelector("#target").addEventListener("htmx:beforeSwap", function(e
       ref.removeAttribute("data-selected-segment")
       if (responseRefs[x].hasAttribute("data-selected-segment")) {
         ref.setAttribute("data-selected-segment", "")
+      }
+      if (ref.children.length == 0) {
+        ref.innerText = responseRefs[x].innerText
       }
     }
     const highlighted = document.querySelector(".highlight")
