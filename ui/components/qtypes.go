@@ -24,7 +24,9 @@ func QuestionToInputMethod(p QuestionToInputMethodParams) g.Node {
 		return VowelInputMethodUnsubmitted(p.Question.Solution)
 	case model.ShortAnswerQuestionType:
 		if p.QuestionSession.Status.IsSubmitted() {
-			return ShortAnswerInputMethodSubmitted()
+			return ShortAnswerInputMethodSubmitted(p.Question.Solution, p.QuestionSession.Answer)
+		} else if p.QuestionSession.Status == model.PendingQuestionStatus {
+			return ShortAnswerInputMethodPending(p.QuestionSession.Answer)
 		}
 		return ShortAnswerInputMethodUnsubmitted()
 	}
@@ -37,8 +39,36 @@ func ShortAnswerInputMethodUnsubmitted() g.Node {
 	return Input(Class("short-answer"), DataAttr("input", ""), AutoFocus())
 }
 
-func ShortAnswerInputMethodSubmitted() g.Node {
-	return Input(Class("short-answer"))
+func ShortAnswerInputMethodSubmitted(solution, answer string) g.Node {
+	if solution == answer {
+		return Div(Class("short-answer-feedback"),
+			Input(Class("short-answer"), Value(answer), Disabled()),
+			Img(Class("short-answer-feedback__icon"), Src("/static/icons/circle-check-solid.svg")),
+		)
+	}
+	return Div(Class("stack"),
+		Div(Class("short-answer-feedback"),
+			Input(Class("short-answer"), Value(answer), Disabled()),
+			Img(Class("short-answer-feedback__icon"), Src("/static/icons/circle-xmark-solid.svg")),
+		),
+		Div(Class("short-answer-feedback"),
+			Input(Class("short-answer"), Value(solution), Disabled()),
+			Img(Class("short-answer-feedback__icon"), Src("/static/icons/circle-check-solid.svg")),
+		),
+	)
+}
+
+// TODO(Amr Ojjeh):
+func ShortAnswerInputMethodPending(answer string) g.Node {
+	return Div(
+		Div(Class("short-answer-feedback"),
+			Input(Class("short-answer"), Value(answer), Disabled()),
+			Img(Class("short-answer-feedback__icon"), Src("/static/icons/circle-question-solid.svg")),
+		),
+		P(
+			g.Text("Waiting for teacher's feedback..."),
+		),
+	)
 }
 
 func VowelInputMethodUnsubmitted(correct string) g.Node {

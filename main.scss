@@ -133,6 +133,17 @@ $blue: #40f1f7;
     font-size: 1em;
   }
 
+  .short-answer-feedback {
+    display: flex;
+    flex-direction: flex-row;
+    gap: 0.5rem;
+
+    &__icon {
+      width: 1.5rem;
+    }
+  }
+  
+
   .btn {
     display: flex;
     background-color: var(--gray-200);
