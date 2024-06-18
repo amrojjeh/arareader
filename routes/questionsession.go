@@ -219,7 +219,7 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		InputMethod: components.QuestionToInputMethod(components.QuestionToInputMethodParams{
 			Question:        question,
 			QuestionSession: questionSession,
-		})(),
+		}),
 		NextURL:   questionURL(quiz.ID, questionPos+1, len(questions)),
 		PrevURL:   questionURL(quiz.ID, questionPos-1, len(questions)),
 		SubmitURL: submitURL,

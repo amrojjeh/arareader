@@ -15,21 +15,30 @@ type QuestionToInputMethodParams struct {
 	QuestionSession model.QuestionSession
 }
 
-func QuestionToInputMethod(p QuestionToInputMethodParams) func() g.Node {
+func QuestionToInputMethod(p QuestionToInputMethodParams) g.Node {
 	switch p.Question.Type {
 	case model.VowelQuestionType:
-		return func() g.Node {
-			if p.QuestionSession.Status.IsSubmitted() {
-				return VowelInputMethodSubmitted(p.Question.Solution, p.QuestionSession.Answer)
-			}
-			return VowelInputMethodUnsubmitted(p.Question.Solution)
+		if p.QuestionSession.Status.IsSubmitted() {
+			return VowelInputMethodSubmitted(p.Question.Solution, p.QuestionSession.Answer)
 		}
+		return VowelInputMethodUnsubmitted(p.Question.Solution)
+	case model.ShortAnswerQuestionType:
+		if p.QuestionSession.Status.IsSubmitted() {
+			return ShortAnswerInputMethodSubmitted()
+		}
+		return ShortAnswerInputMethodUnsubmitted()
 	}
-	return func() g.Node {
-		return P(
-			g.Text("Question not implemented..."),
-		)
-	}
+	return P(
+		g.Text("Question not implemented..."),
+	)
+}
+
+func ShortAnswerInputMethodUnsubmitted() g.Node {
+	return Input(Class("short-answer"), AutoFocus())
+}
+
+func ShortAnswerInputMethodSubmitted() g.Node {
+	return Input(Class("short-answer"))
 }
 
 func VowelInputMethodUnsubmitted(correct string) g.Node {

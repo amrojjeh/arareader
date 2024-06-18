@@ -44,7 +44,7 @@ func (qs QuestionStatus) IsSubmitted() bool {
 
 func ValidateQuestion(q Question, ans string) QuestionStatus {
 	switch q.Type {
-	case VowelQuestionType:
+	case VowelQuestionType, ShortAnswerQuestionType:
 		if ans == q.Solution {
 			return CorrectQuestionStatus
 		}

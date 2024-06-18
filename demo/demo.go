@@ -8,14 +8,16 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"fmt"
 	"text/template"
 
+	"github.com/amrojjeh/arareader/arabic"
 	"github.com/amrojjeh/arareader/model"
 	"github.com/amrojjeh/arareader/must"
 )
 
 func Demo(ctx context.Context, db *sql.DB) {
-	var excerptXML = `<excerpt>{{bw "<nmA Al>EmA"}}<ref id="1">{{bw "lu"}}</ref> {{bw "bAlnyA"}}<ref id="2">{{bw "ti"}}</ref>، {{bw "w<nmA lkl AmrY' mA nwY fmn kAnt hjrth <lY"}} <ref id="3">{{bw "Allh wrswlh fhjrth <lY Allh wrswlh، wmn kAnt hjrth ldnyA ySybhA، >w Amr>p ynkHhA fhjrt"}}<ref id="4">{{bw "hu"}}</ref> {{bw "<lY mA hAjr <lyh"}}</ref></excerpt>`
+	var excerptXML = `<excerpt>{{bw "<nmA Al>EmA"}}<ref id="1">{{bw "lu"}}</ref> <ref id="5">{{bw "bAlnyA"}}<ref id="2">{{bw "ti"}}</ref></ref>، {{bw "w<nmA lkl AmrY' mA nwY fmn kAnt hjrth <lY Allh wrswlh fhjrth <lY Allh wrswlh، wmn kAnt hjrth ldnyA ySybhA، >w Amr>p ynkHhA"}} <ref id="3">{{bw "fhjrt"}}<ref id="4">{{bw "hu"}}</ref> {{bw "<lY mA hAjr <lyh"}}</ref></excerpt>`
 
 	q := model.New(db)
 	teacher := must.Get(q.CreateTeacher(ctx, model.CreateTeacherParams{
@@ -37,8 +39,8 @@ func Demo(ctx context.Context, db *sql.DB) {
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
 		QuizID:    quiz.ID,
 		Position:  0,
-		Type:      model.VowelQuestionType,
 		Reference: 1,
+		Type:      model.VowelQuestionType,
 		Feedback:  "There's a damma because it's a raf'",
 		Prompt:    "Choose the correct vowel",
 		Solution:  excerpt.Ref(1).Plain(),
@@ -69,9 +71,19 @@ func Demo(ctx context.Context, db *sql.DB) {
 		Position:  3,
 		Type:      model.ShortAnswerQuestionType,
 		Reference: 3,
-		Feedback:  "Possible translation: this is a house",
+		Feedback:  "",
 		Prompt:    "Translate the sentence",
-		Solution:  "<MANUAL>",
+		Solution:  "", // manually graded if empty
+	})
+
+	q.CreateQuestion(ctx, model.CreateQuestionParams{
+		QuizID:    quiz.ID,
+		Position:  3,
+		Type:      model.ShortAnswerQuestionType,
+		Reference: 5,
+		Feedback:  "The word highlighted is the plural version, hence why it's rendered as 'surely actions are by their intentions.'",
+		Prompt:    fmt.Sprintf("What is the meaning of the word %s?", arabic.FromBuckwalter("nyp")),
+		Solution:  "intention",
 	})
 
 	class := must.Get(q.CreateClass(ctx, model.CreateClassParams{
