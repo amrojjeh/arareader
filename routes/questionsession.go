@@ -63,20 +63,7 @@ func (qr questionSessionResource) Post(w http.ResponseWriter, r *http.Request) {
 	}
 	question := questions[questionPos]
 
-	options, err := model.VowelQuestionOptions(question.Solution)
-	if err != nil {
-		panic("generating options")
-	}
-
-	validOption := false
-	for _, o := range options {
-		if ans == o {
-			validOption = true
-			break
-		}
-	}
-
-	if !validOption {
+	if !model.ValidateQuestionInput(question, ans) {
 		http.Redirect(w, r, questionURL(quizID, questionPos, len(questions)), http.StatusSeeOther)
 		return
 	}

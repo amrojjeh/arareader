@@ -42,9 +42,34 @@ func (qs QuestionStatus) IsSubmitted() bool {
 	return qs == CorrectQuestionStatus || qs == IncorrectQuestionStatus
 }
 
+// TODO(Amr Ojjeh): Add a character limit to short answer
+func ValidateQuestionInput(q Question, ans string) bool {
+	switch q.Type {
+	case VowelQuestionType:
+		options, err := VowelQuestionOptions(q.Solution)
+		if err != nil {
+			panic("generating options")
+		}
+
+		validOption := false
+		for _, o := range options {
+			if ans == o {
+				validOption = true
+				break
+			}
+		}
+		return validOption
+	default:
+		return true
+	}
+}
+
 func ValidateQuestion(q Question, ans string) QuestionStatus {
 	switch q.Type {
 	case VowelQuestionType, ShortAnswerQuestionType:
+		if q.Solution == "" {
+			return PendingQuestionStatus
+		}
 		if ans == q.Solution {
 			return CorrectQuestionStatus
 		}
