@@ -4,7 +4,7 @@
 
 @layer components {
   .btn {
-    @apply flex bg-white text-green-900 border-0 cursor-pointer items-center justify-center;
+    @apply flex bg-white border-0 cursor-pointer items-center justify-center;
 
     &[disabled] {
       @apply cursor-not-allowed;

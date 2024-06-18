@@ -69,8 +69,8 @@ func shortAnswerInput(value string, disabled bool) g.Node {
 			AutoFocus(),
 		})),
 		c.Classes{
-			"shadow-md":   true,
-			"bg-gray-200": disabled,
+			"shadow-md py-1": true,
+			"bg-gray-200":    disabled,
 		},
 	)
 }
@@ -78,7 +78,7 @@ func shortAnswerInput(value string, disabled bool) g.Node {
 func ShortAnswerInputMethodPending(answer string) g.Node {
 	return Div(
 		shortAnswerFeedback(answer, "/static/icons/circle-question-solid.svg"),
-		P(
+		P(Class("pt-1"),
 			g.Text("Waiting for teacher's feedback..."),
 		),
 	)
@@ -91,7 +91,7 @@ func VowelInputMethodUnsubmitted(correct string) g.Node {
 		panic("generating options")
 	}
 	for _, o := range options {
-		buttons = append(buttons, vowelButton(o))
+		buttons = append(buttons, vowelButton(o, acceptingInput))
 	}
 	return vowelOptionsContainer(buttons)
 }
@@ -103,7 +103,13 @@ func VowelInputMethodSubmitted(correct, chosen string) g.Node {
 		panic("generating options")
 	}
 	for _, o := range options {
-		buttons = append(buttons, vowelButtonDisabled(o, correct, chosen))
+		if o == correct {
+			buttons = append(buttons, vowelButton(o, correctStatus))
+		} else if o == chosen && chosen != correct {
+			buttons = append(buttons, vowelButton(o, incorrectStatus))
+		} else {
+			buttons = append(buttons, vowelButton(o, neutralStatus))
+		}
 	}
 	return vowelOptionsContainer(buttons)
 }
@@ -114,32 +120,24 @@ func vowelOptionsContainer(buttons []g.Node) g.Node {
 	)
 }
 
-func vowelButton(text string) g.Node {
-	return Button(Class("btn shadow"), Type("button"), Data("substitute-button", text),
-		g.Text(text),
-	)
-}
+type inputStatus int
 
-func vowelButtonDisabled(text, correct, chosen string) g.Node {
-	if text == correct {
-		return vowelButtonCorrect(text)
-	}
-	if text == chosen {
-		return vowelButtonIncorrect(text)
-	}
-	return Button(Class("btn shadow"), Type("button"), Disabled(),
-		g.Text(text),
-	)
-}
+const (
+	correctStatus = inputStatus(iota)
+	incorrectStatus
+	neutralStatus
+	acceptingInput
+)
 
-func vowelButtonCorrect(text string) g.Node {
-	return Button(Class("btn shadow"), Data("type", "primary"), Type("button"), Disabled(),
-		g.Text(text),
-	)
-}
-
-func vowelButtonIncorrect(text string) g.Node {
-	return Button(Class("btn shadow bg-red-300"), Type("button"), Disabled(),
+func vowelButton(text string, status inputStatus) g.Node {
+	return Button(Type("button"),
+		g.If(status == acceptingInput, Data("substitute-button", text)),
+		g.If(status == correctStatus, Data("type", "primary")),
+		g.If(status != acceptingInput, Disabled()),
+		c.Classes{
+			"btn shadow py-1 text-xl": true,
+			"bg-red-300":              status == incorrectStatus,
+		},
 		g.Text(text),
 	)
 }
