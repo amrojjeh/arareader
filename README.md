@@ -116,8 +116,8 @@ Scrapped:
 Invite only?
 
 # Technical Tasks
-First phase is development prior to teacher feedback/marketing
-Second phase is development after feedback/marketing
+First phase is development prior to teacher feedback/marketing. Once done, it can be posted to multiple group chats and demoed to different teachers.
+Second phase is development after feedback/marketing. Hopefully by then more people will be interested and involved. [Stone soup](https://stonesoup-enc.org/the-story).
 
 ## First Phase
 - [x] Excerpt API
@@ -125,6 +125,10 @@ Second phase is development after feedback/marketing
 - [ ] Add logo
 - [ ] Write test cases for short answer
   - [ ] Add a character limit
+- [ ] Desktop support
+  - [ ] Support shortcuts for next, submit, plus nav
+  - [ ] Show side drawer without hamburger icon
+  - [ ] Optimize questions for wide screen
 - [x] Add support for quiz sessions
   - [x] Add submit button
   - [x] Add next/prev question
@@ -132,7 +136,6 @@ Second phase is development after feedback/marketing
   - [x] Load submitted answers
   - [x] Disable question if already submitted
   - [x] Add testing
-  - [ ] Support shortcuts for next, submit, plus nav
   - [x] Display feedback
 - [ ] Student perspective
   - [ ] Add student home page
