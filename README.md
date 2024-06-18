@@ -123,6 +123,11 @@ Second phase is development after feedback/marketing
 - [x] Excerpt API
 - [x] **Redesign figma to improve feedback location + phone support**
 - [ ] Add logo
+- [ ] Improve design (a broken window -- which we cannot leave behind)
+  - [ ] Write a components page
+  - [ ] Improve layout
+- [ ] Write test cases for short answer
+  - [ ] Add a character limit
 - [x] Add support for quiz sessions
   - [x] Add submit button
   - [x] Add next/prev question
@@ -137,7 +142,7 @@ Second phase is development after feedback/marketing
   - [ ] Add side drawer
   - [ ] Add quiz report/summary page
   - [x] Support vowel type question
-  - [ ] Support short answer question
+  - [x] Support short answer question
 
 ## Second phase
 - [ ] Use auth solutions like Clerk or OAuth
