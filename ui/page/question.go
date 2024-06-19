@@ -75,7 +75,7 @@ func questionCtrl(prevURL, nextURL, submitURL string) g.Node {
 }
 
 func submitBtn(submitURL string) g.Node {
-	return Button(Class("flex-1 btn"), ID("submit"),
+	return Button(Class("flex-1 btn"), ID("submit"), Data("shortcut", "Enter"),
 		g.If(submitURL == "",
 			g.Group([]g.Node{
 				Type("button"),
@@ -99,7 +99,10 @@ func prev(prevURL string) g.Node {
 			g.Text("Previous"),
 		)
 	}
-	return A(Class("flex-1 rounded-tl-lg btn bg-blue-200 text-black"), Href(prevURL), g.Text("Previous"))
+	return A(Class("flex-1 rounded-tl-lg btn bg-blue-200 text-black"), Href(prevURL),
+		Data("shortcut", "ctrl ArrowLeft"),
+		g.Text("Previous"),
+	)
 }
 
 func next(nextURL string) g.Node {
@@ -109,6 +112,7 @@ func next(nextURL string) g.Node {
 		)
 	}
 	return A(Class("flex-1 rounded-tr btn bg-blue-200 text-black"), Href(nextURL),
+		Data("shortcut", "ctrl ArrowRight"),
 		g.Text("Next"),
 	)
 }

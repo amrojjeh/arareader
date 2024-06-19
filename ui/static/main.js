@@ -44,7 +44,35 @@ htmx.onLoad(function() {
   })
 
   document.querySelector("#excerpt").addEventListener("htmx:oobBeforeSwap", updateExcerpt)
+
+  document.body.addEventListener("keydown", shortcut)
 })
+
+function shortcut(ev) {
+  const shortcuts = document.querySelectorAll("[data-shortcut]")
+  shortcuts.forEach(function(elt) {
+    if (ev.repeat) {
+      return
+    }
+    const modifiers = ["ctrl", "alt", "shift"]
+    var [modifier, key] = elt.dataset.shortcut.split(" ")
+    if (modifiers.indexOf(modifier) == -1) {
+      key = modifier
+      modifier = true
+    } else if (modifier == "ctrl") {
+      modifier = ev.ctrlKey
+    } else if (modifier == "alt") {
+      modifier = ev.altKey
+    } else if (modifier == "shift") {
+      modifier = ev.shiftKey
+    }
+
+    if (modifier && ev.code === key) {
+      elt.click()
+      ev.preventDefault()
+    }
+  })
+}
 
 function updateExcerpt(evt) {
   evt.detail.shouldSwap = false
