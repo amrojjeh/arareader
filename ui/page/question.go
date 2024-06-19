@@ -30,7 +30,7 @@ func QuestionPage(p QuestionParams) g.Node {
 		Head: []g.Node{
 			ar.CSS("/static/main.css"),
 			ar.DeferJS("/static/main.js"),
-			g.Raw("<script src='https://unpkg.com/htmx.org@2.0.0'></script>"),
+			g.Raw("<script src='https://unpkg.com/htmx.org@2.0.0/dist/htmx.js' integrity='sha384-Xh+GLLi0SMFPwtHQjT72aPG19QvKB8grnyRbYBNIdHWc2NkCrz65jlU7YrzO6qRp' crossorigin='anonymous'></script>"),
 			g.Raw("<script src='https://unpkg.com/idiomorph@0.3.0'></script>"),
 			ar.Fonts(),
 		},
