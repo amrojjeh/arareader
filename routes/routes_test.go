@@ -54,7 +54,7 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 		},
 		{
 			name: "Too many questions",
-			path: "/quiz/1/question/4",
+			path: "/quiz/1/question/5",
 			code: http.StatusBadRequest,
 		},
 		{

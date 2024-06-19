@@ -47,7 +47,6 @@ htmx.onLoad(function() {
 })
 
 function updateExcerpt(evt) {
-  console.log(evt.detail)
   evt.detail.shouldSwap = false
   const response = evt.detail.fragment
   const myExcerpt = document.body.querySelector("#excerpt")
