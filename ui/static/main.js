@@ -16,9 +16,6 @@ htmx.onLoad(function() {
         submitBtn.removeAttribute("disabled")
       }
     }.bind(answer)
-    answer.addEventListener("input", function(e) {
-      console.log("ans changed")
-    })
   }
 
   if (inputField) {
