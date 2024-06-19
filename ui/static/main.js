@@ -45,31 +45,32 @@ htmx.onLoad(function() {
     "block": "center",
     "inline": "center",
   })
+
+  document.querySelector("#target").addEventListener("htmx:beforeSwap", function(evt) {
+    const response = new DOMParser().parseFromString(evt.detail.xhr.response, "text/html")
+    const myExcerpt = document.body.querySelector("#excerpt")
+    const responseExcerpt = response.querySelector("#excerpt")
+    if (responseExcerpt) {
+      const responseRefs = responseExcerpt.querySelectorAll("span")
+      const refs = myExcerpt.querySelectorAll("span")
+      for (let x = 0; x < refs.length; x++) {
+        const ref = refs[x]
+        ref.className = responseRefs[x].className
+        delete ref.dataset.selectedSegment
+        if (Object.hasOwn(responseRefs[x].dataset, "selectedSegment")) {
+          ref.dataset.selectedSegment = ""
+        }
+        if (ref.children.length == 0) {
+          ref.innerText = responseRefs[x].innerText
+        }
+      }
+      const selected = document.querySelector("[data-selected-segment]")
+      selected.scrollIntoView({
+        "behavior": "smooth",
+        "block": "center",
+        "inline": "center",
+      })
+    }
+  })
 })
 
-document.querySelector("#target").addEventListener("htmx:beforeSwap", function(evt) {
-  const response = new DOMParser().parseFromString(evt.detail.xhr.response, "text/html")
-  const myExcerpt = document.body.querySelector("#excerpt")
-  const responseExcerpt = response.querySelector("#excerpt")
-  if (responseExcerpt) {
-    const responseRefs = responseExcerpt.querySelectorAll("span")
-    const refs = myExcerpt.querySelectorAll("span")
-    for (let x = 0; x < refs.length; x++) {
-      const ref = refs[x]
-      ref.className = responseRefs[x].className
-      delete ref.dataset.selectedSegment
-      if (Object.hasOwn(responseRefs[x].dataset, "selectedSegment")) {
-        ref.dataset.selectedSegment = ""
-      }
-      if (ref.children.length == 0) {
-        ref.innerText = responseRefs[x].innerText
-      }
-    }
-    const selected = document.querySelector("[data-selected-segment]")
-    selected.scrollIntoView({
-      "behavior": "smooth",
-      "block": "center",
-      "inline": "center",
-    })
-  }
-})
