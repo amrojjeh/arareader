@@ -123,8 +123,7 @@ Second phase is development after feedback/marketing. Hopefully by then more peo
 - [x] Excerpt API
 - [x] **Redesign figma to improve feedback location + phone support**
 - [ ] Add logo
-- [ ] Write test cases for short answer
-  - [ ] Add a character limit
+- [x] Write test cases for short answer
 - [ ] Desktop support
   - [ ] Support shortcuts for next, submit, plus nav
   - [ ] Show side drawer without hamburger icon
@@ -151,6 +150,7 @@ Second phase is development after feedback/marketing. Hopefully by then more peo
 - [ ] Student perspective
   - [ ] Add sign in
   - [ ] Support long answer question
+    - [ ] Add a character limit to short answer questions
   - [ ] Support multiple choice question
   - [ ] Number question
   - [ ] PGN question

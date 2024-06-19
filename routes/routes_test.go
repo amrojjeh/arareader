@@ -6,6 +6,7 @@ package routes
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 	"net/url"
 	"testing"
@@ -79,12 +80,7 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 }
 
 func TestShortVowel(t *testing.T) {
-	ctx := context.Background()
-	db := model.MustOpenDB(":memory:")
-	model.MustSetup(ctx, db)
-	demo.Demo(ctx, db)
-
-	r := Routes(db)
+	r := Routes(demoDB(t))
 	assert.HTTPStatusCode(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, http.StatusOK)
 	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, arabic.FromBuckwalter("a"))
 	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, "</form>")
@@ -95,12 +91,7 @@ func TestShortVowel(t *testing.T) {
 }
 
 func TestShortVowelEmpty(t *testing.T) {
-	ctx := context.Background()
-	db := model.MustOpenDB(":memory:")
-	model.MustSetup(ctx, db)
-	demo.Demo(ctx, db)
-
-	r := Routes(db)
+	r := Routes(demoDB(t))
 	assert.HTTPStatusCode(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, http.StatusOK)
 	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, arabic.FromBuckwalter("a"))
 	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, "</form>")
@@ -111,12 +102,7 @@ func TestShortVowelEmpty(t *testing.T) {
 }
 
 func TestShortVowelInvalid(t *testing.T) {
-	ctx := context.Background()
-	db := model.MustOpenDB(":memory:")
-	model.MustSetup(ctx, db)
-	demo.Demo(ctx, db)
-
-	r := Routes(db)
+	r := Routes(demoDB(t))
 	assert.HTTPStatusCode(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, http.StatusOK)
 	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, arabic.FromBuckwalter("a"))
 	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, "</form>")
@@ -124,4 +110,55 @@ func TestShortVowelInvalid(t *testing.T) {
 		"ans": []string{arabic.FromBuckwalter("to")},
 	})
 	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/0", nil, "</form>")
+}
+
+func TestShortAnswer(t *testing.T) {
+	r := Routes(demoDB(t))
+	assert.HTTPStatusCode(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, http.StatusOK)
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "What is the meaning of the word")
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "</form>")
+
+	assert.HTTPRedirect(t, r.ServeHTTP, http.MethodPost, "/quiz/1/question/4", url.Values{
+		"ans": []string{"intention"},
+	})
+	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "</form>")
+	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "xmark")
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "check")
+}
+
+func TestShortAnswerInvalid(t *testing.T) {
+	r := Routes(demoDB(t))
+	assert.HTTPStatusCode(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, http.StatusOK)
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "What is the meaning of the word")
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "</form>")
+
+	assert.HTTPRedirect(t, r.ServeHTTP, http.MethodPost, "/quiz/1/question/4", url.Values{
+		"ans": []string{"inten"},
+	})
+	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "</form>")
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "xmark")
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "check")
+}
+
+func TestShortAnswerEmpty(t *testing.T) {
+	r := Routes(demoDB(t))
+	assert.HTTPStatusCode(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, http.StatusOK)
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "What is the meaning of the word")
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "</form>")
+
+	assert.HTTPRedirect(t, r.ServeHTTP, http.MethodPost, "/quiz/1/question/4", url.Values{
+		"ans": []string{""},
+	})
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "</form>")
+	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "xmark")
+	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "check")
+}
+
+func demoDB(t *testing.T) *sql.DB {
+	t.Helper()
+	ctx := context.Background()
+	db := model.MustOpenDB(":memory:")
+	model.MustSetup(ctx, db)
+	demo.Demo(ctx, db)
+	return db
 }
