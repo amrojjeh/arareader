@@ -43,8 +43,9 @@ htmx.onLoad(function() {
     "inline": "center",
   })
 
-  document.querySelector("#target").addEventListener("htmx:beforeSwap", function(evt) {
-    const response = new DOMParser().parseFromString(evt.detail.xhr.response, "text/html")
+  document.querySelector("#excerpt").addEventListener("htmx:oobBeforeSwap", function(evt) {
+    evt.detail.shouldSwap = false
+    const response = evt.detail.fragment
     const myExcerpt = document.body.querySelector("#excerpt")
     const responseExcerpt = response.querySelector("#excerpt")
     if (responseExcerpt) {
