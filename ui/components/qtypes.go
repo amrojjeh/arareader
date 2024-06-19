@@ -116,7 +116,7 @@ func VowelInputMethodSubmitted(correct, chosen string) g.Node {
 }
 
 func vowelOptionsContainer(buttons []g.Node) g.Node {
-	return Div(Class("grid grid-cols-2 gap-2"),
+	return Div(Class("grid grid-cols-2 gap-2 mr-4"),
 		g.Group(buttons),
 	)
 }
