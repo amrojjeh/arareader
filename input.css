@@ -18,4 +18,37 @@
   .btn[data-type="disabled"] {
     @apply bg-gray-200 text-gray-900;
   }
+
+  .sidebar {
+    @apply w-64 h-svh overflow-y-auto transition-all bg-white top-0 left-0 m-0;
+    max-height: unset;
+  }
+
+  .sidebar[open] {
+    animation: slidein 100ms ease-in;
+  }
+
+  .sidebar[open]::backdrop {
+    animation: fade 100ms ease-in;
+  }
+
+  @keyframes slidein {
+    0% {
+      left: -100%;
+    }
+
+    100% {
+      left: 0;
+    }
+  }
+
+  @keyframes fade {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
 }

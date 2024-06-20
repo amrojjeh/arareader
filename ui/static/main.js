@@ -44,9 +44,33 @@ htmx.onLoad(function() {
   })
 
   document.querySelector("#excerpt").addEventListener("htmx:oobBeforeSwap", updateExcerpt)
-
   document.body.addEventListener("keydown", shortcut)
+  document.querySelectorAll("[data-sidebar-toggle]").forEach(x => x.addEventListener("click", sidebarToggle))
+  document.querySelector("dialog").addEventListener("click", clickoutSidebar)
 })
+
+
+function clickoutSidebar(e) {
+  const dialog = e.target;
+  const dialogDimensions = dialog.getBoundingClientRect()
+  if (
+    e.clientX < dialogDimensions.left ||
+    e.clientX > dialogDimensions.right ||
+    e.clientY < dialogDimensions.top ||
+    e.clientY > dialogDimensions.bottom
+  ) {
+    dialog.close()
+  }
+}
+
+function sidebarToggle() {
+  const sidebar = document.querySelector("[data-sidebar]")
+  if (sidebar.open) {
+    sidebar.close()
+  } else {
+    sidebar.showModal()
+  }
+}
 
 function shortcut(ev) {
   const shortcuts = document.querySelectorAll("[data-shortcut]")

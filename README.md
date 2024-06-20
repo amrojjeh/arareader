@@ -125,7 +125,7 @@ Second phase is development after feedback/marketing. Hopefully by then more peo
 - [ ] Add logo
 - [x] Write test cases for short answer
 - [ ] Desktop support
-  - [ ] Support shortcuts for next, submit, plus nav
+  - [x] Support shortcuts for next, submit, plus nav
   - [ ] Show side drawer without hamburger icon
   - [ ] Optimize questions for wide screen
 - [x] Add support for quiz sessions
