@@ -113,20 +113,15 @@ func questionCtrl(prevURL, nextURL, submitURL string) g.Node {
 }
 
 func submitBtn(submitURL string) g.Node {
-	return Button(Class("flex-1 btn font-bold"), ID("submit"), Data("shortcut", "Enter"),
+	return Button(Class("flex-1 btn"), ID("submit"), Data("shortcut", "Enter"),
 		g.If(submitURL == "",
-			g.Group([]g.Node{
-				Type("button"),
-				Data("type", "disabled"),
-				Disabled(),
-			}),
+			Type("button"),
 		),
 		g.If(submitURL != "",
-			g.Group([]g.Node{
-				Type("submit"),
-				Data("type", "primary"),
-			}),
+			Type("submit"),
 		),
+		Data("type", "disabled"),
+		Disabled(),
 		g.Text("Submit"),
 	)
 }

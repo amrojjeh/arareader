@@ -122,7 +122,7 @@ func TestShortAnswer(t *testing.T) {
 		"ans": []string{"intention"},
 	})
 	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "</form>")
-	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "xmark")
+	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "circle-xmark")
 	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "check")
 }
 
@@ -136,7 +136,7 @@ func TestShortAnswerInvalid(t *testing.T) {
 		"ans": []string{"inten"},
 	})
 	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "</form>")
-	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "xmark")
+	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "circle-xmark")
 	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "check")
 }
 
@@ -150,7 +150,7 @@ func TestShortAnswerEmpty(t *testing.T) {
 		"ans": []string{""},
 	})
 	assert.HTTPBodyContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "</form>")
-	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "xmark")
+	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "circle-xmark")
 	assert.HTTPBodyNotContains(t, r.ServeHTTP, http.MethodGet, "/quiz/1/question/4", nil, "check")
 }
 

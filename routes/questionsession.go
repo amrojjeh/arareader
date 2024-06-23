@@ -177,6 +177,12 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		Status: model.UnattemptedQuestionStatus,
 	}
 
+	for _, question := range questions {
+		if question.Type == model.VowelQuestionType {
+			excerpt.UnpointRef(question.Reference)
+		}
+	}
+
 	for _, qs := range questionSessions {
 		if qs.Status.IsSubmitted() && questionWithID(questions, qs.QuestionID).Type == model.VowelQuestionType {
 			question := questionWithID(questions, qs.QuestionID)
@@ -197,9 +203,6 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 	sqs := make([]page.SidebarQuestion, 0, len(questions))
 
 	for i, question := range questions {
-		if question.Type == model.VowelQuestionType {
-			excerpt.UnpointRef(question.Reference)
-		}
 		sq := page.SidebarQuestion{
 			Prompt: question.Prompt,
 			Status: model.UnattemptedQuestionStatus,

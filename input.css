@@ -12,7 +12,7 @@
   }
 
   .btn[data-type="primary"] {
-    @apply bg-green-600 text-white;
+    @apply bg-green-600 text-white font-bold;
   }
 
   .btn[data-type="disabled"] {
