@@ -6,7 +6,6 @@ package components
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/amrojjeh/arareader/model"
 	g "github.com/maragudk/gomponents"
@@ -35,7 +34,7 @@ func refNode(r *model.ReferenceNode, highlightedRef int) g.Node {
 	}
 }
 
-func processNodes(nodes []model.ExcerptNodes, highlightedRef int) []g.Node {
+func processNodes(nodes []model.ExcerptNode, highlightedRef int) []g.Node {
 	acc := []g.Node{}
 	for _, n := range nodes {
 		switch n.(type) {
@@ -45,7 +44,7 @@ func processNodes(nodes []model.ExcerptNodes, highlightedRef int) []g.Node {
 			text := n.(*model.TextNode).Text
 			acc = append(acc, g.Text(text))
 		default:
-			panic(fmt.Sprintf("unexpected element of type %v", reflect.TypeOf(n)))
+			panic(fmt.Sprintf("unexpected element of type %T", n))
 		}
 	}
 	return acc

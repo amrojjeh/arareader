@@ -127,6 +127,36 @@ func ParseLetterPack(str string) (LetterPack, error) {
 	return lp, nil
 }
 
+func LetterPacks(pointedWord string) []LetterPack {
+	letters := []LetterPack{}
+	letter := LetterPack{}
+	for _, l := range pointedWord {
+		if l == Shadda {
+			letter.Shadda = true
+		} else if l == SuperscriptAlef {
+			letter.SuperscriptAlef = true
+		} else if vowels[l] {
+			letter.Vowel = l
+		} else {
+			if letter.Letter != 0 {
+				letters = append(letters, letter)
+				letter = LetterPack{}
+			}
+			letter.Letter = l
+		}
+	}
+	letters = append(letters, letter)
+	return letters
+}
+
+func LetterPacksToString(ls []LetterPack) string {
+	b := strings.Builder{}
+	for _, l := range ls {
+		b.WriteString(l.String())
+	}
+	return b.String()
+}
+
 // UnpointedString returns the word without any vowels
 func Unpointed(pointed string) string {
 	res := ""

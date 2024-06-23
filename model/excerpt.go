@@ -17,14 +17,16 @@ import (
 	"github.com/amrojjeh/arareader/arabic"
 )
 
-type ExcerptNodes interface {
+// TODO(Amr Ojjeh): Make Excerpt a type synonyme of ReferenceNode
+
+type ExcerptNode interface {
 	Write(enc *xml.Encoder) error
 	Plain() string
 	Unpoint()
 }
 
 type Excerpt struct {
-	Nodes []ExcerptNodes
+	Nodes []ExcerptNode
 }
 
 type ReferenceNotFoundError struct {
@@ -206,9 +208,23 @@ func (e *Excerpt) UnpointRefs(refs []int) error {
 	return nil
 }
 
+func (e *Excerpt) AvailableID() int {
+	highest := 0
+	for _, n := range e.Nodes {
+		r, ok := n.(*ReferenceNode)
+		if !ok {
+			continue
+		}
+		if sublargest := r.LargestID(); highest < sublargest {
+			highest = sublargest
+		}
+	}
+	return highest + 1
+}
+
 type ReferenceNode struct {
 	ID    int
-	Nodes []ExcerptNodes
+	Nodes []ExcerptNode
 }
 
 func (r *ReferenceNode) Write(enc *xml.Encoder) error {
@@ -285,12 +301,26 @@ func (r *ReferenceNode) ReplaceWithText(text string) {
 	node := &TextNode{
 		Text: text,
 	}
-	r.Nodes = []ExcerptNodes{node}
+	r.Nodes = []ExcerptNode{node}
 }
 
 func (r *ReferenceNode) IsLetterSegmented() bool {
 	_, err := arabic.ParseLetterPack(r.Plain())
 	return err == nil
+}
+
+func (r *ReferenceNode) LargestID() int {
+	highest := r.ID
+	for _, n := range r.Nodes {
+		r, ok := n.(*ReferenceNode)
+		if !ok {
+			continue
+		}
+		if sublargest := r.LargestID(); highest < sublargest {
+			highest = sublargest
+		}
+	}
+	return highest
 }
 
 type TextNode struct {
