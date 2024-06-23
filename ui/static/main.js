@@ -52,6 +52,9 @@ htmx.onLoad(function() {
 
 function clickoutSidebar(e) {
   const dialog = e.target;
+  if (!dialog.dataset.sidebar) {
+    return
+  }
   const dialogDimensions = dialog.getBoundingClientRect()
   if (
     e.clientX < dialogDimensions.left ||
