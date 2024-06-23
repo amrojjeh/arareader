@@ -138,7 +138,7 @@ Second phase is development after feedback/marketing. Hopefully by then more peo
   - [x] Display feedback
 - [ ] Student perspective
   - [ ] Add student home page
-  - [ ] Add side drawer
+  - [x] Add side drawer
   - [ ] Add quiz report/summary page
   - [x] Support vowel type question
   - [x] Support short answer question
