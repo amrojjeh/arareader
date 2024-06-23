@@ -47,14 +47,17 @@ htmx.onLoad(function() {
   document.body.addEventListener("keydown", shortcut)
   document.querySelectorAll("[data-sidebar-toggle]").forEach(x => x.addEventListener("click", sidebarToggle))
   document.querySelector("dialog").addEventListener("click", clickoutSidebar)
+  document.querySelectorAll("dialog a").forEach(x => x.addEventListener("click", exitDialog))
 })
 
 
+function exitDialog() {
+  const dialog = document.querySelector("dialog")
+  dialog.close()
+}
+
 function clickoutSidebar(e) {
-  const dialog = e.target;
-  if (!dialog.dataset.sidebar) {
-    return
-  }
+  const dialog = document.querySelector("dialog")
   const dialogDimensions = dialog.getBoundingClientRect()
   if (
     e.clientX < dialogDimensions.left ||

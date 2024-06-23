@@ -146,12 +146,6 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	for _, question := range questions {
-		if question.Type == model.VowelQuestionType {
-			excerpt.UnpointRef(question.Reference)
-		}
-	}
-
 	quizSession, err := q.GetQuizSession(r.Context(), model.GetQuizSessionParams{
 		StudentID: studentID,
 		QuizID:    quizID,
@@ -200,17 +194,34 @@ func (qr questionSessionResource) Get(w http.ResponseWriter, r *http.Request) {
 		feedback = question.Feedback
 	}
 
+	sqs := make([]page.SidebarQuestion, 0, len(questions))
+
+	for i, question := range questions {
+		if question.Type == model.VowelQuestionType {
+			excerpt.UnpointRef(question.Reference)
+		}
+		sq := page.SidebarQuestion{
+			Prompt: question.Prompt,
+			Status: model.UnattemptedQuestionStatus,
+			URL:    questionURL(quizID, i, len(questions)),
+		}
+		for _, session := range questionSessions {
+			if session.QuestionID == question.ID {
+				sq.Status = session.Status
+			}
+		}
+		sqs = append(sqs, sq)
+	}
+
 	page.QuestionPage(page.QuestionParams{
-		Excerpt: components.Excerpt(excerpt, question.Reference),
-		Prompt:  question.Prompt,
-		InputMethod: components.QuestionToInputMethod(components.QuestionToInputMethodParams{
-			Question:        question,
-			QuestionSession: questionSession,
-		}),
-		NextURL:   questionURL(quiz.ID, questionPos+1, len(questions)),
-		PrevURL:   questionURL(quiz.ID, questionPos-1, len(questions)),
-		SubmitURL: submitURL,
-		Feedback:  feedback,
+		Excerpt:          components.Excerpt(excerpt, question.Reference),
+		Prompt:           question.Prompt,
+		InputMethod:      components.QuestionToInputMethod(components.QuestionToInputMethodParams{Question: question, QuestionSession: questionSession}),
+		SidebarQuestions: sqs,
+		NextURL:          questionURL(quiz.ID, questionPos+1, len(questions)),
+		PrevURL:          questionURL(quiz.ID, questionPos-1, len(questions)),
+		SubmitURL:        submitURL,
+		Feedback:         feedback,
 	}).Render(w)
 }
 

@@ -5,6 +5,7 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package page
 
 import (
+	"github.com/amrojjeh/arareader/model"
 	ar "github.com/amrojjeh/arareader/ui/components"
 	g "github.com/maragudk/gomponents"
 	htmx "github.com/maragudk/gomponents-htmx"
@@ -12,14 +13,21 @@ import (
 	. "github.com/maragudk/gomponents/html"
 )
 
+type SidebarQuestion struct {
+	Prompt string
+	Status model.QuestionStatus
+	URL    string
+}
+
 type QuestionParams struct {
-	Excerpt     g.Node
-	Prompt      string
-	InputMethod g.Node
-	NextURL     string
-	PrevURL     string
-	SubmitURL   string
-	Feedback    string
+	Excerpt          g.Node
+	Prompt           string
+	InputMethod      g.Node
+	SidebarQuestions []SidebarQuestion
+	NextURL          string
+	PrevURL          string
+	SubmitURL        string
+	Feedback         string
 }
 
 func QuestionPage(p QuestionParams) g.Node {
@@ -35,14 +43,30 @@ func QuestionPage(p QuestionParams) g.Node {
 			ar.Fonts(),
 		},
 		Body: []g.Node{Class("flex flex-col"), htmx.Ext("morph"), htmx.Boost("true"),
-			Dialog(Data("sidebar", ""), Class("sidebar"),
-				Div(Class("flex flex-col justify-center p-5"),
-					Div(Class("flex gap-3"),
+			Dialog(Data("sidebar", ""), Class("sidebar"), htmx.SwapOOB("true"), ID("sidebar"),
+				Div(Class("flex flex-col justify-center p-5 gap-4"),
+					Div(Class("flex gap-3 mb-2"),
 						Img(Class("w-6 cursor-pointer"), Data("sidebar-toggle", ""), Src("/static/icons/xmark-solid.svg")),
 						Button(Class("flex-1 bg-blue-200 p-1 cursor-pointer rounded-lg"),
 							g.Text("Summary"),
 						),
 					),
+					g.Group(g.Map(p.SidebarQuestions, func(s SidebarQuestion) g.Node {
+						return Div(Class("flex gap-2 text-lg"), htmx.Select("#target"), htmx.Target("#target"),
+							g.If(s.Status == model.CorrectQuestionStatus,
+								Img(Class("w-5"), Src("/static/icons/circle-check-solid.svg")),
+							),
+							g.If(s.Status == model.IncorrectQuestionStatus,
+								Img(Class("w-5"), Src("/static/icons/circle-xmark-solid.svg")),
+							),
+							g.If(s.Status == model.PendingQuestionStatus,
+								Img(Class("w-5"), Src("/static/icons/circle-question-solid.svg")),
+							),
+							A(Class("underline truncate"), Href(s.URL),
+								g.Text(s.Prompt),
+							),
+						)
+					})),
 				),
 			),
 			Main(
