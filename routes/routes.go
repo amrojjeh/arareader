@@ -7,7 +7,9 @@ package routes
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/alexedwards/scs/sqlite3store"
@@ -25,8 +27,8 @@ type rootResource struct {
 
 func Routes(db *sql.DB) http.Handler {
 	sm := scs.New()
-	sm.Lifetime = time.Hour * 24
 	sm.Store = sqlite3store.New(db)
+	sm.Lifetime = time.Hour * 24
 
 	rs := rootResource{
 		sm,
@@ -49,8 +51,39 @@ func Routes(db *sql.DB) http.Handler {
 	r.Get("/static*", func(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/static", http.FileServer(http.FS(static.Files))).ServeHTTP(w, r)
 	})
-	r.Mount("/quiz", quizResource{db}.Routes())
+	r.With(quizID, questionPosition).
+		Get(fmt.Sprintf("/quiz/{%s:[0-9]+}/question/{%s:[0-9]+}", quizIDKey, questionPosKey), rs.questionGet)
+	r.With(quizID, questionPosition).
+		Post(fmt.Sprintf("/quiz/{%s:[0-9]+}/question/{%s:[0-9]+}", quizIDKey, questionPosKey), rs.questionPost)
 	return r
+}
+
+func quizID(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		idStr := chi.URLParam(r, string(quizIDKey))
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			err = fmt.Errorf("%s is not an int (%v)", quizIDKey, err)
+			panic(err)
+		}
+
+		ctx := context.WithValue(r.Context(), quizIDKey, id)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func questionPosition(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		idStr := chi.URLParam(r, string(questionPosKey))
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			err = fmt.Errorf("%s is not an int (%v)", questionPosKey, err)
+			panic(err)
+		}
+
+		ctx := context.WithValue(r.Context(), questionPosKey, id)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 // TEMP(Amr Ojjeh): Temporary until there's class management
