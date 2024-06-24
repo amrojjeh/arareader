@@ -306,6 +306,15 @@ func (q *Queries) DeleteQuiz(ctx context.Context, id int) error {
 	return err
 }
 
+const deleteQuizSessions = `-- name: DeleteQuizSessions :exec
+DELETE FROM quiz_session
+`
+
+func (q *Queries) DeleteQuizSessions(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, deleteQuizSessions)
+	return err
+}
+
 const deleteStudent = `-- name: DeleteStudent :exec
 DELETE FROM student
 WHERE id=?

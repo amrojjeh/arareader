@@ -12,6 +12,7 @@ import (
 
 	"github.com/alexedwards/scs/sqlite3store"
 	"github.com/alexedwards/scs/v2"
+	"github.com/amrojjeh/arareader/model"
 	"github.com/amrojjeh/arareader/ui/static"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -41,11 +42,25 @@ func Routes(db *sql.DB) http.Handler {
 	r.Use(sm.LoadAndSave)
 	r.Use(rs.htmxVary)
 	r.Use(rs.Auth)
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/quiz/2/question/0", http.StatusSeeOther)
+	})
+	r.Post("/restart", rs.Restart)
 	r.Get("/static*", func(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/static", http.FileServer(http.FS(static.Files))).ServeHTTP(w, r)
 	})
 	r.Mount("/quiz", quizResource{db}.Routes())
 	return r
+}
+
+// TEMP(Amr Ojjeh): Temporary until there's class management
+func (rs rootResource) Restart(w http.ResponseWriter, r *http.Request) {
+	q := model.New(rs.db)
+	err := q.DeleteQuizSessions(r.Context())
+	if err != nil {
+		panic(err)
+	}
+	w.Header().Add("HX-Redirect", "/quiz/2/question/0")
 }
 
 // TODO(Amr Ojjeh): Actually retrieve studentID from session manager once login is supported

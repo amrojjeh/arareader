@@ -153,6 +153,9 @@ INSERT INTO quiz_session (
 SELECT * FROM quiz_session
 WHERE student_id=? AND quiz_id=?;
 
+-- name: DeleteQuizSessions :exec
+DELETE FROM quiz_session;
+
 -- **********
 -- QUESTION_SESSION TABLE
 -- **********

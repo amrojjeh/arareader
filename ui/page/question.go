@@ -47,8 +47,8 @@ func QuestionPage(p QuestionParams) g.Node {
 				Div(Class("flex flex-col justify-center p-5 gap-4"),
 					Div(Class("flex gap-3 mb-2"),
 						Img(Class("w-6 cursor-pointer"), Data("sidebar-toggle", ""), Src("/static/icons/xmark-solid.svg")),
-						Button(Class("flex-1 bg-blue-200 p-1 cursor-pointer rounded-lg"),
-							g.Text("Summary"),
+						Button(Class("flex-1 bg-blue-200 p-1 cursor-pointer rounded-lg"), htmx.Post("/restart"), htmx.Confirm("Are you sure?"), htmx.Target("#target"), htmx.Select("#target"),
+							g.Text("Restart"), // TEMP(Amr Ojjeh): Should be summary
 						),
 					),
 					g.Group(g.Map(p.SidebarQuestions, func(s SidebarQuestion) g.Node {
