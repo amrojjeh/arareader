@@ -27,8 +27,7 @@ func TestHTTPRouteServeHTTP(t *testing.T) {
 		{
 			name: "Root",
 			path: "/",
-			code: http.StatusNotFound,
-			body: "404",
+			code: http.StatusSeeOther,
 		},
 		{
 			name: "Static",
