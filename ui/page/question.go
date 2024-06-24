@@ -69,21 +69,23 @@ func QuestionPage(p QuestionParams) g.Node {
 					})),
 				),
 			),
-			Main(
-				Nav(Class("p-2 mb-2 flex justify-between items-center"),
+			Main(Class("h-svh flex flex-col"),
+				Nav(Class("p-2 mb-2 flex justify-between items-center "),
 					Img(Class("cursor-pointer"), Width("20px"), Src("/static/icons/bars-solid.svg"),
 						Data("sidebar-toggle", ""),
 					),
 					ar.Icon(),
 				),
 				p.Excerpt,
-				Div(ID("target"), Class("pl-2"), htmx.Select("#target"), htmx.Target("#target"), htmx.Swap("show:none"),
-					P(Class("text-lg"),
+				Div(ID("target"), Class("flex flex-col flex-1"), htmx.Select("#target"), htmx.Target("#target"), htmx.Swap("show:none"),
+					P(Class("pl-2 text-lg"),
 						g.Text(p.Prompt),
 					),
-					p.InputMethod,
+					Div(Class("pl-2"),
+						p.InputMethod,
+					),
 					g.If(p.Feedback != "",
-						Div(Class("bg-green-300 min-h-32 mr-4 my-4 p-1 drop-shadow"),
+						Div(Class("bg-green-300 min-h-32 mr-4 my-4 pl-2 p-1 drop-shadow"),
 							Img(Class("w-6"), Src("/static/icons/message-solid.svg")),
 							P(Class("mt-2"),
 								g.Text(p.Feedback),
@@ -104,10 +106,13 @@ func questionCtrl(prevURL, nextURL, submitURL string) g.Node {
 		next(nextURL),
 	})
 
+	class := Class("h-16 text-lg sticky w-screen bottom-0 left-0 flex flex-row mt-auto")
+
 	if submitURL == "" {
-		return Div(Class("h-16 text-lg fixed w-screen bottom-0 left-0 flex flex-row"), inner)
+		return Div(class,
+			inner)
 	}
-	return Form(Class("h-16 text-lg fixed w-screen bottom-0 left-0 flex flex-row"), Method("post"), Action(submitURL),
+	return Form(class, Method("post"), Action(submitURL),
 		Input(Type("hidden"), Name("ans"), DataAttr("form-answer", "")),
 		inner)
 }

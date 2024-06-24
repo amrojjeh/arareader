@@ -629,8 +629,8 @@ video {
   position: static;
 }
 
-.fixed {
-  position: fixed;
+.sticky {
+  position: sticky;
 }
 
 .bottom-0 {
@@ -662,6 +662,10 @@ video {
   margin-top: 0.5rem;
 }
 
+.mt-auto {
+  margin-top: auto;
+}
+
 .block {
   display: block;
 }
@@ -684,6 +688,10 @@ video {
 
 .h-16 {
   height: 4rem;
+}
+
+.h-svh {
+  height: 100svh;
 }
 
 .max-h-96 {
