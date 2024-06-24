@@ -641,9 +641,8 @@ video {
   left: 0px;
 }
 
-.my-4 {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+.m-4 {
+  margin: 1rem;
 }
 
 .mb-2 {
