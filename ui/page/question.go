@@ -106,7 +106,7 @@ func questionCtrl(prevURL, nextURL, submitURL string) g.Node {
 		next(nextURL),
 	})
 
-	class := Class("h-16 text-lg sticky w-screen bottom-0 left-0 flex flex-row mt-auto")
+	class := Class("h-16 text-lg sticky w-screen bottom-0 left-0 flex flex-row mt-auto pt-2")
 
 	if submitURL == "" {
 		return Div(class,
