@@ -163,8 +163,8 @@ func genVowelQuestions(ctx context.Context, q *model.Queries, quizID int, r *mod
 
 // TEMP(Amr Ojjeh): This is basically just a prototype
 // Does not handle the case where a short vowel reference already exists
-func genVowelRefs(e *model.Excerpt) *model.Excerpt {
-	excerpt := &model.Excerpt{}
+func genVowelRefs(e *model.ReferenceNode) *model.ReferenceNode {
+	excerpt := &model.ReferenceNode{}
 	refCounter := e.AvailableID() // the next available reference
 	for _, n := range e.Nodes {
 		switch typed := n.(type) {
@@ -237,7 +237,7 @@ func genVowelRefsText(t *model.TextNode, counter int) (int, []model.ExcerptNode)
 	}
 	return counter, nodes
 }
-func fromTemplate(s string) ([]byte, *model.Excerpt) {
+func fromTemplate(s string) ([]byte, *model.ReferenceNode) {
 
 	buff := &bytes.Buffer{}
 	template.Must(model.ExcerptTemplate().Parse(s)).Execute(buff, nil)

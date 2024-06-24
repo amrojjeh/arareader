@@ -155,7 +155,7 @@ func TestExcerptWrite(t *testing.T) {
 	}
 }
 
-func parseExcerpt(t *testing.T, excerpt string) *Excerpt {
+func parseExcerpt(t *testing.T, excerpt string) *ReferenceNode {
 	t.Helper()
 	buff := &bytes.Buffer{}
 	template.Must(ExcerptTemplate().Parse(excerpt)).Execute(buff, nil)

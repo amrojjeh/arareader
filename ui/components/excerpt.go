@@ -14,7 +14,7 @@ import (
 )
 
 // Assumes excerpt is valid
-func Excerpt(e *model.Excerpt, highlightedRef int) g.Node {
+func Excerpt(e *model.ReferenceNode, highlightedRef int) g.Node {
 	children := processNodes(e.Nodes, highlightedRef)
 	return P(Class("max-h-96 mb-3 leading-relaxed text-3xl text-justify px-5 bg-gray-100 overflow-auto"), ID("excerpt"), Dir("rtl"), htmx.SwapOOB("true"),
 		g.Group(children),
