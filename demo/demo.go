@@ -98,7 +98,7 @@ func Demo(ctx context.Context, db *sql.DB) {
 		ClassID: class.ID,
 	}))
 
-	_, tempExcerpt := fromTemplate(`<excerpt>{{bw "Amna"}} <ref id="1">{{bw "Alrswlu"}}</ref> {{bw "bmA"}} <ref id="2">{{bw "Anzla"}}</ref> {{bw "Alyhi mn rbhi wAlm&mnwna klN Amna bAllhi wmlA}kthi wktbhi wrslhi lA nfrqu byna AHdK mno rslhi wqAlwA smEnA wATEnA gfrAnka rbnA wAlyka AlmSyru lA yklfu Allhu nfsA AlA wsEhA lhA mA ksbto wElyhA mA Aktsbto rbnA lA t&Ax*nA An nsynA Aw AxTAnA rbnA wlA tHmlo ElynA ASrA kmA Hmlthu ElY Al*yna mn qblnA rbnA wlA tHmlnA mA lA TAqpa lnA bhi wAEfu EnA wAgfr lnA wArHmnA Ant mwlAnA fAnSrnA ElY Alqwmi AlkAfryna"}}</excerpt>`)
+	_, tempExcerpt := fromTemplate(`<excerpt>{{bw "Amna"}} <ref id="1">{{bw "Alrswlu"}}</ref> {{bw "bmA"}} <ref id="2">{{bw ">unzila"}}</ref> {{bw "Alyhi mn rbhi wAlm&mnwna klN Amna bAllhi wmlA}kthi wktbhi wrslhi lA nfrqu byna AHdK mno rslhi wqAlwA smEnA wATEnA gfrAnka rbnA wAlyka AlmSyru lA yklfu Allhu nfsA AlA wsEhA lhA mA ksbto wElyhA mA Aktsbto rbnA lA t&Ax*nA An nsynA Aw AxTAnA rbnA wlA tHmlo ElynA ASrA kmA Hmlthu ElY Al*yna mn qblnA rbnA wlA tHmlnA mA lA TAqpa lnA bhi wAEfu EnA wAgfr lnA wArHmnA Ant mwlAnA fAnSrnA ElY Alqwmi AlkAfryna"}}</excerpt>`)
 
 	excerpt = genVowelRefs(tempExcerpt)
 
@@ -134,7 +134,7 @@ func Demo(ctx context.Context, db *sql.DB) {
 		Position:  1,
 		Type:      model.ShortAnswerQuestionType,
 		Reference: 2,
-		Feedback:  "You can tell it's passive because there's no explicit doer mentioned after the verb.",
+		Feedback:  "The main giveaway is that it's in the form " + arabic.FromBuckwalter(">ufEila") + ".",
 		Prompt:    "Active or passive?",
 		Solution:  "passive",
 	})
