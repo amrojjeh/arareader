@@ -143,7 +143,7 @@ func (rs rootResource) questionGet(w http.ResponseWriter, r *http.Request) {
 		Excerpt:          components.Excerpt(false, excerpt, question.Reference),
 		Prompt:           question.Prompt,
 		InputMethod:      components.QuestionToInputMethod(question, questionSession),
-		SidebarQuestions: sidebar(quiz.ID, questionSessions, questions),
+		SidebarQuestions: sidebar(true, quiz.ID, questionSessions, questions),
 		NextURL:          questionURLHTMX(quiz.ID, question.Position+1, len(questions)),
 		PrevURL:          questionURLHTMX(quiz.ID, question.Position-1, len(questions)),
 		SubmitURL:        submitURL,
@@ -187,7 +187,7 @@ func (rs rootResource) htmxSelect(w http.ResponseWriter, r *http.Request) {
 		questionURLHTMX(quiz.ID, question.Position+1, len(questions)),
 		questionURL(quiz.ID, question.Position, len(questions)),
 	).Render(w)
-	page.Sidebar(true, sidebar(quiz.ID, questionSessions, questions), summaryURL(quiz.ID)).Render(w)
+	page.Sidebar(true, sidebar(true, quiz.ID, questionSessions, questions), summaryURL(quiz.ID)).Render(w)
 	components.Excerpt(true, excerpt, question.Reference).Render(w)
 }
 
@@ -307,15 +307,19 @@ func questionURLUnsafe(quizID, questionPos int) string {
 	return fmt.Sprintf("/quiz/%d/question/%d", quizID, questionPos)
 }
 
-func sidebar(quizID int, questionSessions []model.QuestionSession, questions []model.Question) []page.SidebarQuestion {
+func sidebar(htmx bool, quizID int, questionSessions []model.QuestionSession, questions []model.Question) []page.SidebarQuestion {
 	sqs := make([]page.SidebarQuestion, 0, len(questions))
 
 	for i, question := range questions {
 		sq := page.SidebarQuestion{
 			Prompt: question.Prompt,
 			Status: model.UnattemptedQuestionStatus,
-			URL:    questionURLHTMX(quizID, i, len(questions)),
-			Target: true,
+			Target: htmx,
+		}
+		if htmx {
+			sq.URL = questionURLHTMX(quizID, i, len(questions))
+		} else {
+			sq.URL = questionURL(quizID, i, len(questions))
 		}
 		for _, session := range questionSessions {
 			if session.QuestionID == question.ID {

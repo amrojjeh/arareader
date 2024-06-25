@@ -43,6 +43,6 @@ func (rs rootResource) summaryGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page.SummaryPage(page.SummaryParams{
-		SidebarQuestions: sidebar(quizID, questionSessions, questions),
+		SidebarQuestions: sidebar(false, quizID, questionSessions, questions),
 	}).Render(w)
 }
