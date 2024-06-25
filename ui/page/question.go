@@ -87,11 +87,11 @@ func submitBtn(submitURL string) g.Node {
 
 func prev(prevURL string) g.Node {
 	if prevURL == "" {
-		return A(Class("flex-1 rounded-tl-lg btn"), Data("type", "disabled"), Disabled(),
+		return Button(Class("flex-1 rounded-tl-lg btn"), Data("type", "disabled"), Disabled(),
 			g.Text("Previous"),
 		)
 	}
-	return A(Class("flex-1 rounded-tl-lg btn bg-blue-200 text-black"), Href(prevURL),
+	return Button(Class("flex-1 rounded-tl-lg btn bg-blue-200 text-black"), htmx.Get(prevURL),
 		Data("shortcut", "ctrl ArrowLeft"),
 		g.Text("Previous"),
 	)
@@ -99,11 +99,11 @@ func prev(prevURL string) g.Node {
 
 func next(nextURL string) g.Node {
 	if nextURL == "" {
-		return A(Class("flex-1 rounded-tr btn"), Data("type", "disabled"), Disabled(),
+		return Button(Class("flex-1 rounded-tr btn"), Data("type", "disabled"), Disabled(),
 			g.Text("Next"),
 		)
 	}
-	return A(Class("flex-1 rounded-tr btn bg-blue-200 text-black"), Href(nextURL),
+	return Button(Class("flex-1 rounded-tr btn bg-blue-200 text-black"), htmx.Get(nextURL),
 		Data("shortcut", "ctrl ArrowRight"),
 		g.Text("Next"),
 	)

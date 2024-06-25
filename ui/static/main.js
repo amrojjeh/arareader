@@ -54,6 +54,14 @@ htmx.onLoad(function() {
   document.body.addEventListener("keydown", shortcut)
   document.querySelectorAll("[data-sidebar-toggle]").forEach(x => x.addEventListener("click", sidebarToggle))
   if (dialog) {
+    // to fix this bug:
+    // 1) Open dialog
+    // 2) Select a question
+    // 3) Press back
+    // The dialog will be in a "open" state where the question is interactable and the dialog is open at the same time
+    // Not sure if this is a browser bug
+    dialog.close()
+
     dialog.addEventListener("click", clickoutSidebar)
   }
 })

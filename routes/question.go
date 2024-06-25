@@ -179,6 +179,7 @@ func (rs rootResource) htmxSelect(w http.ResponseWriter, r *http.Request) {
 		feedback = question.Feedback
 	}
 
+	w.Header().Add("HX-Push-Url", questionURL(quiz.ID, question.Position, len(questions)))
 	page.Question(question.Prompt,
 		components.QuestionToInputMethod(question, questionSession),
 		feedback,
