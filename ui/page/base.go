@@ -38,19 +38,20 @@ type SidebarQuestion struct {
 	Prompt string
 	Status model.QuestionStatus
 	URL    string
+	Target bool
 }
 
-func sidebar(qs []SidebarQuestion) g.Node {
-	return Dialog(Data("sidebar", ""), Class("sidebar"), htmx.SwapOOB("true"), ID("sidebar"),
+func Sidebar(oob bool, qs []SidebarQuestion, summaryURL string) g.Node {
+	return Dialog(Data("sidebar", ""), Class("sidebar"), g.If(oob, htmx.SwapOOB("true")), ID("sidebar"),
 		Div(Class("flex flex-col justify-center p-5 gap-4"),
 			Div(Class("flex gap-3 mb-2"),
 				Img(Class("w-6 cursor-pointer"), Data("sidebar-toggle", ""), Src("/static/icons/xmark-solid.svg")),
-				Button(Class("flex-1 bg-blue-200 p-1 cursor-pointer rounded-lg"),
+				A(Class("flex-1 bg-blue-200 p-1 cursor-pointer rounded-lg"), Href(summaryURL),
 					g.Text("Summary"),
 				),
 			),
 			g.Group(g.Map(qs, func(s SidebarQuestion) g.Node {
-				return Div(Class("flex gap-2 text-lg"), htmx.Select("#target"), htmx.Target("#target"),
+				return Div(Class("flex gap-2 text-lg"), g.If(s.Target, htmx.Target("#target")),
 					g.If(s.Status == model.CorrectQuestionStatus,
 						Img(Class("w-5"), Src("/static/icons/circle-check-solid.svg")),
 					),

@@ -23,6 +23,7 @@ import (
 type rootResource struct {
 	sm *scs.SessionManager
 	db *sql.DB
+	q  *model.Queries
 }
 
 func Routes(db *sql.DB) http.Handler {
@@ -33,17 +34,20 @@ func Routes(db *sql.DB) http.Handler {
 	rs := rootResource{
 		sm,
 		db,
+		model.New(db),
 	}
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(clientErrorRecoverer)
 	r.Use(middleware.CleanPath)
 	r.Use(middleware.StripSlashes)
 	r.Use(sm.LoadAndSave)
 	r.Use(rs.htmxVary)
 	r.Use(rs.Auth)
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/quiz/2/question/0", http.StatusSeeOther)
 	})
@@ -51,11 +55,40 @@ func Routes(db *sql.DB) http.Handler {
 	r.Get("/static*", func(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/static", http.FileServer(http.FS(static.Files))).ServeHTTP(w, r)
 	})
-	r.With(quizID, questionPosition).
-		Get(fmt.Sprintf("/quiz/{%s:[0-9]+}/question/{%s:[0-9]+}", quizIDKey, questionPosKey), rs.questionGet)
-	r.With(quizID, questionPosition).
-		Post(fmt.Sprintf("/quiz/{%s:[0-9]+}/question/{%s:[0-9]+}", quizIDKey, questionPosKey), rs.questionPost)
+
+	r.Route(fmt.Sprintf("/quiz/{%s:[0-9]+}/question/{%s:[0-9]+}", quizIDKey, questionPosKey), func(r chi.Router) {
+		r.Use(quizID, questionPosition)
+		r.Get("/", rs.questionGet)
+		r.Post("/", rs.questionPost)
+
+		r.Get("/htmx/select", rs.htmxSelect)
+	})
+
+	r.With(quizID).
+		Get(fmt.Sprintf("/quiz/{%s:[0-9]+}/summary", quizIDKey), rs.summaryGet)
+
 	return r
+}
+
+func (rs rootResource) clientError(code int) {
+	panic(clientErr(code))
+}
+
+type clientErr int
+
+func clientErrorRecoverer(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if r := recover(); r != nil {
+				ce, ok := r.(clientErr)
+				if !ok {
+					panic(r)
+				}
+				http.Error(w, http.StatusText(int(ce)), int(ce))
+			}
+		}()
+		h.ServeHTTP(w, r)
+	})
 }
 
 func quizID(next http.Handler) http.Handler {

@@ -18,38 +18,43 @@ type QuestionParams struct {
 	NextURL          string
 	PrevURL          string
 	SubmitURL        string
+	SummaryURL       string
 	Feedback         string
 }
 
 func QuestionPage(p QuestionParams) g.Node {
 	return base([]g.Node{Class("flex flex-col"), htmx.Boost("true"),
-		sidebar(p.SidebarQuestions),
+		Sidebar(false, p.SidebarQuestions, p.SummaryURL),
 		Main(Class("h-svh flex flex-col"),
 			navbar(),
 			p.Excerpt,
-			Div(ID("target"), Class("flex flex-col flex-1"), htmx.Select("#target"), htmx.Target("#target"), htmx.Swap("show:none"),
-				P(Class("pl-2 text-lg"),
-					g.Text(p.Prompt),
-				),
-				Div(Class("pl-2"),
-					p.InputMethod,
-				),
-				g.If(p.Feedback != "",
-					Div(Class("bg-green-300 min-h-32 m-4 p-1 drop-shadow"),
-						Img(Class("w-6"), Src("/static/icons/message-solid.svg")),
-						P(Class("mt-2"),
-							g.Text(p.Feedback),
-						),
-					),
-				),
-				questionCtrl(p.PrevURL, p.NextURL, p.SubmitURL),
-			),
+			Question(p.Prompt, p.InputMethod, p.Feedback, p.PrevURL, p.NextURL, p.SubmitURL),
 		),
 	})
 }
 
-func questionCtrl(prevURL, nextURL, submitURL string) g.Node {
-	inner := g.Group([]g.Node{
+func Question(prompt string, input g.Node, feedback, prevURL, nextURL, submitURL string) g.Node {
+	return Div(ID("target"), Class("flex flex-col flex-1"), htmx.Swap("show:none"), htmx.Target("#target"),
+		P(Class("pl-2 text-lg"),
+			g.Text(prompt),
+		),
+		Div(Class("pl-2"),
+			input,
+		),
+		g.If(feedback != "",
+			Div(Class("bg-green-300 min-h-32 m-4 p-1 drop-shadow"),
+				Img(Class("w-6"), Src("/static/icons/message-solid.svg")),
+				P(Class("mt-2"),
+					g.Text(feedback),
+				),
+			),
+		),
+		QuestionCtrl(false, prevURL, nextURL, submitURL),
+	)
+}
+
+func QuestionCtrl(oob bool, prevURL, nextURL, submitURL string) g.Node {
+	inner := g.Group([]g.Node{ID("questionctrl"), g.If(oob, htmx.SwapOOB("true")),
 		prev(prevURL),
 		submitBtn(submitURL),
 		next(nextURL),

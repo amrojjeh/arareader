@@ -538,7 +538,7 @@ func (q *Queries) ListQuestionSessions(ctx context.Context, quizSessionID int) (
 const listQuestionsByQuiz = `-- name: ListQuestionsByQuiz :many
 SELECT id, quiz_id, position, type, reference, feedback, prompt, solution, created, updated FROM question
 WHERE quiz_id=?
-ORDER BY position
+ORDER BY position ASC
 `
 
 func (q *Queries) ListQuestionsByQuiz(ctx context.Context, quizID int) ([]Question, error) {

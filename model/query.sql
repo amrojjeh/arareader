@@ -67,7 +67,7 @@ WHERE id=?;
 -- name: ListQuestionsByQuiz :many
 SELECT * FROM question
 WHERE quiz_id=?
-ORDER BY position;
+ORDER BY position ASC;
 
 -- name: ListSegmentedQuestionsByQuiz :many
 SELECT * FROM question

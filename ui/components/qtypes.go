@@ -11,24 +11,19 @@ import (
 	. "github.com/maragudk/gomponents/html"
 )
 
-type QuestionToInputMethodParams struct {
-	Question        model.Question
-	QuestionSession model.QuestionSession
-}
-
-func QuestionToInputMethod(p QuestionToInputMethodParams) g.Node {
-	switch p.Question.Type {
+func QuestionToInputMethod(question model.Question, session model.QuestionSession) g.Node {
+	switch question.Type {
 	case model.VowelQuestionType:
-		if p.QuestionSession.Status.IsSubmitted() {
-			return VowelInputMethodSubmitted(p.Question.Solution, p.QuestionSession.Answer)
+		if session.Status.IsSubmitted() {
+			return VowelInputMethodSubmitted(question.Solution, session.Answer)
 		}
-		return VowelInputMethodUnsubmitted(p.Question.Solution)
+		return VowelInputMethodUnsubmitted(question.Solution)
 	case model.ShortAnswerQuestionType:
-		if p.QuestionSession.Status.IsSubmitted() {
-			if p.QuestionSession.Status == model.PendingQuestionStatus {
-				return ShortAnswerInputMethodPending(p.QuestionSession.Answer)
+		if session.Status.IsSubmitted() {
+			if session.Status == model.PendingQuestionStatus {
+				return ShortAnswerInputMethodPending(session.Answer)
 			}
-			return ShortAnswerInputMethodSubmitted(p.Question.Solution, p.QuestionSession.Answer)
+			return ShortAnswerInputMethodSubmitted(question.Solution, session.Answer)
 		}
 		return ShortAnswerInputMethodUnsubmitted()
 	}

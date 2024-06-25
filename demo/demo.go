@@ -111,14 +111,6 @@ func Demo(ctx context.Context, db *sql.DB) {
 		Excerpt:   excerptBuffer.Bytes(),
 	}))
 
-	for _, n := range excerpt.Nodes {
-		r, ok := n.(*model.ReferenceNode)
-		if !ok {
-			continue
-		}
-		genVowelQuestions(ctx, q, quiz.ID, r)
-	}
-
 	q.CreateQuestion(ctx, model.CreateQuestionParams{
 		QuizID:    quiz.ID,
 		Position:  0,
@@ -138,13 +130,23 @@ func Demo(ctx context.Context, db *sql.DB) {
 		Prompt:    "Active or passive?",
 		Solution:  "passive",
 	})
+
+	pos := 2
+	for _, n := range excerpt.Nodes {
+		r, ok := n.(*model.ReferenceNode)
+		if !ok {
+			continue
+		}
+		genVowelQuestions(ctx, q, quiz.ID, pos, r)
+		pos += 1
+	}
 }
 
-func genVowelQuestions(ctx context.Context, q *model.Queries, quizID int, r *model.ReferenceNode) {
+func genVowelQuestions(ctx context.Context, q *model.Queries, quizID, position int, r *model.ReferenceNode) {
 	if lp, err := arabic.ParseLetterPack(r.Plain()); err == nil && lp.Vowel != 0 {
 		q.CreateQuestion(ctx, model.CreateQuestionParams{
 			QuizID:    quizID,
-			Position:  0,
+			Position:  position,
 			Type:      model.VowelQuestionType,
 			Reference: r.ID,
 			Prompt:    "Choose the correct vowel",
@@ -157,7 +159,7 @@ func genVowelQuestions(ctx context.Context, q *model.Queries, quizID int, r *mod
 		if !ok {
 			continue
 		}
-		genVowelQuestions(ctx, q, quizID, r)
+		genVowelQuestions(ctx, q, quizID, position, r)
 	}
 }
 

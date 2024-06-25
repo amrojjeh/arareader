@@ -12,7 +12,7 @@ type SummaryParams struct {
 
 func SummaryPage(p SummaryParams) g.Node {
 	return base([]g.Node{Class("flex flex-col"), htmx.Boost("true"),
-		sidebar(p.SidebarQuestions),
+		Sidebar(false, p.SidebarQuestions, "#"),
 		Main(Class("h-svh flex flex-col"),
 			navbar(),
 		),

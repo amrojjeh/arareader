@@ -4,6 +4,8 @@ htmx.onLoad(function() {
   const inputField = document.querySelector("[data-input]")
   const submitBtn = document.querySelector("#submit")
   const answer = document.querySelector("[data-form-answer]")
+  const excerpt = document.querySelector("#excerpt")
+  const dialog = document.querySelector("dialog")
 
   if (answer) {
     answer.set = function(value) {
@@ -37,16 +39,23 @@ htmx.onLoad(function() {
     })
   })
 
-  selected.scrollIntoView({
-    "behavior": "smooth",
-    "block": "center",
-    "inline": "center",
-  })
+  if (selected) {
+    selected.scrollIntoView({
+      "behavior": "smooth",
+      "block": "center",
+      "inline": "center",
+    })
+  }
 
-  document.querySelector("#excerpt").addEventListener("htmx:oobBeforeSwap", updateExcerpt)
+  if (excerpt) {
+    excerpt.addEventListener("htmx:oobBeforeSwap", updateExcerpt)
+  }
+
   document.body.addEventListener("keydown", shortcut)
   document.querySelectorAll("[data-sidebar-toggle]").forEach(x => x.addEventListener("click", sidebarToggle))
-  document.querySelector("dialog").addEventListener("click", clickoutSidebar)
+  if (dialog) {
+    dialog.addEventListener("click", clickoutSidebar)
+  }
 })
 
 function clickoutSidebar(e) {
