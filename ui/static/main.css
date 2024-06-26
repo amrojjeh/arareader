@@ -735,10 +735,6 @@ video {
   width: min-content;
 }
 
-.w-screen {
-  width: 100vw;
-}
-
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -970,4 +966,26 @@ video {
 .drop-shadow {
   --tw-drop-shadow: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+@media (min-width: 1024px) {
+  .lg\:invisible {
+    visibility: hidden;
+  }
+
+  .lg\:static {
+    position: static;
+  }
+
+  .lg\:block {
+    display: block;
+  }
+
+  .lg\:hidden {
+    display: none;
+  }
+
+  .lg\:shrink-0 {
+    flex-shrink: 0;
+  }
 }

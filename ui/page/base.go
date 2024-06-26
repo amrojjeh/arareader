@@ -26,8 +26,8 @@ func base(body []g.Node) g.Node {
 }
 
 func navbar() g.Node {
-	return Nav(Class("p-2 mb-2 flex justify-between items-center "),
-		Img(Class("cursor-pointer"), Width("20px"), Src("/static/icons/bars-solid.svg"),
+	return Nav(Class("p-2 mb-2 flex justify-between items-center"),
+		Img(Class("lg:invisible cursor-pointer"), Width("20px"), Src("/static/icons/bars-solid.svg"),
 			Data("sidebar-toggle", ""),
 		),
 		icon(),
@@ -42,10 +42,10 @@ type SidebarQuestion struct {
 }
 
 func Sidebar(oob bool, qs []SidebarQuestion, summaryURL string) g.Node {
-	return Dialog(Data("sidebar", ""), Class("sidebar"), g.If(oob, htmx.SwapOOB("true")), ID("sidebar"),
+	return Dialog(Data("sidebar", ""), Class("sidebar lg:shrink-0 lg:static lg:block"), g.If(oob, htmx.SwapOOB("true")), ID("sidebar"),
 		Div(Class("flex flex-col justify-center p-5 gap-4"),
 			Div(Class("flex gap-3 mb-2"),
-				Img(Class("w-6 cursor-pointer"), Data("sidebar-toggle", ""), Src("/static/icons/xmark-solid.svg")),
+				Img(Class("w-6 cursor-pointer lg:hidden"), Data("sidebar-toggle", ""), Src("/static/icons/xmark-solid.svg")),
 				A(Class("flex-1 bg-blue-200 text-center p-1 cursor-pointer rounded-lg"), Href(summaryURL),
 					g.Text("Summary"),
 				),

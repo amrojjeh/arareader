@@ -23,7 +23,7 @@ type QuestionParams struct {
 }
 
 func QuestionPage(p QuestionParams) g.Node {
-	return base([]g.Node{Class("flex flex-col"), htmx.Boost("true"),
+	return base([]g.Node{Class("flex"), htmx.Boost("true"),
 		Sidebar(false, p.SidebarQuestions, p.SummaryURL),
 		Main(Class("h-svh flex flex-col"),
 			navbar(),
@@ -60,7 +60,7 @@ func QuestionCtrl(oob bool, prevURL, nextURL, submitURL string) g.Node {
 		next(nextURL),
 	})
 
-	class := Class("h-16 text-lg sticky w-screen bottom-0 left-0 flex flex-row mt-auto pt-2")
+	class := Class("h-16 text-lg sticky bottom-0 left-0 flex flex-row mt-auto pt-2")
 
 	if submitURL == "" {
 		return Div(class,
