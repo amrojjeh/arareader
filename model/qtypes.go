@@ -53,7 +53,7 @@ func ValidateQuestionInput(q Question, ans string) bool {
 
 		validOption := false
 		for _, o := range options {
-			if ans == o {
+			if ans == o.Option {
 				validOption = true
 				break
 			}
@@ -88,15 +88,34 @@ func (e NotALetterError) Error() string {
 	return fmt.Sprintf("model: %s is not an Arabic letter", e.letter)
 }
 
-func VowelQuestionOptions(letter string) ([]string, error) {
+type VowelQuestionOption struct {
+	Option   string
+	Shortcut string // ONLY used for UI. Do not use in model
+}
+
+var shortcuts = map[rune]string{
+	arabic.Fatha:    "KeyQ",
+	arabic.Fathatan: "KeyW",
+
+	arabic.Kasra:    "KeyA",
+	arabic.Kasratan: "KeyS",
+
+	arabic.Damma:    "KeyE",
+	arabic.Dammatan: "KeyR",
+
+	arabic.Sukoon: "KeyX",
+}
+
+func VowelQuestionOptions(letter string) ([]VowelQuestionOption, error) {
 	letterPack, err := arabic.ParseLetterPack(letter)
 	if err != nil {
 		return nil, NotALetterError{letter}
 	}
-	options := make([]string, len(arabic.Vowels))
+	options := make([]VowelQuestionOption, len(arabic.Vowels))
 	for i := range len(arabic.Vowels) {
 		letterPack.Vowel = arabic.Vowels[i]
-		options[i] = letterPack.String()
+		options[i].Option = letterPack.String()
+		options[i].Shortcut = shortcuts[arabic.Vowels[i]]
 	}
 	return options, nil
 }

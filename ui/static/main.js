@@ -132,7 +132,6 @@ function updateSidebar(evt) {
   const mydialog = evt.currentTarget
   mydialog.replaceChild(responseDialog.firstChild, mydialog.firstChild)
   const selected = mydialog.querySelector("[data-selected-question]")
-  console.log(selected)
   selected.scrollIntoView({
     "behavior": "smooth",
     "block": "center",
@@ -169,7 +168,7 @@ function updateExcerpt(evt) {
   }
 }
 
-window.addEventListener("resize", function(evnt) {
+window.addEventListener("resize", function() {
   if (window.innerWidth >= 1024 && dialog) { // equivalent to tailwind's "lg"
     dialog.close()
   }

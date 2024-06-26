@@ -99,9 +99,9 @@ func VowelInputMethodSubmitted(correct, chosen string) g.Node {
 		panic("generating options")
 	}
 	for _, o := range options {
-		if o == correct {
+		if o.Option == correct {
 			buttons = append(buttons, vowelButton(o, correctStatus))
-		} else if o == chosen && chosen != correct {
+		} else if o.Option == chosen && chosen != correct {
 			buttons = append(buttons, vowelButton(o, incorrectStatus))
 		} else {
 			buttons = append(buttons, vowelButton(o, neutralStatus))
@@ -125,15 +125,15 @@ const (
 	acceptingInput
 )
 
-func vowelButton(text string, status inputStatus) g.Node {
+func vowelButton(option model.VowelQuestionOption, status inputStatus) g.Node {
 	return Button(Type("button"),
-		g.If(status == acceptingInput, Data("substitute-button", text)),
+		g.If(status == acceptingInput, Data("substitute-button", option.Option)),
 		g.If(status == correctStatus, Data("type", "primary")),
-		g.If(status != acceptingInput, Disabled()),
+		Data("shortcut", option.Shortcut),
 		c.Classes{
 			"btn shadow py-2 text-2xl": true,
 			"bg-red-300":               status == incorrectStatus,
 		},
-		g.Text(text),
+		g.Text(option.Option),
 	)
 }
