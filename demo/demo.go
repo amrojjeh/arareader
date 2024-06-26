@@ -107,7 +107,7 @@ func Demo(ctx context.Context, db *sql.DB) {
 
 	quiz = must.Get(q.CreateQuiz(ctx, model.CreateQuizParams{
 		TeacherID: teacher.ID,
-		Title:     "Surah al-Baqarah",
+		Title:     "Ending of Surah al-Baqarah",
 		Excerpt:   excerptBuffer.Bytes(),
 	}))
 
