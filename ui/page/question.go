@@ -11,6 +11,7 @@ import (
 )
 
 type QuestionParams struct {
+	Title            string
 	Excerpt          g.Node
 	Prompt           string
 	InputMethod      g.Node
@@ -26,7 +27,7 @@ func QuestionPage(p QuestionParams) g.Node {
 	return base([]g.Node{Class("flex"), htmx.Boost("true"),
 		Sidebar(false, p.SidebarQuestions, p.SummaryURL),
 		Main(Class("h-svh flex flex-col"),
-			navbar(),
+			navbar(p.Title),
 			p.Excerpt,
 			Question(p.Prompt, p.InputMethod, p.Feedback, p.PrevURL, p.NextURL, p.SubmitURL),
 		),

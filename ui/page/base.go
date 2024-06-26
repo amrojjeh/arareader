@@ -25,10 +25,13 @@ func base(body []g.Node) g.Node {
 	})
 }
 
-func navbar() g.Node {
+func navbar(title string) g.Node {
 	return Nav(Class("p-2 mb-2 flex justify-between items-center"),
 		Img(Class("lg:invisible cursor-pointer"), Width("20px"), Src("/static/icons/bars-solid.svg"),
 			Data("sidebar-toggle", ""),
+		),
+		P(Class("basis-1/2 overflow-x-auto font-medium text-xl text-nowrap overflow-hidden"),
+			g.Text(title),
 		),
 		icon(),
 	)

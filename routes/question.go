@@ -121,6 +121,7 @@ func (rs rootResource) questionGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page.QuestionPage(page.QuestionParams{
+		Title:            quiz.Title,
 		Excerpt:          components.Excerpt(false, excerpt, question.Reference),
 		Prompt:           question.Prompt,
 		InputMethod:      components.QuestionToInputMethod(question, questionSession),

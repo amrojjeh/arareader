@@ -10,6 +10,7 @@ import (
 )
 
 type SummaryParams struct {
+	Title            string
 	SidebarQuestions []SidebarQuestion
 	Progress         int
 	RestartURL       string
@@ -19,7 +20,7 @@ func SummaryPage(p SummaryParams) g.Node {
 	return base([]g.Node{Class("flex"), htmx.Boost("true"),
 		Sidebar(false, p.SidebarQuestions, "#"),
 		Main(Class("h-svh flex flex-col flex-1"),
-			navbar(),
+			navbar(p.Title),
 			Div(Class("flex flex-col items-center text-2xl font-bold mb-3"),
 				g.Text(fmt.Sprintf("%d%% ", p.Progress)),
 				g.If(p.Progress == 100, g.Text("\U0001F973")),
