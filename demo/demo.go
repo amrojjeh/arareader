@@ -239,8 +239,8 @@ func genVowelRefsText(t *model.TextNode, counter int) (int, []model.ExcerptNode)
 	}
 	return counter, nodes
 }
-func fromTemplate(s string) ([]byte, *model.ReferenceNode) {
 
+func fromTemplate(s string) ([]byte, *model.ReferenceNode) {
 	buff := &bytes.Buffer{}
 	template.Must(model.ExcerptTemplate().Parse(s)).Execute(buff, nil)
 	excerpt, _ := model.ExcerptFromXML(bytes.NewReader(buff.Bytes()))
