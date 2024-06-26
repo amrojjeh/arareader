@@ -20,7 +20,7 @@
   }
 
   .sidebar {
-    @apply w-64 h-svh overflow-y-auto transition-all bg-white top-0 left-0 m-0;
+    @apply w-64 h-svh overflow-y-auto bg-white top-0 left-0 m-0;
     max-height: unset;
   }
 

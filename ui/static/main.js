@@ -1,3 +1,5 @@
+var dialog = undefined
+
 htmx.onLoad(function() {
   const selectedRef = document.querySelector("[data-selected-segment]")
   const selectedQuestion = document.querySelector("[data-selected-question]")
@@ -6,7 +8,7 @@ htmx.onLoad(function() {
   const submitBtn = document.querySelector("#submit")
   const answer = document.querySelector("[data-form-answer]")
   const excerpt = document.querySelector("#excerpt")
-  const dialog = document.querySelector("dialog")
+  dialog = document.querySelector("dialog")
 
   if (answer) {
     answer.set = function(value) {
@@ -166,3 +168,9 @@ function updateExcerpt(evt) {
     })
   }
 }
+
+window.addEventListener("resize", function(evnt) {
+  if (window.innerWidth >= 1024 && dialog) { // equivalent to tailwind's "lg"
+    dialog.close()
+  }
+})
