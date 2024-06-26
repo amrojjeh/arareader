@@ -1,5 +1,6 @@
 htmx.onLoad(function() {
-  const selected = document.querySelector("[data-selected-segment]")
+  const selectedRef = document.querySelector("[data-selected-segment]")
+  const selectedQuestion = document.querySelector("[data-selected-question]")
   const substituteButtons = document.querySelectorAll("[data-substitute-button]")
   const inputField = document.querySelector("[data-input]")
   const submitBtn = document.querySelector("#submit")
@@ -33,14 +34,22 @@ htmx.onLoad(function() {
         delete b.dataset.selectedButton
       })
       const sub = e.target.dataset.substituteButton
-      selected.innerText = sub
+      selectedRef.innerText = sub
       e.target.dataset.type = "primary"
       answer.set(sub)
     })
   })
 
-  if (selected) {
-    selected.scrollIntoView({
+  if (selectedRef) {
+    selectedRef.scrollIntoView({
+      "behavior": "smooth",
+      "block": "center",
+      "inline": "center",
+    })
+  }
+
+  if (selectedQuestion) {
+    selectedQuestion.scrollIntoView({
       "behavior": "smooth",
       "block": "center",
       "inline": "center",
@@ -63,6 +72,7 @@ htmx.onLoad(function() {
     dialog.close()
 
     dialog.addEventListener("click", clickoutSidebar)
+    dialog.addEventListener("htmx:oobBeforeSwap", updateSidebar)
   }
 })
 
@@ -114,10 +124,25 @@ function shortcut(ev) {
   })
 }
 
+function updateSidebar(evt) {
+  evt.detail.shouldSwap = false
+  const responseDialog = evt.detail.fragment.firstChild
+  const mydialog = evt.currentTarget
+  mydialog.replaceChild(responseDialog.firstChild, mydialog.firstChild)
+  const selected = mydialog.querySelector("[data-selected-question]")
+  console.log(selected)
+  selected.scrollIntoView({
+    "behavior": "smooth",
+    "block": "center",
+    "inline": "center",
+  })
+  htmx.process(mydialog)
+}
+
 function updateExcerpt(evt) {
   evt.detail.shouldSwap = false
   const response = evt.detail.fragment
-  const myExcerpt = document.body.querySelector("#excerpt")
+  const myExcerpt = evt.currentTarget
   const responseExcerpt = response.querySelector("#excerpt")
   if (responseExcerpt) {
     const responseRefs = responseExcerpt.querySelectorAll("span")

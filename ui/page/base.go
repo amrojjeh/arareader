@@ -63,7 +63,7 @@ func Sidebar(oob bool, qs []SidebarQuestion, summaryURL string) g.Node {
 						Img(Class("w-5"), Src("/static/icons/circle-question-solid.svg")),
 					),
 
-					g.If(s.Selected, P(Class("truncate font-bold"),
+					g.If(s.Selected, P(Class("truncate font-bold"), Data("selected-question", "true"),
 						g.Text(s.Prompt),
 					)),
 					g.If(!s.Selected, Button(Class("truncate underline cursor"), htmx.Get(s.URL), g.If(!s.Target, htmx.PushURL("true")),
