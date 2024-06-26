@@ -18,7 +18,7 @@ type SummaryParams struct {
 func SummaryPage(p SummaryParams) g.Node {
 	return base([]g.Node{Class("flex"), htmx.Boost("true"),
 		Sidebar(false, p.SidebarQuestions, "#"),
-		Main(Class("h-svh flex flex-col"),
+		Main(Class("h-svh flex flex-col flex-1"),
 			navbar(),
 			Div(Class("flex flex-col items-center text-2xl font-bold mb-3"),
 				g.Text(fmt.Sprintf("%d%% ", p.Progress)),
