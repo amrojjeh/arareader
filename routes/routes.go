@@ -51,7 +51,6 @@ func Routes(db *sql.DB) http.Handler {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/quiz/2/question/0", http.StatusSeeOther)
 	})
-	r.Post("/restart", rs.Restart)
 	r.Get("/static*", func(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/static", http.FileServer(http.FS(static.Files))).ServeHTTP(w, r)
 	})
@@ -66,6 +65,8 @@ func Routes(db *sql.DB) http.Handler {
 
 	r.With(quizID).
 		Get(fmt.Sprintf("/quiz/{%s:[0-9]+}/summary", quizIDKey), rs.summaryGet)
+
+	r.With(quizID).Delete(fmt.Sprintf("/quiz/{%s:[0-9]+}", quizIDKey), rs.restart)
 
 	return r
 }
@@ -120,13 +121,22 @@ func questionPosition(next http.Handler) http.Handler {
 }
 
 // TEMP(Amr Ojjeh): Temporary until there's class management
-func (rs rootResource) Restart(w http.ResponseWriter, r *http.Request) {
-	q := model.New(rs.db)
-	err := q.DeleteQuizSessions(r.Context())
+func (rs rootResource) restart(w http.ResponseWriter, r *http.Request) {
+	studentID, found := studentIDFromRequest(r)
+	if !found {
+		panic("getting student id")
+	}
+
+	quiz := rs.quiz(r)
+	err := rs.q.DeleteQuizSessions(r.Context(), model.DeleteQuizSessionsParams{
+		StudentID: studentID,
+		QuizID:    quiz.ID,
+	})
 	if err != nil {
 		panic(err)
 	}
-	w.Header().Add("HX-Redirect", "/quiz/2/question/0")
+
+	w.Header().Add("HX-Redirect", summaryURL(quiz.ID))
 }
 
 // TODO(Amr Ojjeh): Actually retrieve studentID from session manager once login is supported

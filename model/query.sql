@@ -154,7 +154,8 @@ SELECT * FROM quiz_session
 WHERE student_id=? AND quiz_id=?;
 
 -- name: DeleteQuizSessions :exec
-DELETE FROM quiz_session;
+DELETE FROM quiz_session
+WHERE student_id=? AND quiz_id=?;
 
 -- **********
 -- QUESTION_SESSION TABLE

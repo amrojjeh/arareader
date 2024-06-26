@@ -308,10 +308,16 @@ func (q *Queries) DeleteQuiz(ctx context.Context, id int) error {
 
 const deleteQuizSessions = `-- name: DeleteQuizSessions :exec
 DELETE FROM quiz_session
+WHERE student_id=? AND quiz_id=?
 `
 
-func (q *Queries) DeleteQuizSessions(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, deleteQuizSessions)
+type DeleteQuizSessionsParams struct {
+	StudentID int
+	QuizID    int
+}
+
+func (q *Queries) DeleteQuizSessions(ctx context.Context, arg DeleteQuizSessionsParams) error {
+	_, err := q.db.ExecContext(ctx, deleteQuizSessions, arg.StudentID, arg.QuizID)
 	return err
 }
 

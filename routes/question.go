@@ -304,6 +304,10 @@ func questionURLHTMX(quizID, questionPos, totalQuestions int) string {
 	return url + "/htmx/select"
 }
 
+func quizURL(quizID int) string {
+	return fmt.Sprintf("/quiz/%d", quizID)
+}
+
 func summaryURL(quizID int) string {
 	return fmt.Sprintf("/quiz/%d/summary", quizID)
 }
