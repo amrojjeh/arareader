@@ -17,7 +17,15 @@ func (rs rootResource) summaryGet(w http.ResponseWriter, r *http.Request) {
 	questionSessions := rs.questionSessions(r, quizSession.ID)
 	questions := rs.questions(r, quiz.ID)
 
+	submitted := 0
+	for _, qs := range questionSessions {
+		if qs.Status.IsSubmitted() {
+			submitted += 100
+		}
+	}
+
 	page.SummaryPage(page.SummaryParams{
 		SidebarQuestions: sidebar(false, quiz.ID, questionSessions, questions),
+		Progress:         submitted / len(questions),
 	}).Render(w)
 }
