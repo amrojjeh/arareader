@@ -30,7 +30,7 @@ func navbar(title string) g.Node {
 		Img(Class("lg:invisible cursor-pointer"), Width("20px"), Src("/static/icons/bars-solid.svg"),
 			Data("sidebar-toggle", ""),
 		),
-		P(Class("basis-1/2 overflow-x-auto font-medium text-xl text-nowrap overflow-hidden"),
+		P(Class("basis-1/2 overflow-x-auto text-center font-medium text-xl text-nowrap overflow-hidden"),
 			g.Text(title),
 		),
 		icon(),
