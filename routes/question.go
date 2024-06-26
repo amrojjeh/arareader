@@ -98,30 +98,11 @@ func (rs rootResource) questionGet(w http.ResponseWriter, r *http.Request) {
 	questions := rs.questions(r, quiz.ID)
 	question := rs.selectedQuestion(r, questions)
 
-	quizSession, err := rs.q.GetQuizSession(r.Context(), model.GetQuizSessionParams{
-		StudentID: studentID,
-		QuizID:    quiz.ID,
-	})
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			quizSession, err = rs.q.CreateQuizSession(r.Context(), model.CreateQuizSessionParams{
-				StudentID: studentID,
-				QuizID:    quiz.ID,
-				Status:    model.UnsubmittedQuizStatus,
-			})
-			if err != nil {
-				err = fmt.Errorf("creating quiz session: %v", err)
-				panic(err)
-			}
-		} else {
-			err = fmt.Errorf("getting quiz session: %v", err)
-			panic(err)
-		}
-	}
-
 	questionSession := model.QuestionSession{
 		Status: model.UnattemptedQuestionStatus,
 	}
+
+	quizSession := rs.createQuizSession(r, studentID, quiz.ID)
 
 	questionSessions := rs.questionSessions(r, quizSession.ID)
 	excerpt := rs.excerpt(quiz, questions, questionSessions)
@@ -261,6 +242,30 @@ func (rs rootResource) quizSession(r *http.Request, studentID, quizID int) model
 			rs.clientError(http.StatusNotFound)
 		}
 		panic(err)
+	}
+	return quizSession
+}
+
+func (rs rootResource) createQuizSession(r *http.Request, studentID, quizID int) model.QuizSession {
+	quizSession, err := rs.q.GetQuizSession(r.Context(), model.GetQuizSessionParams{
+		StudentID: studentID,
+		QuizID:    quizID,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			quizSession, err = rs.q.CreateQuizSession(r.Context(), model.CreateQuizSessionParams{
+				StudentID: studentID,
+				QuizID:    quizID,
+				Status:    model.UnsubmittedQuizStatus,
+			})
+			if err != nil {
+				err = fmt.Errorf("creating quiz session: %v", err)
+				panic(err)
+			}
+		} else {
+			err = fmt.Errorf("getting quiz session: %v", err)
+			panic(err)
+		}
 	}
 	return quizSession
 }
