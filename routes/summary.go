@@ -25,7 +25,7 @@ func (rs rootResource) summaryGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page.SummaryPage(page.SummaryParams{
-		SidebarQuestions: sidebar(false, quiz.ID, questionSessions, questions),
+		SidebarQuestions: sidebar(false, quiz.ID, questionSessions, questions, -1),
 		Progress:         submitted / len(questions),
 		RestartURL:       quizURL(quiz.ID),
 	}).Render(w)
