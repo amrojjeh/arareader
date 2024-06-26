@@ -110,7 +110,7 @@ function shortcut(ev) {
     var [modifier, key] = elt.dataset.shortcut.split(" ")
     if (modifiers.indexOf(modifier) == -1) {
       key = modifier
-      modifier = true
+      modifier = !(ev.ctrlKey || ev.altKey || ev.shiftKey)
     } else if (modifier == "ctrl") {
       modifier = ev.ctrlKey
     } else if (modifier == "alt") {
