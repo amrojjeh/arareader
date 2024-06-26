@@ -61,7 +61,7 @@ func Sidebar(oob bool, qs []SidebarQuestion, summaryURL string) g.Node {
 					g.If(s.Status == model.PendingQuestionStatus,
 						Img(Class("w-5"), Src("/static/icons/circle-question-solid.svg")),
 					),
-					Button(Class("underline truncate"), htmx.Get(s.URL),
+					Button(Class("underline truncate"), htmx.Get(s.URL), g.If(!s.Target, htmx.PushURL("true")),
 						g.Text(s.Prompt),
 					),
 				)
