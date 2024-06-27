@@ -9,9 +9,10 @@ import "net/http"
 type contextKey string
 
 var (
-	studentIDKey   = contextKey("studentID")
-	quizIDKey      = contextKey("quizID")
-	questionPosKey = contextKey("questionPos")
+	studentIDKey     = contextKey("studentID")
+	quizIDKey        = contextKey("quizID")
+	questionPosKey   = contextKey("questionPos")
+	questionErrorKey = contextKey("questionErrorKey")
 )
 
 func studentIDFromRequest(r *http.Request) (int, bool) {
@@ -33,4 +34,11 @@ func quizIDFromRequest(r *http.Request) (int, bool) {
 		return 0, false
 	}
 	return r.Context().Value(quizIDKey).(int), true
+}
+
+func questionErrorFromRequest(r *http.Request) (string, bool) {
+	if r.Context().Value(questionErrorKey) == nil {
+		return "", false
+	}
+	return r.Context().Value(questionErrorKey).(string), true
 }

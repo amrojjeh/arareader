@@ -10,47 +10,55 @@ import (
 	. "github.com/maragudk/gomponents/html"
 )
 
-type QuestionParams struct {
+type QuestionPageParams struct {
+	QuestionParams
 	Title            string
 	Excerpt          g.Node
-	Prompt           string
-	InputMethod      g.Node
-	SidebarQuestions []SidebarQuestion
-	NextURL          string
-	PrevURL          string
-	SubmitURL        string
 	SummaryURL       string
-	Feedback         string
+	SidebarQuestions []SidebarQuestion
 }
 
-func QuestionPage(p QuestionParams) g.Node {
+type QuestionParams struct {
+	Prompt      string
+	InputMethod g.Node
+	NextURL     string
+	PrevURL     string
+	SubmitURL   string
+	Feedback    string
+	InputError  string
+}
+
+func QuestionPage(p QuestionPageParams) g.Node {
 	return base([]g.Node{Class("flex"), htmx.Boost("true"),
 		Sidebar(false, p.SidebarQuestions, p.SummaryURL),
 		Main(Class("h-svh flex flex-col"),
 			navbar(p.Title),
 			p.Excerpt,
-			Question(p.Prompt, p.InputMethod, p.Feedback, p.PrevURL, p.NextURL, p.SubmitURL),
+			Question(p.QuestionParams),
 		),
 	})
 }
 
-func Question(prompt string, input g.Node, feedback, prevURL, nextURL, submitURL string) g.Node {
+func Question(p QuestionParams) g.Node {
 	return Div(ID("target"), Class("flex flex-col flex-1"), htmx.Swap("show:none"), htmx.Target("#target"),
 		P(Class("pl-2 text-lg"),
-			g.Text(prompt),
+			g.Text(p.Prompt),
 		),
 		Div(Class("pl-2"),
-			input,
+			p.InputMethod,
+			P(Class("text-red-500"),
+				g.Text(p.InputError),
+			),
 		),
-		g.If(feedback != "",
+		g.If(p.Feedback != "",
 			Div(Class("bg-green-300 min-h-32 m-4 p-1 drop-shadow"),
 				Img(Class("w-6"), Src("/static/icons/message-solid.svg")),
 				P(Class("mt-2"),
-					g.Text(feedback),
+					g.Text(p.Feedback),
 				),
 			),
 		),
-		QuestionCtrl(false, prevURL, nextURL, submitURL),
+		QuestionCtrl(false, p.PrevURL, p.NextURL, p.SubmitURL),
 	)
 }
 

@@ -6,6 +6,7 @@ package model
 
 import (
 	"fmt"
+	"unicode/utf8"
 
 	"github.com/amrojjeh/arareader/arabic"
 )
@@ -42,8 +43,7 @@ func (qs QuestionStatus) IsSubmitted() bool {
 	return qs == CorrectQuestionStatus || qs == IncorrectQuestionStatus || qs == PendingQuestionStatus
 }
 
-// TODO(Amr Ojjeh): Add a character limit to short answer
-func ValidateQuestionInput(q Question, ans string) bool {
+func ValidateQuestionInput(q Question, ans string) (bool, string) {
 	switch q.Type {
 	case VowelQuestionType:
 		options, err := VowelQuestionOptions(q.Solution)
@@ -58,9 +58,17 @@ func ValidateQuestionInput(q Question, ans string) bool {
 				break
 			}
 		}
-		return validOption
+		if !validOption {
+			return false, "invalid option"
+		}
+		return true, ""
+	case ShortAnswerQuestionType:
+		if utf8.RuneCountInString(ans) > 40 {
+			return false, "answer is too long"
+		}
+		return true, ""
 	default:
-		return true
+		return true, ""
 	}
 }
 

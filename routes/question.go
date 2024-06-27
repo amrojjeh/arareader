@@ -5,6 +5,7 @@ Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
 package routes
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -47,7 +48,12 @@ func (rs rootResource) questionPost(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	if !model.ValidateQuestionInput(question, ans) {
+	if ok, errMsg := model.ValidateQuestionInput(question, ans); !ok {
+		r = r.WithContext(context.WithValue(r.Context(), questionErrorKey, errMsg))
+		if r.Header.Get("HX-Target") != "" {
+			rs.htmxSelect(w, r)
+			return
+		}
 		http.Redirect(w, r, questionURL(quiz.ID, question.Position, len(questions)), http.StatusSeeOther)
 		return
 	}
@@ -120,17 +126,20 @@ func (rs rootResource) questionGet(w http.ResponseWriter, r *http.Request) {
 		feedback = question.Feedback
 	}
 
-	page.QuestionPage(page.QuestionParams{
+	page.QuestionPage(page.QuestionPageParams{
+		QuestionParams: page.QuestionParams{
+			Prompt:      question.Prompt,
+			InputMethod: components.QuestionToInputMethod(question, questionSession),
+			NextURL:     questionURLHTMX(quiz.ID, question.Position+1, len(questions)),
+			PrevURL:     questionURLHTMX(quiz.ID, question.Position-1, len(questions)),
+			SubmitURL:   submitURL,
+			Feedback:    feedback,
+		},
+
 		Title:            quiz.Title,
 		Excerpt:          components.Excerpt(false, excerpt, question.Reference),
-		Prompt:           question.Prompt,
-		InputMethod:      components.QuestionToInputMethod(question, questionSession),
 		SidebarQuestions: sidebar(true, quiz.ID, questionSessions, questions, question.ID),
-		NextURL:          questionURLHTMX(quiz.ID, question.Position+1, len(questions)),
-		PrevURL:          questionURLHTMX(quiz.ID, question.Position-1, len(questions)),
-		SubmitURL:        submitURL,
 		SummaryURL:       summaryURL(quiz.ID),
-		Feedback:         feedback,
 	}).Render(w)
 }
 
@@ -161,14 +170,18 @@ func (rs rootResource) htmxSelect(w http.ResponseWriter, r *http.Request) {
 		feedback = question.Feedback
 	}
 
+	questionError, _ := questionErrorFromRequest(r)
+
 	w.Header().Add("HX-Push-Url", questionURL(quiz.ID, question.Position, len(questions)))
-	page.Question(question.Prompt,
-		components.QuestionToInputMethod(question, questionSession),
-		feedback,
-		questionURLHTMX(quiz.ID, question.Position-1, len(questions)),
-		questionURLHTMX(quiz.ID, question.Position+1, len(questions)),
-		questionURL(quiz.ID, question.Position, len(questions)),
-	).Render(w)
+	page.Question(page.QuestionParams{
+		Prompt:      question.Prompt,
+		InputMethod: components.QuestionToInputMethod(question, questionSession),
+		NextURL:     questionURLHTMX(quiz.ID, question.Position+1, len(questions)),
+		PrevURL:     questionURLHTMX(quiz.ID, question.Position-1, len(questions)),
+		SubmitURL:   questionURL(quiz.ID, question.Position, len(questions)),
+		Feedback:    feedback,
+		InputError:  questionError,
+	}).Render(w)
 	page.Sidebar(true, sidebar(true, quiz.ID, questionSessions, questions, question.ID), summaryURL(quiz.ID)).Render(w)
 	components.Excerpt(true, excerpt, question.Reference).Render(w)
 }
