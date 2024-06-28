@@ -18,7 +18,7 @@ func base(body []g.Node) g.Node {
 		Head: []g.Node{
 			css("/static/main.css"),
 			deferJS("/static/main.js"),
-			g.Raw("<script src='https://unpkg.com/htmx.org@2.0.0/dist/htmx.js' integrity='sha384-Xh+GLLi0SMFPwtHQjT72aPG19QvKB8grnyRbYBNIdHWc2NkCrz65jlU7YrzO6qRp' crossorigin='anonymous'></script>"),
+			Script(Src("/static/htmx.js")),
 			fonts(),
 		},
 		Body: body,
@@ -105,6 +105,7 @@ func permanentMarker() string {
 	return "family=Permanent+Marker&"
 }
 
+// TODO(Amr Ojjeh): Download fonts locally
 func fonts() g.Node {
 	fonts := fmt.Sprintf("https://fonts.googleapis.com/css2?%vdisplay=swap", notoNaskh()+roboto()+permanentMarker())
 	return g.Group([]g.Node{

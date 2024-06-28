@@ -1,5 +1,3 @@
--- Copyright © 2024 Amr Ojjeh <amrojjeh@outlook.com>
-
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS teacher (
