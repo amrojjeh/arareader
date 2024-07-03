@@ -11,6 +11,8 @@ An open-source curriculum for learning Arabic, with a focus on guided readings a
 - *Ultimate mode*: Answers are submitted at the very end after all questions have been attempted (should probably change the name)
 
 ## Re: Excerpts
+> **Needs to be updated**
+
 Excerpts will be stored in a plaintext format. Here's an example:
 
 ```

@@ -28,6 +28,11 @@ func (r ReferenceNotFoundError) Error() string {
 	return fmt.Sprintf("ReferenceNotFound: could not find reference (id: %d)", r.ID)
 }
 
+type ReferenceNode struct {
+	ID    int
+	Nodes []ExcerptNode
+}
+
 func ExcerptFromQuiz(quiz Quiz) (*ReferenceNode, error) {
 	return ExcerptFromXML(bytes.NewReader(quiz.Excerpt))
 }
@@ -195,11 +200,6 @@ func (e *ReferenceNode) AvailableID() int {
 		}
 	}
 	return highest + 1
-}
-
-type ReferenceNode struct {
-	ID    int
-	Nodes []ExcerptNode
 }
 
 func (r *ReferenceNode) tags() (xml.StartElement, xml.EndElement) {

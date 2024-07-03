@@ -1,0 +1,30 @@
+[
+  {
+    "id": "203afe5e-d482-47d8-b1ae-1c42e755ee0a",
+    "chapter": "Nouns and Adjectives",
+    "lessons": [
+      {
+        "title": "Introduction",
+        "path": "10_nouns/00_intro.md"
+      },
+      {
+        "id": "1fd86bb7-010d-4a13-93db-004ca0e9e27b",
+        "title": "Definite and Indefinite",
+        "path": "10_nouns/10_definiteness.md"
+      },
+      {
+        "id": "4353963f-616d-4e26-97d3-bb4af3aebb6b",
+        "title": "Sun and Moon Letters",
+        "path": "10_nouns/20_sun_moon.md"
+      },
+      {
+        "title": "Adjectives",
+        "path": "10_nouns/30_adjectives.md"
+      },
+      {
+        "title": "Equational Sentences",
+        "path": "10_nouns/40_equational_sentences.md"
+      }
+    ]
+  }
+]
